@@ -27,7 +27,7 @@ function Nav() {
           <a href="#funciones" className="mn-btn-ghost mn-nav-link" style={{ fontSize: 14, padding: "8px 14px" }}>Funciones</a>
           <a href="#precios" className="mn-btn-ghost mn-nav-link" style={{ fontSize: 14, padding: "8px 14px" }}>Precios</a>
           <Link href="/login" className="mn-btn-ghost mn-nav-link" style={{ fontSize: 14, padding: "8px 14px" }}>Iniciar sesión</Link>
-          <Link href="/registro" className="mn-btn-primary" style={{ padding: "8px 18px", fontSize: 14 }}>Empieza gratis</Link>
+          <Link href="/registro" className="mn-btn-primary" style={{ padding: "8px 18px", fontSize: 14 }}>Comenzar gratis</Link>
         </nav>
       </div>
     </header>
@@ -45,24 +45,24 @@ function Hero() {
       </div>
 
       <h1 className="font-display mn-animate mn-animate-d1" style={{ fontSize: "clamp(38px, 6vw, 70px)", fontWeight: 800, lineHeight: 1.06, letterSpacing: "-0.025em", color: "#1A1612", maxWidth: 900, margin: "0 auto 24px" }}>
-        La IA que recuerda todo lo que estudiaste
+        Tu entrenador académico con IA.
         <br />
-        <span style={{ color: "#1B3F2F" }}>y te dice exactamente qué estudiar después</span>
+        <span style={{ color: "#1B3F2F" }}>Estudia menos. Recuerda más.</span>
       </h1>
 
       <p className="mn-animate mn-animate-d2" style={{ fontSize: "clamp(17px, 2.2vw, 20px)", color: "#6B6259", maxWidth: 640, margin: "0 auto 44px", lineHeight: 1.6 }}>
-        Sube tus apuntes o PDFs. Mnemora los convierte automáticamente en flashcards, mapas mentales, quizzes y un plan de estudio personalizado.
+        Sube tu syllabus y tus apuntes. Mnemora organiza el semestre, crea flashcards, mapas mentales, quizzes y un plan personalizado para ayudarte a llegar preparado a cada examen.
       </p>
 
       <div className="mn-animate mn-animate-d3" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
         <Link href="/registro" className="mn-btn-primary" style={{ fontSize: 16, padding: "16px 32px" }}>
-          Empieza a estudiar de forma inteligente <ArrowRight size={16} />
+          Comenzar gratis durante 7 días <ArrowRight size={16} />
         </Link>
         <a href="#funciones" className="mn-btn-ghost" style={{ fontSize: 16 }}>Ver funciones</a>
       </div>
 
       <p className="mn-animate mn-animate-d4" style={{ marginTop: 16, color: "#9E9389", fontSize: 13 }}>
-        7 días gratis · cancela antes de que termine y no pagas nada
+        Se solicita tarjeta · cancela cuando quieras
       </p>
 
       <div className="mn-animate mn-animate-d4" style={{ marginTop: 72 }}>
@@ -97,6 +97,19 @@ function DashboardMockup() {
           </div>
         </div>
         <div style={{ padding: 20, background: "#F7F4EF", display: "flex", flexDirection: "column", gap: 14 }}>
+          {/* Mientras dormías */}
+          <div style={{ background: "#1B3F2F", borderRadius: 12, padding: "12px 16px" }}>
+            <p style={{ fontSize: 11, color: "#6EE7B7", fontWeight: 700, marginBottom: 8, letterSpacing: "0.04em" }}>Mientras dormías...</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+              {["Reorganicé tu plan de estudio", "Detecté 12 conceptos débiles", "Preparé tu sesión de hoy"].map(t => (
+                <div key={t} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                  <Check size={11} color="#6EE7B7" />
+                  <span style={{ fontSize: 12, color: "#D1FAE5" }}>{t}</span>
+                </div>
+              ))}
+            </div>
+            <p style={{ fontSize: 11, color: "#86EFAC", marginTop: 8, fontWeight: 700 }}>Solo necesitas 23 minutos hoy.</p>
+          </div>
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <div>
               <p style={{ fontSize: 18, fontWeight: 800, color: "#1A1612" }}>Buenos días 👋</p>
@@ -179,19 +192,30 @@ function WhyDifferent() {
             No es otro chatbot genérico. Es un sistema diseñado para que aprendas más con menos esfuerzo.
           </p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(300px, 1fr))", gap: 20 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
           {[
-            { icon: "🧠", title: "La IA recuerda todo lo que estudiaste", desc: "Cada conversación continúa donde la dejaste. El tutor sabe qué temas viste, cuáles te costaron y qué hay en tu próximo parcial — sin que tengas que explicarle nada cada vez.", bg: "#E8F1EC" },
-            { icon: "🎯", title: "Estudias solo lo que necesitas", desc: "El sistema detecta tus puntos débiles automáticamente. En lugar de repasar todo, Mnemora te dice exactamente qué conceptos necesitas reforzar antes del examen.", bg: "#EDE9FE" },
-            { icon: "📈", title: "Tu aprendizaje mejora cada día", desc: "Con repetición espaciada, perfil cognitivo y predicción de rendimiento, el sistema se adapta a cómo aprendes — no a cómo aprende el promedio.", bg: "#FEF3C7" },
+            { before: "No sabes qué estudiar.", after: "Mnemora ya organizó todo.", iconB: "📚", iconA: "🧠" },
+            { before: "Repasas horas sin saber si sirve.", after: "Solo repasas lo importante.", iconB: "😓", iconA: "🎯" },
+            { before: "Olvidas antes del examen.", after: "La IA decide cuándo volver a mostrarte cada tema.", iconB: "😰", iconA: "📈" },
           ].map(c => (
-            <div key={c.title} className="mn-card" style={{ padding: 32 }}>
-              <div style={{ fontSize: 40, marginBottom: 16 }}>{c.icon}</div>
-              <h3 className="font-display" style={{ fontSize: 20, fontWeight: 800, color: "#1A1612", marginBottom: 12, lineHeight: 1.25 }}>{c.title}</h3>
-              <p style={{ fontSize: 15, color: "#6B6259", lineHeight: 1.7 }}>{c.desc}</p>
+            <div key={c.before} className="mn-card" style={{ padding: 28 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, padding: "12px 14px", borderRadius: 10, background: "#FEF2F2", border: "1px solid rgba(239,68,68,0.1)" }}>
+                <span style={{ fontSize: 22 }}>{c.iconB}</span>
+                <p style={{ fontSize: 14, color: "#6B6259", lineHeight: 1.4 }}><strong style={{ color: "#EF4444", fontWeight: 700 }}>Antes:</strong> {c.before}</p>
+              </div>
+              <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
+                <span style={{ fontSize: 18, color: "#9E9389" }}>↓</span>
+              </div>
+              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 10, background: "#F0FDF4", border: "1px solid rgba(27,63,47,0.12)" }}>
+                <span style={{ fontSize: 22 }}>{c.iconA}</span>
+                <p style={{ fontSize: 14, color: "#3D352E", lineHeight: 1.4 }}><strong style={{ color: "#1B3F2F", fontWeight: 700 }}>Después:</strong> {c.after}</p>
+              </div>
             </div>
           ))}
         </div>
+        <p style={{ textAlign: "center", fontSize: 16, color: "#6B6259", maxWidth: 620, margin: "40px auto 0", lineHeight: 1.7, fontStyle: "italic" }}>
+          "La mayoría de las apps esperan que tú organices tu estudio. Mnemora hace ese trabajo por ti."
+        </p>
       </div>
     </section>
   );
@@ -458,14 +482,15 @@ function FlowDiagram() {
 ───────────────────────────────────────────── */
 function Comparison() {
   const rows = [
-    { feature: "Recuerda tu progreso entre sesiones",  mnemora: true,  chatgpt: false, quizlet: false },
-    { feature: "Tutor IA en español universitario",    mnemora: true,  chatgpt: true,  quizlet: false },
-    { feature: "Flashcards automáticas desde PDF",     mnemora: true,  chatgpt: false, quizlet: true  },
-    { feature: "Roadmap personalizado por materia",    mnemora: true,  chatgpt: false, quizlet: false },
-    { feature: "Perfil cognitivo y puntos débiles",    mnemora: true,  chatgpt: false, quizlet: false },
-    { feature: "Mapa mental automático",               mnemora: true,  chatgpt: false, quizlet: false },
-    { feature: "Predicción de rendimiento",            mnemora: true,  chatgpt: false, quizlet: false },
-    { feature: "Modo examen intensivo",                mnemora: true,  chatgpt: false, quizlet: false },
+    { feature: "Trabaja mientras no estudias",         mnemora: true,  chatgpt: false, quizlet: false, highlight: true },
+    { feature: "Recuerda tu progreso entre sesiones",  mnemora: true,  chatgpt: false, quizlet: false, highlight: false },
+    { feature: "Tutor IA en español universitario",    mnemora: true,  chatgpt: true,  quizlet: false, highlight: false },
+    { feature: "Flashcards automáticas desde PDF",     mnemora: true,  chatgpt: false, quizlet: true,  highlight: false },
+    { feature: "Roadmap personalizado por materia",    mnemora: true,  chatgpt: false, quizlet: false, highlight: false },
+    { feature: "Perfil cognitivo y puntos débiles",    mnemora: true,  chatgpt: false, quizlet: false, highlight: false },
+    { feature: "Mapa mental automático",               mnemora: true,  chatgpt: false, quizlet: false, highlight: false },
+    { feature: "Predicción de rendimiento",            mnemora: true,  chatgpt: false, quizlet: false, highlight: false },
+    { feature: "Modo examen intensivo",                mnemora: true,  chatgpt: false, quizlet: false, highlight: false },
   ];
 
   return (
@@ -486,8 +511,8 @@ function Comparison() {
             ))}
           </div>
           {rows.map((row, i) => (
-            <div key={row.feature} style={{ display: "grid", gridTemplateColumns: "1fr 120px 120px 120px", padding: "14px 24px", borderBottom: i < rows.length - 1 ? "0.5px solid rgba(26,22,18,0.06)" : "none", background: i % 2 === 0 ? "#FFFFFF" : "#FAFAF8" }}>
-              <span style={{ fontSize: 14, color: "#3D352E", paddingRight: 16 }}>{row.feature}</span>
+            <div key={row.feature} style={{ display: "grid", gridTemplateColumns: "1fr 120px 120px 120px", padding: "14px 24px", borderBottom: i < rows.length - 1 ? "0.5px solid rgba(26,22,18,0.06)" : "none", background: row.highlight ? "#F0FDF4" : i % 2 === 0 ? "#FFFFFF" : "#FAFAF8" }}>
+              <span style={{ fontSize: 14, color: row.highlight ? "#1B3F2F" : "#3D352E", paddingRight: 16, fontWeight: row.highlight ? 700 : 400 }}>{row.feature}</span>
               {[row.mnemora, row.chatgpt, row.quizlet].map((has, ci) => (
                 <div key={ci} style={{ textAlign: "center" }}><span style={{ fontSize: 18 }}>{has ? "✅" : "❌"}</span></div>
               ))}
@@ -526,9 +551,9 @@ function Pricing() {
 
         <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, maxWidth: 980, margin: "0 auto" }}>
 
-          {/* FREE */}
+          {/* STARTER */}
           <div className="mn-card" style={{ padding: 32 }}>
-            <h3 className="font-display" style={{ fontSize: 20, fontWeight: 800, color: "#1A1612", marginBottom: 4 }}>Gratis</h3>
+            <h3 className="font-display" style={{ fontSize: 20, fontWeight: 800, color: "#1A1612", marginBottom: 4 }}>Starter</h3>
             <p style={{ fontSize: 13, color: "#6B6259", marginBottom: 24 }}>Para explorar Mnemora</p>
             <div style={{ marginBottom: 28 }}>
               <span className="font-display" style={{ fontSize: 44, fontWeight: 800, color: "#1A1612" }}>$0</span>
@@ -617,10 +642,11 @@ function Pricing() {
                 { label: "Coach académico IA", star: true },
                 { label: "Tutor ilimitado", star: true },
                 { label: "Modo examen intensivo", star: false },
-                { label: "Predicción de rendimiento", star: true },
+                { label: "Predicción de nota", star: true },
+                { label: "Estrategias personalizadas", star: true },
+                { label: "Cobertura inteligente del examen", star: true },
                 { label: "Perfil cognitivo avanzado", star: true },
-                { label: "Replanificador inteligente", star: true },
-                { label: "Análisis de fotos de apuntes", star: false },
+                { label: "Replanificador inteligente", star: false },
               ].map(({ label, star }) => (
                 <div key={label} style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <Check size={15} color={star ? "#F59E0B" : "#FDE68A"} />
@@ -743,12 +769,14 @@ function Proof() {
    FAQ
 ───────────────────────────────────────────── */
 const faqs = [
-  { q: "¿Necesito tarjeta de crédito para la prueba?", a: "Sí, se solicitará una tarjeta al iniciar la prueba de 7 días. Si cancelas antes de que termine el período de prueba, no se realizará ningún cobro." },
+  { q: "¿Necesito saber usar IA?", a: "No. Solo sube tus documentos y Mnemora hace el resto. No hay comandos, no hay prompts, no hay configuración." },
+  { q: "¿Puedo cancelar cuando quiera?", a: "Sí. La suscripción se puede cancelar en cualquier momento desde tu cuenta, sin formularios ni llamadas." },
+  { q: "¿Necesito tarjeta para empezar?", a: "Sí. La prueba dura 7 días y puedes cancelar antes de que termine para no pagar nada. Se solicita la tarjeta al iniciar." },
+  { q: "¿Mis documentos son privados?", a: "Sí. Solo tú puedes acceder a ellos. No usamos tu contenido para entrenar modelos de IA." },
   { q: "¿En qué idioma funciona el tutor?", a: "100% en español. Entiende vocabulario académico latinoamericano, nombres de materias en español y el formato de las universidades de la región." },
   { q: "¿Qué formatos de documentos acepta?", a: "PDF (el más común para programas de materia y apuntes), texto copiado directamente, e imágenes de apuntes. No requiere formato especial." },
   { q: "¿Cómo funciona la memoria del tutor?", a: "Mnemora guarda un resumen semántico de cada sesión de estudio por materia. Cuando vuelves, el tutor sabe qué temas viste, cuáles te costaron más y qué hay próximo en tu calendario." },
-  { q: "¿Mis documentos son privados?", a: "Sí. Tus archivos y conversaciones son privados y solo tú puedes verlos. No usamos tu contenido para entrenar modelos de IA." },
-  { q: "¿Cuál es la diferencia entre Pro y Premium?", a: "Pro incluye todo lo que necesitas para estudiar: tutor con memoria, flashcards, mapas mentales, quiz y planificador. Premium agrega el modo examen intensivo, análisis de fotos de apuntes, perfil cognitivo avanzado, predicción de rendimiento y el AI Coach personalizado." },
+  { q: "¿Cuál es la diferencia entre Pro y Premium?", a: "Pro incluye todo lo que necesitas para estudiar: tutor con memoria, flashcards, mapas mentales, quiz y planificador. Premium agrega predicción de nota, perfil cognitivo avanzado, modo examen intensivo, cobertura inteligente del examen y el AI Coach personalizado." },
   { q: "¿Cómo funciona el programa de Recompensas?", a: "Cada amigo que invites y active un plan te suma tiempo gratis en Mnemora: 1 referido = 1 semana, 3 = 1 mes, 5 = 2 meses, 10 = 6 meses, 25 = 12 meses + Insignia Embajador." },
 ];
 
@@ -814,7 +842,10 @@ function Footer() {
           </div>
           <span className="font-display" style={{ fontWeight: 800, fontSize: 16, color: "#FFFFFF" }}>Mnemora</span>
         </div>
-        <p style={{ fontSize: 13, color: "#6B6259" }}>© 2026 Mnemora · Hecho para estudiantes de Latinoamérica</p>
+        <div style={{ textAlign: "center" }}>
+          <p style={{ fontSize: 13, color: "#6B6259" }}>© 2026 Mnemora · Hecho para estudiantes de Latinoamérica</p>
+          <p style={{ fontSize: 12, color: "#4B5563", marginTop: 4, fontStyle: "italic" }}>Creado para estudiantes que quieren estudiar mejor, no más.</p>
+        </div>
         <div style={{ display: "flex", gap: 20 }}>
           {[{ label: "Términos", href: "/terminos" }, { label: "Privacidad", href: "/privacidad" }, { label: "Contacto", href: "/contacto" }, { label: "Recompensas", href: "/#recompensas" }].map(({ label, href }) => (
             <Link key={label} href={href} style={{ fontSize: 13, color: "#6B6259", textDecoration: "none" }}>{label}</Link>
