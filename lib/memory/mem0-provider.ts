@@ -5,8 +5,12 @@ export class Mem0Provider implements IMemoryProvider {
   private client: MemoryClient | null = null;
 
   constructor() {
-    if (process.env.MEM0_API_KEY) {
-      this.client = new MemoryClient({ apiKey: process.env.MEM0_API_KEY });
+    try {
+      if (process.env.MEM0_API_KEY) {
+        this.client = new MemoryClient({ apiKey: process.env.MEM0_API_KEY });
+      }
+    } catch {
+      this.client = null;
     }
   }
 
