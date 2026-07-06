@@ -38,6 +38,12 @@ function LoginInner() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
+
+    if (!SUPABASE_CONFIGURED) {
+      setError("La app aún no está conectada. Configura las variables de entorno en Vercel (NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY).");
+      return;
+    }
+
     setLoading(true);
 
     const db = createClient();
