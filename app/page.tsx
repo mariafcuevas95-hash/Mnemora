@@ -352,7 +352,7 @@ function MindMapShowcase() {
   return (
     <section style={{ padding: "80px 0 0", background: "#1B3F2F" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
-        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 32 }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 20 }}>
           <div>
             <span className="mn-badge" style={{ background: "rgba(255,255,255,0.12)", color: "#D1FAE5", marginBottom: 12, display: "inline-flex" }}><GitBranch size={12} /> Mapa mental</span>
             <h2 className="font-display" style={{ fontSize: "clamp(24px, 3.5vw, 38px)", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.15 }}>
@@ -364,7 +364,7 @@ function MindMapShowcase() {
           </p>
         </div>
       </div>
-      <div style={{ background: "rgba(255,255,255,0.03)", borderTop: "0.5px solid rgba(255,255,255,0.08)", padding: "40px 0 0" }}>
+      <div style={{ background: "rgba(255,255,255,0.03)", borderTop: "0.5px solid rgba(255,255,255,0.08)" }}>
           <svg viewBox="0 0 800 340" width="100%" style={{ display: "block" }} xmlns="http://www.w3.org/2000/svg">
             <rect x="330" y="135" width="140" height="44" rx="22" fill="#6EE7B7" />
             <text x="400" y="162" textAnchor="middle" fontSize="13" fontWeight="700" fill="#1B3F2F">Epistemología</text>
@@ -745,7 +745,7 @@ function Proof() {
   return (
     <section style={{ padding: "80px 24px", background: "#F7F4EF" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, alignItems: "stretch" }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, alignItems: "stretch" }}>
           <div className="mn-card" style={{ padding: 32, background: "#1B3F2F" }}>
             <Shield size={32} color="#86EFAC" style={{ marginBottom: 16 }} />
             <h3 className="font-display" style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 12 }}>Garantía de 30 días</h3>
