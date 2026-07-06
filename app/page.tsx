@@ -192,28 +192,42 @@ function WhyDifferent() {
             No es otro chatbot genérico. Es un sistema diseñado para que aprendas más con menos esfuerzo.
           </p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
-          {[
-            { before: "No sabes qué estudiar.", after: "Mnemora ya organizó todo.", iconB: "📚", iconA: "🧠" },
-            { before: "Repasas horas sin saber si sirve.", after: "Solo repasas lo importante.", iconB: "😓", iconA: "🎯" },
-            { before: "Olvidas antes del examen.", after: "La IA decide cuándo volver a mostrarte cada tema.", iconB: "😰", iconA: "📈" },
-          ].map(c => (
-            <div key={c.before} className="mn-card" style={{ padding: 28 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 16, padding: "12px 14px", borderRadius: 10, background: "#FEF2F2", border: "1px solid rgba(239,68,68,0.1)" }}>
-                <span style={{ fontSize: 22 }}>{c.iconB}</span>
-                <p style={{ fontSize: 14, color: "#6B6259", lineHeight: 1.4 }}><strong style={{ color: "#EF4444", fontWeight: 700 }}>Antes:</strong> {c.before}</p>
+        {/* Comparación horizontal Antes → Después */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 40px 1fr", gap: 0, alignItems: "stretch", maxWidth: 820, margin: "0 auto" }}>
+          {/* Columna Antes */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ padding: "8px 14px", fontSize: 12, fontWeight: 700, color: "#EF4444", textTransform: "uppercase", letterSpacing: "0.08em" }}>Antes</div>
+            {[
+              { icon: "📚", text: "No sabes qué estudiar." },
+              { icon: "😓", text: "Repasas horas sin saber si sirve." },
+              { icon: "😰", text: "Olvidas antes del examen." },
+            ].map(r => (
+              <div key={r.text} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "#FEF2F2", border: "1px solid rgba(239,68,68,0.1)", borderRadius: 12, flex: 1 }}>
+                <span style={{ fontSize: 20, flexShrink: 0 }}>{r.icon}</span>
+                <span style={{ fontSize: 14, color: "#6B6259", lineHeight: 1.4 }}>{r.text}</span>
               </div>
-              <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}>
-                <span style={{ fontSize: 18, color: "#9E9389" }}>↓</span>
+            ))}
+          </div>
+          {/* Flecha central */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, paddingTop: 36 }}>
+            {[0, 1, 2].map(i => <span key={i} style={{ fontSize: 16, color: "#C4BAAE" }}>→</span>)}
+          </div>
+          {/* Columna Después */}
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            <div style={{ padding: "8px 14px", fontSize: 12, fontWeight: 700, color: "#1B3F2F", textTransform: "uppercase", letterSpacing: "0.08em" }}>Después</div>
+            {[
+              { icon: "🧠", text: "Mnemora ya organizó todo." },
+              { icon: "🎯", text: "Solo repasas lo importante." },
+              { icon: "📈", text: "La IA decide cuándo mostrarte cada tema." },
+            ].map(r => (
+              <div key={r.text} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "#F0FDF4", border: "1px solid rgba(27,63,47,0.12)", borderRadius: 12, flex: 1 }}>
+                <span style={{ fontSize: 20, flexShrink: 0 }}>{r.icon}</span>
+                <span style={{ fontSize: 14, color: "#3D352E", lineHeight: 1.4, fontWeight: 500 }}>{r.text}</span>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 12, padding: "12px 14px", borderRadius: 10, background: "#F0FDF4", border: "1px solid rgba(27,63,47,0.12)" }}>
-                <span style={{ fontSize: 22 }}>{c.iconA}</span>
-                <p style={{ fontSize: 14, color: "#3D352E", lineHeight: 1.4 }}><strong style={{ color: "#1B3F2F", fontWeight: 700 }}>Después:</strong> {c.after}</p>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
-        <p style={{ textAlign: "center", fontSize: 16, color: "#6B6259", maxWidth: 620, margin: "40px auto 0", lineHeight: 1.7, fontStyle: "italic" }}>
+        <p style={{ textAlign: "center", fontSize: 15, color: "#6B6259", maxWidth: 560, margin: "32px auto 0", lineHeight: 1.7, fontStyle: "italic" }}>
           "La mayoría de las apps esperan que tú organices tu estudio. Mnemora hace ese trabajo por ti."
         </p>
       </div>
@@ -336,19 +350,22 @@ function FlashcardShowcase() {
 ───────────────────────────────────────────── */
 function MindMapShowcase() {
   return (
-    <section style={{ padding: "96px 24px", background: "#1B3F2F" }}>
-      <div style={{ maxWidth: 1120, margin: "0 auto" }}>
-        <div style={{ textAlign: "center", marginBottom: 48 }}>
-          <span className="mn-badge" style={{ background: "rgba(255,255,255,0.12)", color: "#D1FAE5", marginBottom: 20, display: "inline-flex" }}><GitBranch size={12} /> Mapa mental</span>
-          <h2 className="font-display" style={{ fontSize: "clamp(26px, 4vw, 42px)", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.15, marginBottom: 16 }}>
-            Visualiza cómo se conectan todos<br />los conceptos de tu materia
-          </h2>
-          <p style={{ color: "#A3C4AC", fontSize: 16, maxWidth: 520, margin: "0 auto" }}>
-            Mnemora construye el mapa automáticamente desde tus documentos — con nodos coloreados por nivel de dominio.
+    <section style={{ padding: "80px 0 0", background: "#1B3F2F" }}>
+      <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px" }}>
+        <div style={{ display: "flex", alignItems: "baseline", justifyContent: "space-between", flexWrap: "wrap", gap: 16, marginBottom: 32 }}>
+          <div>
+            <span className="mn-badge" style={{ background: "rgba(255,255,255,0.12)", color: "#D1FAE5", marginBottom: 12, display: "inline-flex" }}><GitBranch size={12} /> Mapa mental</span>
+            <h2 className="font-display" style={{ fontSize: "clamp(24px, 3.5vw, 38px)", fontWeight: 800, color: "#fff", letterSpacing: "-0.02em", lineHeight: 1.15 }}>
+              Visualiza cómo se conectan<br />todos los conceptos
+            </h2>
+          </div>
+          <p style={{ color: "#A3C4AC", fontSize: 15, maxWidth: 320, lineHeight: 1.6 }}>
+            Generado automáticamente desde tus documentos. Nodos coloreados por nivel de dominio.
           </p>
         </div>
-        <div style={{ background: "rgba(255,255,255,0.04)", borderRadius: 20, padding: 32, border: "0.5px solid rgba(255,255,255,0.1)" }}>
-          <svg viewBox="0 0 800 340" width="100%" style={{ maxHeight: 340 }} xmlns="http://www.w3.org/2000/svg">
+      </div>
+      <div style={{ background: "rgba(255,255,255,0.03)", borderTop: "0.5px solid rgba(255,255,255,0.08)", padding: "40px 0 0" }}>
+          <svg viewBox="0 0 800 340" width="100%" style={{ display: "block" }} xmlns="http://www.w3.org/2000/svg">
             <rect x="330" y="135" width="140" height="44" rx="22" fill="#6EE7B7" />
             <text x="400" y="162" textAnchor="middle" fontSize="13" fontWeight="700" fill="#1B3F2F">Epistemología</text>
             <line x1="330" y1="157" x2="230" y2="90" stroke="#6EE7B7" strokeWidth="1.5" strokeOpacity="0.5" />
@@ -389,7 +406,6 @@ function MindMapShowcase() {
             <text x="502" y="315" fontSize="10" fill="#A3C4AC">Sin comenzar</text>
           </svg>
         </div>
-      </div>
     </section>
   );
 }
@@ -414,7 +430,7 @@ function StudentJourney() {
           </h2>
           <p style={{ color: "#6B6259", fontSize: 17 }}>El recorrido completo desde que subes el primer apunte hasta que apruebas el final.</p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, alignItems: "stretch" }}>
           {phases.map((phase, pi) => (
             <div key={phase.title} style={{ background: "var(--mn-surface)", borderRadius: 20, padding: 24, border: "1.5px solid var(--mn-ink-4)", position: "relative" }}>
               {pi < phases.length - 1 && (
@@ -729,7 +745,7 @@ function Proof() {
   return (
     <section style={{ padding: "80px 24px", background: "#F7F4EF" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16 }}>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 16, alignItems: "stretch" }}>
           <div className="mn-card" style={{ padding: 32, background: "#1B3F2F" }}>
             <Shield size={32} color="#86EFAC" style={{ marginBottom: 16 }} />
             <h3 className="font-display" style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 12 }}>Garantía de 30 días</h3>
