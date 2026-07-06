@@ -1,6 +1,8 @@
 import { Resend } from "resend";
 
-const resend = new Resend(process.env.RESEND_API_KEY!);
+function getResend() {
+  return new Resend(process.env.RESEND_API_KEY ?? "placeholder");
+}
 const FROM = process.env.RESEND_FROM_EMAIL ?? "hola@mnemora.app";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://mnemora.app";
 
@@ -36,7 +38,7 @@ export async function sendDailyDigest(data: DailyDigestData) {
     .map(s => `<li style="margin:4px 0;color:#4B5563;font-size:13px;">${s.name} — <strong>${s.dueCount} flashcard${s.dueCount !== 1 ? "s" : ""}</strong></li>`)
     .join("");
 
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to: email,
     subject: dueCount > 0
@@ -100,7 +102,7 @@ export async function sendDailyDigest(data: DailyDigestData) {
 }
 
 export async function sendWelcomeEmail(to: string, name: string) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: "Bienvenido a Mnemora 🎓",
@@ -124,7 +126,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
 }
 
 export async function sendProActivatedEmail(to: string, name: string) {
-  await resend.emails.send({
+  await getResend().emails.send({
     from: FROM,
     to,
     subject: "Tu Plan Pro está activo — Mnemora",
