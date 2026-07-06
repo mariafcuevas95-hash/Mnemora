@@ -2,13 +2,16 @@ import MemoryClient from "mem0ai";
 import type { IMemoryProvider, MemoryMessage } from "./types";
 
 export class Mem0Provider implements IMemoryProvider {
-  private client: MemoryClient;
+  private client: MemoryClient | null = null;
 
   constructor() {
-    this.client = new MemoryClient({ apiKey: process.env.MEM0_API_KEY! });
+    if (process.env.MEM0_API_KEY) {
+      this.client = new MemoryClient({ apiKey: process.env.MEM0_API_KEY });
+    }
   }
 
   async get(userId: string, subjectId: string): Promise<string> {
+    if (!this.client) return "";
     const agentId = `user_${userId}_subject_${subjectId}`;
     try {
       const result = await this.client.search("contexto académico del estudiante", {
@@ -25,6 +28,7 @@ export class Mem0Provider implements IMemoryProvider {
   }
 
   async add(userId: string, subjectId: string, messages: MemoryMessage[]): Promise<void> {
+    if (!this.client) return;
     const agentId = `user_${userId}_subject_${subjectId}`;
     try {
       await this.client.add(messages, { agent_id: agentId });
