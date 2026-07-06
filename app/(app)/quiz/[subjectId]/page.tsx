@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback , Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import {
@@ -12,7 +12,7 @@ import type { QuizAnswer } from "@/app/api/quiz/[subjectId]/submit/route";
 
 type Phase = "loading" | "error" | "question" | "feedback" | "result";
 
-export default function QuizPage() {
+function QuizPageInner() {
   const { subjectId } = useParams<{ subjectId: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -403,4 +403,8 @@ export default function QuizPage() {
       </p>
     </div>
   );
+}
+
+export default function QuizPage() {
+  return <Suspense><QuizPageInner /></Suspense>;
 }

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect, useCallback } from "react";
+import { useState, useRef, useEffect, useCallback , Suspense } from "react";
 import { useParams, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Send, ChevronLeft, Sparkles, Calendar, BookOpen, X, ArrowUp } from "lucide-react";
@@ -133,7 +133,7 @@ function TutorContextCard({
   );
 }
 
-export default function TutorPage() {
+function TutorPageInner() {
   const { id } = useParams<{ id: string }>();
   const searchParams = useSearchParams();
   const conceptParam = searchParams.get("concept");
@@ -453,4 +453,8 @@ export default function TutorPage() {
       `}</style>
     </div>
   );
+}
+
+export default function TutorPage() {
+  return <Suspense><TutorPageInner /></Suspense>;
 }

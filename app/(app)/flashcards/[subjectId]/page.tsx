@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback , Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { ChevronLeft, Layers, RotateCcw, ArrowRight } from "lucide-react";
@@ -16,7 +16,7 @@ const RATINGS: Rating[] = [
   { label: "Perfecto",  quality: 5, color: "var(--mn-green)" },
 ];
 
-export default function FlashcardsReviewPage() {
+function FlashcardsReviewPageInner() {
   const { subjectId } = useParams<{ subjectId: string }>();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -402,4 +402,8 @@ export default function FlashcardsReviewPage() {
       </div>
     </div>
   );
+}
+
+export default function FlashcardsReviewPage() {
+  return <Suspense><FlashcardsReviewPageInner /></Suspense>;
 }

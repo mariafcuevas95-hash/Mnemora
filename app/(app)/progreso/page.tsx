@@ -646,10 +646,7 @@ function PerformancePredictionCard({ subjectId }: { subjectId: string }) {
   );
 }
 
+
 export default function ProgresoPage() {
-  return (
-    <Suspense>
-      <ProgresoPageInner />
-    </Suspense>
-  );
+  return <Suspense><ProgresoPageInner /></Suspense>;
 }

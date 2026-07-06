@@ -1,9 +1,8 @@
 "use client";
 
-import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useState } from "react";
+import { useState , Suspense } from "react";
 import { BookOpen, Check, Shield, Zap, Lock, Star } from "lucide-react";
 
 type PaywallReason = "materia" | "memoria" | "limite" | "syllabus" | "general";
@@ -259,10 +258,14 @@ function PlanCard({ name, icon, bgColor, accentColor, subtleColor, tagline, pric
   );
 }
 
-export default function UpgradePage() {
+function UpgradePageInner() {
   return (
     <Suspense>
       <UpgradeContent />
     </Suspense>
   );
+}
+
+export default function UpgradePage() {
+  return <Suspense><UpgradePageInner /></Suspense>;
 }

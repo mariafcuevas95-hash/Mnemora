@@ -1,10 +1,11 @@
 "use client";
+import { Suspense } from "react";
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { BookOpen, Mail } from "lucide-react";
 
-export default function ConfirmarPage() {
+function ConfirmarPageInner() {
   const email = useSearchParams().get("email") ?? "tu email";
 
   return (
@@ -34,4 +35,8 @@ export default function ConfirmarPage() {
       </div>
     </div>
   );
+}
+
+export default function ConfirmarPage() {
+  return <Suspense><ConfirmarPageInner /></Suspense>;
 }

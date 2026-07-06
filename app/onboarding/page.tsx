@@ -496,7 +496,7 @@ function StepSyllabus({ data, update, onNext }: { data: OnboardingData; update: 
   );
 }
 
-export default function OnboardingPage() {
+function OnboardingPageInner() {
   return (
     <Suspense>
       <OnboardingInner />
@@ -559,4 +559,8 @@ function StepListo({ data }: { data: OnboardingData }) {
       </div>
     </div>
   );
+}
+
+export default function OnboardingPage() {
+  return <Suspense><OnboardingPageInner /></Suspense>;
 }
