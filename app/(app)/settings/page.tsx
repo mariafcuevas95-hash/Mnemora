@@ -55,25 +55,27 @@ export default function SettingsPage() {
 
   useEffect(() => {
     const db = createClient();
-    db.auth.getUser().then(({ data: { user } }) => {
-      if (!user) { router.replace("/login"); return; }
-      db.from("profiles")
-        .select("id, name, plan, trial_ends_at, notifications_email")
-        .eq("id", user.id).single()
-        .then(({ data, error }) => {
-          if (error && !data) { setFetchError(true); setLoading(false); return; }
-          const p: Profile = {
-            id:                  user.id,
-            name:                data?.name ?? "",
-            email:               user.email ?? "",
-            plan:                data?.plan ?? "free",
-            trial_ends_at:       data?.trial_ends_at ?? null,
-            notifications_email: data?.notifications_email ?? false,
-          };
-          setProfile(p); setName(p.name); setLoading(false);
-        })
-        .catch(() => { setFetchError(true); setLoading(false); });
-    }).catch(() => { setFetchError(true); setLoading(false); });
+    (async () => {
+      try {
+        const { data: { user } } = await db.auth.getUser();
+        if (!user) { router.replace("/login"); return; }
+        const { data, error } = await db.from("profiles")
+          .select("id, name, plan, trial_ends_at, notifications_email")
+          .eq("id", user.id).single();
+        if (error && !data) { setFetchError(true); setLoading(false); return; }
+        const p: Profile = {
+          id:                  user.id,
+          name:                data?.name ?? "",
+          email:               user.email ?? "",
+          plan:                data?.plan ?? "free",
+          trial_ends_at:       data?.trial_ends_at ?? null,
+          notifications_email: data?.notifications_email ?? false,
+        };
+        setProfile(p); setName(p.name); setLoading(false);
+      } catch {
+        setFetchError(true); setLoading(false);
+      }
+    })();
   }, [router]);
 
   async function saveName() {
