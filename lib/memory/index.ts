@@ -1,8 +1,21 @@
 import type { IMemoryProvider } from "./types";
-import { Mem0Provider } from "./mem0-provider";
 
-// To replace Mem0 with an internal solution, swap this single line.
-// The rest of the codebase is unaffected.
-export const memoryProvider: IMemoryProvider = new Mem0Provider();
+let _provider: IMemoryProvider | null = null;
+
+// Lazy singleton — instantiated on first use so module import doesn't crash
+// during build when MEM0_API_KEY is not available in the build environment.
+export function getMemoryProvider(): IMemoryProvider {
+  if (!_provider) {
+    const { Mem0Provider } = require("./mem0-provider");
+    _provider = new Mem0Provider() as IMemoryProvider;
+  }
+  return _provider as IMemoryProvider;
+}
+
+// Backwards-compat alias used by existing callers.
+export const memoryProvider = {
+  get:(...args: Parameters<IMemoryProvider["get"]>) => getMemoryProvider().get(...args),
+  add:(...args: Parameters<IMemoryProvider["add"]>) => getMemoryProvider().add(...args),
+};
 
 export type { IMemoryProvider, MemoryMessage } from "./types";
