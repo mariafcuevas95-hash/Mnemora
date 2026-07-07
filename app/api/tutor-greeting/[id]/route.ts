@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { checkLimit } from "@/lib/plan-limits";
 import Anthropic from "@anthropic-ai/sdk";
 
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -13,6 +14,9 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const limit = await checkLimit(user.id, "tutor_messages");
+  if (!limit.allowed) return NextResponse.json({ error: "Límite alcanzado" }, { status: 429 });
 
   // Collect context in parallel
   const [subjectRes, weakRes, examRes, sessionRes, lastMsgRes] = await Promise.all([

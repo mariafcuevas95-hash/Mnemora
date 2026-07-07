@@ -33,9 +33,9 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
 
-  const limit = await checkLimit(user.id, "ai_requests");
-  if (!limit.allowed) return limitExceededResponse("ai_requests");
-  await incrementUsage(user.id, "ai_requests");
+  const limit = await checkLimit(user.id, "summaries");
+  if (!limit.allowed) return limitExceededResponse(limit);
+  await incrementUsage(user.id, "summaries_count");
 
   const body = await req.json();
   const parsed = BodySchema.safeParse(body);
