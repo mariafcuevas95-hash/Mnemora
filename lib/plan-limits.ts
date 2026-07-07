@@ -75,11 +75,20 @@ const PREMIUM_BOOLEAN_FEATURES = new Set<Feature>([
 ]);
 
 export async function checkLimit(userId: string, feature: Feature): Promise<LimitCheck> {
-  const [planRow, usage, subjectCount] = await Promise.all([
-    getUserPlanRow(userId),
-    getMonthlyUsage(userId),
-    feature === "subjects" ? countSubjects(userId) : Promise.resolve(0),
-  ]);
+  let planRow: UserPlanRow;
+  let usage: Awaited<ReturnType<typeof getMonthlyUsage>>;
+  let subjectCount: number;
+
+  try {
+    [planRow, usage, subjectCount] = await Promise.all([
+      getUserPlanRow(userId),
+      getMonthlyUsage(userId),
+      feature === "subjects" ? countSubjects(userId) : Promise.resolve(0),
+    ]);
+  } catch {
+    // DB error — fail closed (deny) to prevent free access on outage
+    return { allowed: false, feature, used: 0, limit: 0, remaining: 0, planRequired: "pro" };
+  }
 
   const effectiveId = effectivePlan(planRow.plan, planRow.trial_ends_at);
   const limits = PLANS[effectiveId].limits;

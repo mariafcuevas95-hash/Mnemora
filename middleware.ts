@@ -5,7 +5,7 @@ const PROTECTED = [
   "/dashboard", "/materias", "/tutor", "/calendario", "/flashcards",
   "/onboarding", "/progreso", "/settings",
   "/examen", "/quiz", "/mapas", "/roadmap", "/replanner",
-  "/analytics", "/referidos", "/biblioteca",
+  "/analytics", "/referidos", "/biblioteca", "/admin",
 ];
 const AUTH_PAGES = ["/login", "/registro"];
 

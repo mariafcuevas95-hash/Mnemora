@@ -727,7 +727,7 @@ function Referrals() {
 
         <div style={{ textAlign: "center" }}>
           <p style={{ fontSize: 14, color: "#9E9389", marginBottom: 24 }}>
-            ❤️ Más de <strong style={{ color: "#1B3F2F" }}>1.247 estudiantes</strong> ya estudian gratis gracias a sus referidos.
+            ❤️ Cada referido que activa un plan te suma tiempo gratis.
           </p>
           <Link href="/registro" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 32px", borderRadius: 12, background: "#1B3F2F", color: "#fff", fontSize: 15, fontWeight: 700, textDecoration: "none" }}>
             Empieza y comparte tu enlace <ArrowRight size={16} />
