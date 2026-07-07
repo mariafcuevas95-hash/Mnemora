@@ -42,7 +42,7 @@ const STATUS: Record<string, { label: string; color: string }> = {
 export default function ReferidosPage() {
   const [data, setData]           = useState<Data | null>(null);
   const [loading, setLoading]     = useState(true);
-  const [fetchError, setFetchError] = useState(false);
+  const [fetchError, setFetchError] = useState<string | false>(false);
   const [copied, setCopied]       = useState(false);
   const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
 
@@ -59,7 +59,8 @@ export default function ReferidosPage() {
         .sort((a, b) => b.count - a.count);
       if (topFriends.length > 0) setLeaderboard(topFriends);
     } else {
-      setFetchError(true);
+      const body = await res.json().catch(() => ({}));
+      setFetchError(JSON.stringify(body));
     }
     setLoading(false);
   }, []);
@@ -96,7 +97,8 @@ export default function ReferidosPage() {
 
   if (fetchError || !data) return (
     <div className="mn-dashboard-wrap" style={{ maxWidth: 560, paddingTop: 48 }}>
-      <p style={{ fontSize: 14, color: "var(--mn-ink-2)", marginBottom: 16 }}>No se pudo cargar el programa de referidos. Verifica tu conexión.</p>
+      <p style={{ fontSize: 14, color: "var(--mn-ink-2)", marginBottom: 8 }}>No se pudo cargar el programa de referidos.</p>
+      {fetchError && <pre style={{ fontSize: 11, color: "var(--mn-ink-3)", background: "var(--mn-raised)", padding: 12, borderRadius: 8, marginBottom: 16, whiteSpace: "pre-wrap", wordBreak: "break-all" }}>{fetchError}</pre>}
       <button onClick={() => { setLoading(true); loadData(); }} className="mn-btn-primary" style={{ fontSize: 13 }}>
         Reintentar
       </button>
