@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import Anthropic from "@anthropic-ai/sdk";
 import { createClient } from "@/lib/supabase/server";
 import { getIntelligenceContext } from "@/lib/intelligence";
+import { checkLimit, incrementUsage, limitExceededResponse } from "@/lib/plan-limits";
 import { z } from "zod";
 
 const anthropic = new Anthropic();
@@ -31,6 +32,10 @@ export async function POST(req: NextRequest) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return new Response("Unauthorized", { status: 401 });
+
+  const limit = await checkLimit(user.id, "ai_requests");
+  if (!limit.allowed) return limitExceededResponse("ai_requests");
+  await incrementUsage(user.id, "ai_requests");
 
   const body = await req.json();
   const parsed = BodySchema.safeParse(body);
