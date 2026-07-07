@@ -58,36 +58,42 @@ export default function RegistroPage() {
     if (password.length < 8) { setError("La contraseña debe tener al menos 8 caracteres."); return; }
     setLoading(true);
 
-    const db = createClient();
-    const { error: signUpError } = await db.auth.signUp({
-      email,
-      password,
-      options: {
-        data: { name },
-        emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
-      },
-    });
+    try {
+      const db = createClient();
+      const { error: signUpError } = await db.auth.signUp({
+        email,
+        password,
+        options: {
+          data: { name },
+          emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
+        },
+      });
 
-    if (signUpError) {
+      if (signUpError) {
+        setError(
+          signUpError.message.includes("already registered")
+            ? "Ya existe una cuenta con ese email. ¿Querés iniciar sesión?"
+            : signUpError.message
+        );
+        setLoading(false);
+        return;
+      }
+
+      const { data: { user } } = await db.auth.getUser();
+      if (user) {
+        await db.from("profiles").upsert({ id: user.id, email: user.email!, name });
+        router.push("/onboarding");
+      } else {
+        router.push(`/registro/confirmar?email=${encodeURIComponent(email)}`);
+      }
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
       setError(
-        signUpError.message.includes("already registered")
-          ? "Ya existe una cuenta con ese email. ¿Querés iniciar sesión?"
-          : signUpError.message
+        msg.includes("non ISO-8859-1")
+          ? "Error de configuración: la clave de Supabase tiene caracteres inválidos. Contacta al administrador."
+          : msg
       );
       setLoading(false);
-      return;
-    }
-
-    // Supabase puede confirmar automáticamente en dev si está configurado.
-    // En prod, el usuario recibe un email de confirmación.
-    // Creamos el perfil y mandamos al onboarding de inmediato.
-    const { data: { user } } = await db.auth.getUser();
-    if (user) {
-      await db.from("profiles").upsert({ id: user.id, email: user.email!, name });
-      router.push("/onboarding");
-    } else {
-      // Sin confirmación automática: pantalla de "revisá tu email"
-      router.push(`/registro/confirmar?email=${encodeURIComponent(email)}`);
     }
   }
 
