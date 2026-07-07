@@ -39,9 +39,10 @@ function LandingStyles() {
         .mn-mockup-sidebar { display: none !important; }
         .mn-mockup-grid { grid-template-columns: 1fr !important; }
         .mn-footer-inner { flex-direction: column !important; align-items: center !important; text-align: center !important; }
-        .mn-flow-steps { flex-direction: column !important; align-items: flex-start !important; gap: 0 !important; }
-        .mn-flow-step { flex-direction: row !important; align-items: center !important; gap: 16px !important; padding: 8px 0 !important; }
-        .mn-flow-step p { text-align: left !important; max-width: none !important; }
+        .mn-flow-steps { flex-direction: column !important; align-items: stretch !important; gap: 0 !important; width: 100% !important; flex-wrap: nowrap !important; }
+        .mn-flow-step { flex-direction: row !important; align-items: center !important; gap: 16px !important; padding: 14px 0 !important; position: relative !important; }
+        .mn-flow-step-inner { flex-direction: row !important; align-items: center !important; gap: 16px !important; }
+        .mn-flow-step p { text-align: left !important; max-width: none !important; font-size: 15px !important; }
         .mn-flow-arrow { display: none !important; }
         .mn-hero-pad { padding: 56px 20px 48px !important; }
         .mn-section-pad { padding: 64px 20px !important; }
@@ -524,8 +525,8 @@ function FlowDiagram() {
         <div className="mn-flow-steps" style={{ display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
           {steps.map((step, i) => (
             <div key={step.label} className="mn-flow-step" style={{ display: "flex", alignItems: "center" }}>
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "0 8px" }}>
-                <div style={{ width: 52, height: 52, borderRadius: 14, background: i === 5 ? "#1B3F2F" : "#FFFFFF", border: i === 5 ? "none" : "0.5px solid rgba(26,22,18,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, boxShadow: i === 5 ? "0 4px 20px rgba(27,63,47,0.3)" : "0 2px 8px rgba(26,22,18,0.06)" }}>
+              <div className="mn-flow-step-inner" style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "0 8px" }}>
+                <div style={{ width: 52, height: 52, borderRadius: 14, background: i === 5 ? "#1B3F2F" : "#FFFFFF", border: i === 5 ? "none" : "0.5px solid rgba(26,22,18,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, boxShadow: i === 5 ? "0 4px 20px rgba(27,63,47,0.3)" : "0 2px 8px rgba(26,22,18,0.06)", flexShrink: 0 }}>
                   {step.icon}
                 </div>
                 <p style={{ fontSize: 12, fontWeight: 600, color: i === 5 ? "#1B3F2F" : "#3D352E", textAlign: "center", maxWidth: 90, lineHeight: 1.3 }}>{step.label}</p>
