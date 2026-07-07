@@ -504,9 +504,22 @@ function OnboardingPageInner() {
   );
 }
 
-/* ─── Step 4: ¡Listo! ─── */
+/* ─── Step 4: ¡Listo! — auto-redirect al tutor en 4s ─── */
 function StepListo({ data }: { data: OnboardingData }) {
   const router = useRouter();
+  const [countdown, setCountdown] = useState(4);
+  const destination = data.subjectId ? `/tutor/${data.subjectId}` : "/dashboard";
+
+  useEffect(() => {
+    if (countdown <= 0) {
+      router.push(destination);
+      return;
+    }
+    const t = setTimeout(() => setCountdown(c => c - 1), 1000);
+    return () => clearTimeout(t);
+  }, [countdown, destination, router]);
+
+  const progress = ((4 - countdown) / 4) * 100;
 
   return (
     <div style={{ textAlign: "center" }}>
@@ -514,13 +527,12 @@ function StepListo({ data }: { data: OnboardingData }) {
         <span style={{ fontSize: 44 }}>🎉</span>
       </div>
       <h2 className="font-display" style={{ fontSize: 30, fontWeight: 800, color: "#1A1612", marginBottom: 12 }}>¡Todo listo!</h2>
-      <p style={{ fontSize: 16, color: "#6B6259", lineHeight: 1.65, marginBottom: 32 }}>
-        Tu semestre está organizado y tu tutor ya conoce{" "}
-        <strong style={{ color: "#1A1612" }}>{data.subjectName}</strong>.
+      <p style={{ fontSize: 16, color: "#6B6259", lineHeight: 1.65, marginBottom: 28 }}>
+        Tu tutor ya conoce <strong style={{ color: "#1A1612" }}>{data.subjectName}</strong>.
         {!data.syllabusSkipped && " El calendario se llenará en segundos."}
       </p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 32 }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
         {[
           { text: "Materia creada en Mnemora", done: true },
           { text: data.syllabusSkipped ? "Programa: puedes subirlo desde la materia" : "Programa recibido · extrayendo fechas", done: !data.syllabusSkipped },
@@ -537,26 +549,31 @@ function StepListo({ data }: { data: OnboardingData }) {
         ))}
       </div>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-        {data.subjectId && (
-          <button
-            onClick={() => router.push(`/tutor/${data.subjectId}`)}
-            className="mn-btn-primary"
-            style={{ fontSize: 16, padding: "14px 32px", justifyContent: "center" }}
-          >
-            Estudiar ahora con el tutor <ArrowRight size={16} />
-          </button>
-        )}
-        <button
-          onClick={() => router.push("/dashboard")}
-          style={{
-            padding: "12px 24px", borderRadius: 12, border: "1.5px solid rgba(26,22,18,0.14)",
-            background: "#FFFFFF", fontSize: 14, fontWeight: 600, color: "#6B6259", cursor: "pointer",
-          }}
-        >
-          Ver mi dashboard
-        </button>
+      {/* Auto-redirect CTA */}
+      <button
+        onClick={() => router.push(destination)}
+        className="mn-btn-primary"
+        style={{ fontSize: 16, padding: "14px 32px", justifyContent: "center", width: "100%", marginBottom: 12 }}
+      >
+        Hablar con mi tutor ahora <ArrowRight size={16} />
+      </button>
+
+      {/* Progress bar + countdown */}
+      <div style={{ marginBottom: 10 }}>
+        <div style={{ height: 3, background: "#EDE9E2", borderRadius: 99, overflow: "hidden", marginBottom: 8 }}>
+          <div style={{ height: "100%", width: `${progress}%`, background: "#1B3F2F", borderRadius: 99, transition: "width 900ms linear" }} />
+        </div>
+        <p style={{ fontSize: 12, color: "#9E9389" }}>
+          Te llevamos en {countdown}s...
+        </p>
       </div>
+
+      <button
+        onClick={() => router.push("/dashboard")}
+        style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#C4BAAE", textDecoration: "underline" }}
+      >
+        Ir al dashboard en su lugar
+      </button>
     </div>
   );
 }

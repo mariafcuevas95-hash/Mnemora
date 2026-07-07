@@ -167,6 +167,7 @@ export default function DashboardPage() {
   const [coachLocked, setCoachLocked] = useState(false);
   const [gamification, setGamification] = useState<{
     xpTotal: number; streakDays: number; weeklyDays: number;
+    studiedToday: boolean;
     recentAchievements: { achievement_id: string; earned_at: string }[];
   } | null>(null);
 
@@ -324,11 +325,15 @@ export default function DashboardPage() {
         monday.setDate(monday.getDate() - ((monday.getDay() + 6) % 7));
         monday.setHours(0, 0, 0, 0);
         const { data: weekEvents } = await db.from("xp_events").select("created_at").eq("user_id", user.id).gte("created_at", monday.toISOString());
-        const weekDays = new Set((weekEvents ?? []).map((e: { created_at: string }) => e.created_at.slice(0, 10))).size;
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const weekDates = (weekEvents ?? []).map((e: { created_at: string }) => e.created_at.slice(0, 10));
+        const weekDays = new Set(weekDates).size;
+        const studiedToday = weekDates.includes(todayStr);
         setGamification({
           xpTotal: progressRes.data?.xp_total ?? 0,
           streakDays: progressRes.data?.streak_days ?? 0,
           weeklyDays: weekDays,
+          studiedToday,
           recentAchievements: achievRes.data ?? [],
         });
       }
@@ -442,22 +447,57 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* 4 — Gamification chips (discreta, sin competir con el briefing) */}
-      {gamification && (gamification.streakDays > 0 || gamification.xpTotal > 0) && (
-        <div className="mn-fade-up" style={{ display: "flex", gap: 8, marginBottom: 28, animationDelay: "220ms" }}>
-          {gamification.streakDays > 0 && (
-            <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 11px", background: gamification.streakDays >= 3 ? "var(--mn-amber-light)" : "var(--mn-raised)", borderRadius: "var(--mn-r-full)" }}>
-              <span style={{ fontSize: 12 }}>🔥</span>
-              <span style={{ fontSize: 12, fontWeight: 700, color: gamification.streakDays >= 3 ? "var(--mn-amber)" : "var(--mn-ink-2)" }}>{gamification.streakDays} {gamification.streakDays === 1 ? "día" : "días"}</span>
+      {/* 4 — Gamification chips + streak-at-risk banner */}
+      {gamification && (
+        <>
+          <div className="mn-fade-up" style={{ display: "flex", gap: 8, marginBottom: gamification.streakDays > 0 && !gamification.studiedToday ? 12 : 28, animationDelay: "220ms" }}>
+            {/* Streak — siempre visible */}
+            {gamification.streakDays === 0 ? (
+              <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 11px", background: "var(--mn-raised)", borderRadius: "var(--mn-r-full)" }}>
+                <span style={{ fontSize: 12 }}>🔥</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: "var(--mn-ink-3)" }}>Empieza tu racha hoy</span>
+              </div>
+            ) : (
+              <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 11px", background: gamification.streakDays >= 3 ? "var(--mn-amber-light)" : "var(--mn-raised)", borderRadius: "var(--mn-r-full)" }}>
+                <span style={{ fontSize: 12 }}>🔥</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: gamification.streakDays >= 3 ? "var(--mn-amber)" : "var(--mn-ink-2)" }}>
+                  {gamification.streakDays} {gamification.streakDays === 1 ? "día" : "días"}
+                </span>
+              </div>
+            )}
+            {gamification.xpTotal > 0 && (
+              <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 11px", background: "var(--mn-raised)", borderRadius: "var(--mn-r-full)" }}>
+                <span style={{ fontSize: 12 }}>⚡</span>
+                <span style={{ fontSize: 12, fontWeight: 700, color: "var(--mn-ink-2)" }}>{gamification.xpTotal >= 1000 ? `${(gamification.xpTotal / 1000).toFixed(1)}k` : gamification.xpTotal} XP</span>
+              </div>
+            )}
+          </div>
+
+          {/* Racha en riesgo — solo si tiene racha activa y no estudió hoy */}
+          {gamification.streakDays > 0 && !gamification.studiedToday && subjects.length > 0 && (
+            <div className="mn-fade-up" style={{ marginBottom: 28, animationDelay: "235ms" }}>
+              <Link
+                href={subjects[0] ? `/flashcards/${subjects[0].id}` : "/dashboard"}
+                style={{
+                  display: "flex", alignItems: "center", gap: 12,
+                  padding: "12px 16px", borderRadius: "var(--mn-r-lg)",
+                  background: "var(--mn-amber-light)", border: "1px solid var(--mn-amber)",
+                  textDecoration: "none",
+                }}
+              >
+                <span style={{ fontSize: 22, flexShrink: 0 }}>⚠️</span>
+                <div style={{ flex: 1 }}>
+                  <p style={{ fontSize: 13, fontWeight: 700, color: "var(--mn-amber)", marginBottom: 2 }}>
+                    Tu racha de {gamification.streakDays} {gamification.streakDays === 1 ? "día" : "días"} está en riesgo
+                  </p>
+                  <p style={{ fontSize: 12, color: "var(--mn-amber)", opacity: 0.8 }}>
+                    Estudia aunque sea 5 minutos hoy para no perderla →
+                  </p>
+                </div>
+              </Link>
             </div>
           )}
-          {gamification.xpTotal > 0 && (
-            <div style={{ display: "flex", alignItems: "center", gap: 5, padding: "3px 11px", background: "var(--mn-raised)", borderRadius: "var(--mn-r-full)" }}>
-              <span style={{ fontSize: 12 }}>⚡</span>
-              <span style={{ fontSize: 12, fontWeight: 700, color: "var(--mn-ink-2)" }}>{gamification.xpTotal >= 1000 ? `${(gamification.xpTotal / 1000).toFixed(1)}k` : gamification.xpTotal} XP</span>
-            </div>
-          )}
-        </div>
+        </>
       )}
 
       {/* 5 — Alerta de examen próximo */}
