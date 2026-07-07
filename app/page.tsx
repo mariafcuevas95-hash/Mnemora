@@ -64,8 +64,8 @@ function Nav() {
     <header style={{ position: "sticky", top: 0, zIndex: 50, background: "rgba(247,244,239,0.92)", backdropFilter: "blur(16px)", WebkitBackdropFilter: "blur(16px)", borderBottom: "0.5px solid rgba(26,22,18,0.08)" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 32, height: 32, background: "#1B3F2F", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <BookOpen size={16} color="#fff" />
+          <div style={{ width: 36, height: 36, borderRadius: 10, overflow: "hidden", flexShrink: 0 }}>
+            <img src="/icon-192.png" alt="Mnemora" style={{ width: "200%", height: "200%", objectFit: "cover", marginLeft: "-50%", marginTop: "-50%" }} />
           </div>
           <span className="font-display" style={{ fontWeight: 800, fontSize: 18, color: "#1A1612" }}>Mnemora</span>
         </div>
