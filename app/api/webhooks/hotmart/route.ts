@@ -18,7 +18,7 @@ import {
   shouldActivate,
   shouldDeactivate,
 } from "@/lib/hotmart";
-import { sendProActivatedEmail } from "@/lib/resend";
+import { sendProActivatedEmail, sendPlanCancelledEmail, sendPaymentFailedEmail } from "@/lib/resend";
 import { handleReferralConversion } from "@/lib/referrals";
 
 export async function POST(req: NextRequest) {
@@ -118,6 +118,14 @@ export async function POST(req: NextRequest) {
     );
   } else if (shouldDeactivate(event.eventType)) {
     await deactivatePro(db, userId);
+    if (process.env.RESEND_API_KEY) {
+      const isChargeback = event.eventType === "PURCHASE_CHARGEBACK" || event.eventType === "PURCHASE_REFUNDED";
+      if (isChargeback) {
+        sendPaymentFailedEmail(event.buyerEmail, userName ?? "estudiante").catch(() => {});
+      } else {
+        sendPlanCancelledEmail(event.buyerEmail, userName ?? "estudiante").catch(() => {});
+      }
+    }
   }
   // PURCHASE_DELAYED → log only, no profile change
 

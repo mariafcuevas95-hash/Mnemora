@@ -148,3 +148,86 @@ export async function sendProActivatedEmail(to: string, name: string) {
     `,
   });
 }
+
+const emailShell = (content: string) => `<!DOCTYPE html>
+<html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
+<body style="margin:0;padding:0;background:#F7F4EF;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;">
+<div style="max-width:520px;margin:32px auto;padding:0 16px;">
+  <div style="background:#1B3F2F;border-radius:16px 16px 0 0;padding:20px 28px;">
+    <p style="margin:0;color:#A7C4B0;font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:0.08em;">Mnemora</p>
+  </div>
+  <div style="background:#FFFFFF;padding:28px;border-radius:0 0 16px 16px;border:1px solid rgba(0,0,0,0.06);">
+    ${content}
+    <hr style="border:none;border-top:1px solid #EDE9E2;margin:24px 0 16px;">
+    <p style="margin:0;color:#9E9389;font-size:12px;text-align:center;">
+      Garantía 30 días · cancela cuando quieras<br>
+      <a href="mailto:hola@mnemora.app" style="color:#1B3F2F;text-decoration:none;">hola@mnemora.app</a>
+    </p>
+  </div>
+</div>
+</body></html>`;
+
+const btn = (url: string, label: string) =>
+  `<div style="text-align:center;margin:24px 0;"><a href="${url}" style="display:inline-block;padding:13px 32px;background:#1B3F2F;color:#FFFFFF;border-radius:12px;text-decoration:none;font-size:15px;font-weight:700;">${label}</a></div>`;
+
+export async function sendTrialEndingEmail(to: string, name: string) {
+  const firstName = name.split(" ")[0] || "estudiante";
+  await getResend().emails.send({
+    from: FROM, to,
+    subject: "Tu prueba gratuita termina en 2 días — Mnemora",
+    html: emailShell(`
+      <h1 style="margin:0 0 12px;color:#1A1612;font-size:22px;font-weight:800;">Tu prueba termina pronto, ${firstName}</h1>
+      <p style="margin:0 0 16px;color:#6B6259;font-size:15px;line-height:1.6;">En 2 días finaliza tu período de prueba gratuita de Pro. A partir de entonces pasarás al plan gratuito con funciones limitadas.</p>
+      <div style="background:#FEF3C7;border:1px solid #D97706;border-radius:12px;padding:16px 18px;margin-bottom:16px;">
+        <p style="margin:0;color:#92400E;font-size:14px;font-weight:700;">¿Qué perdés si no te suscribís?</p>
+        <ul style="margin:8px 0 0;padding-left:18px;color:#78350F;font-size:13px;line-height:1.8;">
+          <li>Solo 1 materia activa (ahora tenés ilimitadas)</li>
+          <li>El tutor ya no recordará lo que hablaron</li>
+          <li>Sin flashcards ni resúmenes nuevos este mes</li>
+        </ul>
+      </div>
+      ${btn(`${APP_URL}/upgrade`, "Mantener mi Plan Pro →")}
+      <p style="text-align:center;margin:0;color:#9E9389;font-size:13px;">Solo $9,99/mes · cancela cuando quieras</p>
+    `),
+  });
+}
+
+export async function sendPlanCancelledEmail(to: string, name: string) {
+  const firstName = name.split(" ")[0] || "estudiante";
+  await getResend().emails.send({
+    from: FROM, to,
+    subject: "Tu plan Pro fue cancelado — Mnemora",
+    html: emailShell(`
+      <h1 style="margin:0 0 12px;color:#1A1612;font-size:22px;font-weight:800;">Cancelación confirmada</h1>
+      <p style="margin:0 0 16px;color:#6B6259;font-size:15px;line-height:1.6;">Hola ${firstName}, tu suscripción Pro fue cancelada. Seguís en Plan Free — tus materias y datos están guardados.</p>
+      <div style="background:#F7F4EF;border-radius:12px;padding:16px 18px;margin-bottom:16px;">
+        <p style="margin:0 0 8px;color:#1A1612;font-size:14px;font-weight:700;">Podés volver cuando quieras</p>
+        <p style="margin:0;color:#6B6259;font-size:13px;line-height:1.6;">Tu historial, flashcards y progreso te esperan. Reactivar el Plan Pro toma menos de 1 minuto.</p>
+      </div>
+      ${btn(`${APP_URL}/upgrade`, "Reactivar Plan Pro")}
+      <p style="text-align:center;margin:0;color:#9E9389;font-size:13px;">¿Tuviste algún problema? <a href="mailto:hola@mnemora.app" style="color:#1B3F2F;">hola@mnemora.app</a></p>
+    `),
+  });
+}
+
+export async function sendPaymentFailedEmail(to: string, name: string) {
+  const firstName = name.split(" ")[0] || "estudiante";
+  await getResend().emails.send({
+    from: FROM, to,
+    subject: "Problema con tu pago — Mnemora",
+    html: emailShell(`
+      <h1 style="margin:0 0 12px;color:#1A1612;font-size:22px;font-weight:800;">No pudimos procesar tu pago</h1>
+      <p style="margin:0 0 16px;color:#6B6259;font-size:15px;line-height:1.6;">Hola ${firstName}, hubo un problema al renovar tu suscripción Pro. Mientras se resuelve, tu acceso Pro sigue activo.</p>
+      <div style="background:#FEE2E2;border:1px solid #FCA5A5;border-radius:12px;padding:16px 18px;margin-bottom:16px;">
+        <p style="margin:0;color:#991B1B;font-size:14px;font-weight:700;">¿Qué hacer?</p>
+        <ol style="margin:8px 0 0;padding-left:18px;color:#7F1D1D;font-size:13px;line-height:1.8;">
+          <li>Verificá que tu tarjeta no esté vencida</li>
+          <li>Confirmá que tenés fondos disponibles</li>
+          <li>Intentá con otro método de pago en Hotmart</li>
+        </ol>
+      </div>
+      ${btn(`${APP_URL}/upgrade`, "Actualizar método de pago")}
+      <p style="text-align:center;margin:0;color:#9E9389;font-size:13px;">¿Necesitás ayuda? <a href="mailto:hola@mnemora.app" style="color:#1B3F2F;">hola@mnemora.app</a></p>
+    `),
+  });
+}
