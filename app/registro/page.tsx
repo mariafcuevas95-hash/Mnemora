@@ -70,10 +70,13 @@ export default function RegistroPage() {
       });
 
       if (signUpError) {
+        const msg = signUpError.message ?? "";
         setError(
-          signUpError.message.includes("already registered")
+          msg.includes("already registered") || msg.includes("already exists")
             ? "Ya existe una cuenta con ese email. ¿Querés iniciar sesión?"
-            : signUpError.message
+            : !msg || msg === "{}" || msg === "[object Object]"
+            ? "No pudimos crear tu cuenta. Verificá que el email sea válido o intenta con otro."
+            : msg
         );
         setLoading(false);
         return;
