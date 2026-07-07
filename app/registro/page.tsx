@@ -71,11 +71,13 @@ export default function RegistroPage() {
 
       if (signUpError) {
         const msg = signUpError.message ?? "";
+        // Temporary debug — remove after fixing
+        console.error("signUpError full:", JSON.stringify(signUpError), "status:", (signUpError as any).status, "code:", (signUpError as any).code);
         setError(
           msg.includes("already registered") || msg.includes("already exists")
             ? "Ya existe una cuenta con ese email. ¿Querés iniciar sesión?"
             : !msg || msg === "{}" || msg === "[object Object]"
-            ? "No pudimos crear tu cuenta. Verificá que el email sea válido o intenta con otro."
+            ? `Error ${(signUpError as any).status ?? ""} ${(signUpError as any).code ?? ""}`.trim() || "Error al crear cuenta. Intentá con otro email."
             : msg
         );
         setLoading(false);
