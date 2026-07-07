@@ -2,7 +2,7 @@
 
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { useState , Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { BookOpen, Check, Shield, Zap, Lock, Star } from "lucide-react";
 
 type PaywallReason = "materia" | "memoria" | "limite" | "syllabus" | "general";
@@ -61,6 +61,11 @@ function UpgradeContent() {
   const { title, desc } = HEADLINES[reason] ?? HEADLINES.general;
 
   const [billing, setBilling] = useState<"monthly" | "annual">("annual");
+  const [userCount, setUserCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/stats").then(r => r.ok ? r.json() : null).then(d => { if (d) setUserCount(d.userCount); }).catch(() => {});
+  }, []);
   const isAnnual = billing === "annual";
 
   const proPrice  = isAnnual ? PRO_ANNUAL  : PRO_MONTHLY;
@@ -156,6 +161,13 @@ function UpgradeContent() {
           checkoutsReady={checkoutsReady}
           isAnnual={isAnnual}
         />
+
+        {/* Social proof */}
+        {userCount !== null && userCount >= 10 && (
+          <p style={{ textAlign: "center", fontSize: 13, color: "#6B6259", marginBottom: 20 }}>
+            🎓 <strong>{userCount.toLocaleString("es")} estudiantes</strong> ya organizan su semestre con Mnemora
+          </p>
+        )}
 
         {/* Guarantee */}
         <div style={{

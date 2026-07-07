@@ -170,6 +170,11 @@ export default function DashboardPage() {
     studiedToday: boolean;
     recentAchievements: { achievement_id: string; earned_at: string }[];
   } | null>(null);
+  const [userCount, setUserCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    fetch("/api/stats").then(r => r.ok ? r.json() : null).then(d => { if (d) setUserCount(d.userCount); }).catch(() => {});
+  }, []);
 
   // Study Coach — cached per session in sessionStorage
   useEffect(() => {
@@ -396,6 +401,15 @@ export default function DashboardPage() {
           {profileLabel && ` · Perfil ${profileLabel}`}
         </p>
       </div>
+
+      {/* 1b — Social proof (solo cuando hay datos reales) */}
+      {userCount !== null && userCount >= 10 && (
+        <div className="mn-fade-up" style={{ marginBottom: 20, animationDelay: "40ms" }}>
+          <p style={{ fontSize: 12, color: "var(--mn-ink-3)" }}>
+            🎓 <strong style={{ color: "var(--mn-ink-2)" }}>{userCount.toLocaleString("es")} estudiantes</strong> ya organizan su semestre con Mnemora
+          </p>
+        </div>
+      )}
 
       {/* 2 — Mientras no estabas */}
       {loaded && activityNote && (
