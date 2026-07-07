@@ -68,8 +68,6 @@ export default function RegistroPage() {
 
       if (signUpError) {
         const msg = signUpError.message ?? "";
-        // Temporary debug — remove after fixing
-        console.error("signUpError full:", JSON.stringify(signUpError), "status:", (signUpError as any).status, "code:", (signUpError as any).code);
         setError(
           msg.includes("already registered") || msg.includes("already exists")
             ? "Ya existe una cuenta con ese email. ¿Querés iniciar sesión?"
