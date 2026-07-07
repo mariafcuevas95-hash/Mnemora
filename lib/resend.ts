@@ -3,7 +3,7 @@ import { Resend } from "resend";
 function getResend() {
   return new Resend(process.env.RESEND_API_KEY ?? "placeholder");
 }
-const FROM = process.env.RESEND_FROM_EMAIL ?? "hola@mnemora.app";
+const FROM = process.env.RESEND_FROM_EMAIL ?? "hello@mnemora.me";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://mnemora.app";
 
 export interface DailyDigestData {
