@@ -425,6 +425,36 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* 2b — Tutor proactivo: alerta cuando hay repasos urgentes + examen próximo */}
+      {loaded && reviewItems.length >= 3 && nextExam && daysToExam !== null && daysToExam <= 10 && (
+        <div className="mn-fade-up" style={{ marginBottom: 20, animationDelay: "140ms" }}>
+          <Link
+            href={subjects.find(s => reviewItems[0]?.subject_id === s.id) ? `/tutor/${reviewItems[0].subject_id}` : "/tutor/" + (subjects[0]?.id ?? "")}
+            style={{
+              display: "flex", alignItems: "flex-start", gap: 12,
+              padding: "14px 16px", borderRadius: "var(--mn-r-lg)",
+              background: "var(--mn-surface)", border: "1px solid var(--mn-ink-4)",
+              textDecoration: "none",
+            }}
+          >
+            <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#1B3F2F", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Brain size={16} color="#fff" />
+            </div>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "var(--mn-ink-1)", marginBottom: 3 }}>
+                Tu tutor detectó algo importante
+              </p>
+              <p style={{ fontSize: 12, color: "var(--mn-ink-2)", lineHeight: 1.55 }}>
+                Tenés {reviewItems.length} conceptos sin repasar y el examen de{" "}
+                <strong>{(nextExam.subjects as { name: string } | undefined)?.name ?? "tu materia"}</strong>{" "}
+                es en {daysToExam} {daysToExam === 1 ? "día" : "días"}. Entrá a hablar.
+              </p>
+            </div>
+            <ArrowRight size={14} color="var(--mn-ink-3)" style={{ marginTop: 2, flexShrink: 0 }} />
+          </Link>
+        </div>
+      )}
+
       {/* 3 — DailyBriefing: card blanca, protagonista por tipografía */}
       {loaded && briefing && (
         <div className="mn-fade-up" style={{ padding: "24px 28px", marginBottom: 28, animationDelay: "160ms", background: "var(--mn-surface)", borderRadius: "var(--mn-r-xl)", boxShadow: "0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04)" }}>
