@@ -620,7 +620,7 @@ function Pricing() {
                 </div>
               ))}
             </div>
-            <Link href="https://pay.hotmart.com/X106608100N" target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center", padding: "14px", borderRadius: 12, background: "#FFFFFF", fontSize: 15, fontWeight: 700, color: "#1B3F2F", textDecoration: "none" }}>
+            <Link href={billing === "monthly" ? "https://pay.hotmart.com/X106608100N?off=dc4u4ck4" : "https://pay.hotmart.com/X106608100N?off=rglfytvv"} target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center", padding: "14px", borderRadius: 12, background: "#FFFFFF", fontSize: 15, fontWeight: 700, color: "#1B3F2F", textDecoration: "none" }}>
               Empieza tu prueba de 7 días
             </Link>
             <p style={{ textAlign: "center", fontSize: 12, color: "#86EFAC", marginTop: 12, lineHeight: 1.5 }}>
@@ -670,7 +670,7 @@ function Pricing() {
                 </div>
               ))}
             </div>
-            <Link href="https://pay.hotmart.com/X106608100N" target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center", padding: "14px", borderRadius: 12, background: "var(--mn-green)", fontSize: 15, fontWeight: 700, color: "#fff", textDecoration: "none" }}>
+            <Link href={billing === "monthly" ? "https://pay.hotmart.com/X106608100N?off=ob9wndyf" : "https://pay.hotmart.com/X106608100N?off=5k6odu6s"} target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center", padding: "14px", borderRadius: 12, background: "var(--mn-green)", fontSize: 15, fontWeight: 700, color: "#fff", textDecoration: "none" }}>
               Prueba Premium durante 7 días
             </Link>
             <p style={{ textAlign: "center", fontSize: 12, color: "#FCD34D", marginTop: 12, lineHeight: 1.5 }}>

@@ -50,10 +50,10 @@ const PRO_ANNUAL   = "7,42";   // $89/año ÷ 12
 const PRM_MONTHLY  = "14,99";
 const PRM_ANNUAL   = "13,25";  // $159/año ÷ 12
 
-const CHECKOUT_PRO_MONTHLY     = process.env.NEXT_PUBLIC_HOTMART_CHECKOUT_PRO_MONTHLY     ?? "https://pay.hotmart.com/X106608100N";
-const CHECKOUT_PRO_ANNUAL      = process.env.NEXT_PUBLIC_HOTMART_CHECKOUT_PRO_ANNUAL      ?? "https://pay.hotmart.com/X106608100N";
-const CHECKOUT_PREMIUM_MONTHLY = process.env.NEXT_PUBLIC_HOTMART_CHECKOUT_PREMIUM_MONTHLY ?? "https://pay.hotmart.com/X106608100N";
-const CHECKOUT_PREMIUM_ANNUAL  = process.env.NEXT_PUBLIC_HOTMART_CHECKOUT_PREMIUM_ANNUAL  ?? "https://pay.hotmart.com/X106608100N";
+const CHECKOUT_PRO_MONTHLY     = process.env.NEXT_PUBLIC_HOTMART_CHECKOUT_PRO_MONTHLY     ?? "https://pay.hotmart.com/X106608100N?off=dc4u4ck4";
+const CHECKOUT_PRO_ANNUAL      = process.env.NEXT_PUBLIC_HOTMART_CHECKOUT_PRO_ANNUAL      ?? "https://pay.hotmart.com/X106608100N?off=rglfytvv";
+const CHECKOUT_PREMIUM_MONTHLY = process.env.NEXT_PUBLIC_HOTMART_CHECKOUT_PREMIUM_MONTHLY ?? "https://pay.hotmart.com/X106608100N?off=ob9wndyf";
+const CHECKOUT_PREMIUM_ANNUAL  = process.env.NEXT_PUBLIC_HOTMART_CHECKOUT_PREMIUM_ANNUAL  ?? "https://pay.hotmart.com/X106608100N?off=5k6odu6s";
 
 function UpgradeContent() {
   const searchParams = useSearchParams();
