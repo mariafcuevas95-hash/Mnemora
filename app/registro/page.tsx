@@ -63,10 +63,7 @@ export default function RegistroPage() {
       const { error: signUpError } = await db.auth.signUp({
         email,
         password,
-        options: {
-          data: { name },
-          emailRedirectTo: `${window.location.origin}/auth/callback?next=/onboarding`,
-        },
+        options: { data: { name } },
       });
 
       if (signUpError) {
