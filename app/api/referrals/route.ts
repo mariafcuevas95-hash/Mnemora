@@ -34,8 +34,12 @@ export async function GET() {
       .order("milestone"),
   ]);
 
+  if (profileRes.error) console.error("[referrals] profile error:", JSON.stringify(profileRes.error));
+  if (referralsRes.error) console.error("[referrals] referrals error:", JSON.stringify(referralsRes.error));
+  if (rewardsRes.error) console.error("[referrals] rewards error:", JSON.stringify(rewardsRes.error));
+
   const profile = profileRes.data;
-  if (!profile) return NextResponse.json({ error: "Not found" }, { status: 404 });
+  if (!profile) return NextResponse.json({ error: "Not found", detail: profileRes.error }, { status: 404 });
 
   // Ensure referral_code exists (backfill edge case)
   let referralCode = profile.referral_code;
