@@ -1,11 +1,17 @@
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
+function sanitizeEnv(v: string | undefined): string {
+  if (!v) return "";
+  // eslint-disable-next-line no-control-regex
+  return v.replace(/[^\x00-\xFF]/g, "").trim();
+}
+
 export async function createClient() {
   const cookieStore = await cookies();
   return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    sanitizeEnv(process.env.NEXT_PUBLIC_SUPABASE_URL),
+    sanitizeEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY),
     {
       cookies: {
         getAll() { return cookieStore.getAll(); },

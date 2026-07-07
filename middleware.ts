@@ -9,17 +9,26 @@ const PROTECTED = [
 ];
 const AUTH_PAGES = ["/login", "/registro"];
 
+function sanitizeEnv(v: string | undefined): string {
+  if (!v) return "";
+  // eslint-disable-next-line no-control-regex
+  return v.replace(/[^\x00-\xFF]/g, "").trim();
+}
+
 export async function middleware(request: NextRequest) {
+  const supabaseUrl  = sanitizeEnv(process.env.NEXT_PUBLIC_SUPABASE_URL);
+  const supabaseAnon = sanitizeEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+
   // Sin credenciales (dev local sin .env.local) — dejar pasar todo
-  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+  if (!supabaseUrl || !supabaseAnon) {
     return NextResponse.next({ request });
   }
 
   let supabaseResponse = NextResponse.next({ request });
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    supabaseUrl,
+    supabaseAnon,
     {
       cookies: {
         getAll() { return request.cookies.getAll(); },
