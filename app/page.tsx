@@ -46,6 +46,9 @@ function LandingStyles() {
         .mn-flow-arrow { display: none !important; }
         .mn-hero-pad { padding: 56px 20px 48px !important; }
         .mn-section-pad { padding: 64px 20px !important; }
+        .mn-comparison-wrap { overflow: visible !important; border: none !important; box-shadow: none !important; }
+        .mn-comparison-desktop { display: none !important; }
+        .mn-comparison-mobile { display: flex !important; }
       }
 
       @media (max-width: 480px) {
@@ -564,23 +567,47 @@ function Comparison() {
           <p style={{ color: "#6B6259", fontSize: 16 }}>No atacamos a nadie — solo mostramos la diferencia.</p>
         </div>
         <div className="mn-comparison-wrap">
-          <div className="mn-comparison-table" style={{ display: "grid", gridTemplateColumns: "1fr 120px 120px 120px", background: "#F7F4EF", padding: "16px 24px", borderBottom: "0.5px solid rgba(26,22,18,0.08)" }}>
-            <div />
-            {[{ name: "Mnemora", highlight: true }, { name: "ChatGPT", highlight: false }, { name: "Quizlet", highlight: false }].map(({ name, highlight }) => (
-              <div key={name} style={{ textAlign: "center" }}>
-                <p style={{ fontSize: 13, fontWeight: 800, color: highlight ? "#1B3F2F" : "#6B6259" }}>{name}</p>
-                {highlight && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#1B3F2F", margin: "4px auto 0" }} />}
+          {/* Desktop table */}
+          <div className="mn-comparison-desktop">
+            <div className="mn-comparison-table" style={{ display: "grid", gridTemplateColumns: "1fr 120px 120px 120px", background: "#F7F4EF", padding: "16px 24px", borderBottom: "0.5px solid rgba(26,22,18,0.08)" }}>
+              <div />
+              {[{ name: "Mnemora", highlight: true }, { name: "ChatGPT", highlight: false }, { name: "Quizlet", highlight: false }].map(({ name, highlight }) => (
+                <div key={name} style={{ textAlign: "center" }}>
+                  <p style={{ fontSize: 13, fontWeight: 800, color: highlight ? "#1B3F2F" : "#6B6259" }}>{name}</p>
+                  {highlight && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#1B3F2F", margin: "4px auto 0" }} />}
+                </div>
+              ))}
+            </div>
+            {rows.map((row, i) => (
+              <div key={row.feature} className="mn-comparison-table" style={{ display: "grid", gridTemplateColumns: "1fr 120px 120px 120px", padding: "14px 24px", borderBottom: i < rows.length - 1 ? "0.5px solid rgba(26,22,18,0.06)" : "none", background: row.highlight ? "#F0FDF4" : i % 2 === 0 ? "#FFFFFF" : "#FAFAF8" }}>
+                <span style={{ fontSize: 14, color: row.highlight ? "#1B3F2F" : "#3D352E", paddingRight: 16, fontWeight: row.highlight ? 700 : 400 }}>{row.feature}</span>
+                {[row.mnemora, row.chatgpt, row.quizlet].map((has, ci) => (
+                  <div key={ci} style={{ textAlign: "center" }}><span style={{ fontSize: 18 }}>{has ? "✅" : "❌"}</span></div>
+                ))}
               </div>
             ))}
           </div>
-          {rows.map((row, i) => (
-            <div key={row.feature} className="mn-comparison-table" style={{ display: "grid", gridTemplateColumns: "1fr 120px 120px 120px", padding: "14px 24px", borderBottom: i < rows.length - 1 ? "0.5px solid rgba(26,22,18,0.06)" : "none", background: row.highlight ? "#F0FDF4" : i % 2 === 0 ? "#FFFFFF" : "#FAFAF8" }}>
-              <span style={{ fontSize: 14, color: row.highlight ? "#1B3F2F" : "#3D352E", paddingRight: 16, fontWeight: row.highlight ? 700 : 400 }}>{row.feature}</span>
-              {[row.mnemora, row.chatgpt, row.quizlet].map((has, ci) => (
-                <div key={ci} style={{ textAlign: "center" }}><span style={{ fontSize: 18 }}>{has ? "✅" : "❌"}</span></div>
+
+          {/* Mobile: card list */}
+          <div className="mn-comparison-mobile" style={{ display: "none", flexDirection: "column", gap: 8 }}>
+            {/* Header chips */}
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 60px 60px 60px", gap: 4, padding: "10px 16px", background: "#F7F4EF", borderRadius: 16, marginBottom: 4 }}>
+              <div />
+              {[{ name: "Mnemora", highlight: true }, { name: "ChatGPT", highlight: false }, { name: "Quizlet", highlight: false }].map(({ name, highlight }) => (
+                <div key={name} style={{ textAlign: "center" }}>
+                  <p style={{ fontSize: 11, fontWeight: 800, color: highlight ? "#1B3F2F" : "#6B6259", lineHeight: 1.2 }}>{name}</p>
+                </div>
               ))}
             </div>
-          ))}
+            {rows.map((row, i) => (
+              <div key={row.feature} style={{ display: "grid", gridTemplateColumns: "1fr 60px 60px 60px", gap: 4, padding: "12px 16px", borderRadius: 12, background: row.highlight ? "#F0FDF4" : i % 2 === 0 ? "#FFFFFF" : "#FAFAF8", border: row.highlight ? "0.5px solid #BBF7D0" : "0.5px solid rgba(26,22,18,0.06)", alignItems: "center" }}>
+                <span style={{ fontSize: 13, color: row.highlight ? "#1B3F2F" : "#3D352E", fontWeight: row.highlight ? 700 : 400, lineHeight: 1.3 }}>{row.feature}</span>
+                {[row.mnemora, row.chatgpt, row.quizlet].map((has, ci) => (
+                  <div key={ci} style={{ textAlign: "center" }}><span style={{ fontSize: 16 }}>{has ? "✅" : "❌"}</span></div>
+                ))}
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
