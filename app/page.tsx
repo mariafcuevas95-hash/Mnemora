@@ -10,6 +10,52 @@ import {
 } from "lucide-react";
 
 /* ─────────────────────────────────────────────
+   RESPONSIVE STYLES
+───────────────────────────────────────────── */
+function LandingStyles() {
+  return (
+    <style>{`
+      /* Grids responsive */
+      .mn-2col { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+      .mn-3col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+      .mn-4col { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; align-items: stretch; }
+      .mn-5col { display: grid; grid-template-columns: repeat(5, 1fr); gap: 12px; }
+      .mn-why-grid { display: grid; grid-template-columns: 1fr 40px 1fr; gap: 0; align-items: stretch; max-width: 820px; margin: 0 auto; }
+      .mn-comparison-wrap { border-radius: 20px; overflow: auto; border: 0.5px solid rgba(26,22,18,0.10); box-shadow: 0 4px 24px rgba(26,22,18,0.07); }
+      .mn-comparison-table { min-width: 500px; }
+      .mn-mockup-grid { display: grid; grid-template-columns: 200px 1fr; min-height: 440px; }
+      .mn-mockup-sidebar { display: block; }
+      .mn-footer-links { display: flex; gap: 20px; flex-wrap: wrap; justify-content: center; }
+      .mn-pricing-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; max-width: 980px; margin: 0 auto; }
+
+      @media (max-width: 768px) {
+        .mn-2col { grid-template-columns: 1fr !important; gap: 36px !important; }
+        .mn-3col { grid-template-columns: 1fr !important; }
+        .mn-4col { grid-template-columns: repeat(2, 1fr) !important; }
+        .mn-5col { grid-template-columns: repeat(2, 1fr) !important; }
+        .mn-pricing-grid { grid-template-columns: 1fr !important; max-width: 440px !important; }
+        .mn-why-grid { grid-template-columns: 1fr !important; gap: 0 !important; }
+        .mn-why-arrow { display: none !important; }
+        .mn-mockup-sidebar { display: none !important; }
+        .mn-mockup-grid { grid-template-columns: 1fr !important; }
+        .mn-footer-inner { flex-direction: column !important; align-items: center !important; text-align: center !important; }
+        .mn-flow-steps { flex-direction: column !important; align-items: flex-start !important; gap: 0 !important; }
+        .mn-flow-step { flex-direction: row !important; align-items: center !important; gap: 16px !important; padding: 8px 0 !important; }
+        .mn-flow-step p { text-align: left !important; max-width: none !important; }
+        .mn-flow-arrow { display: none !important; }
+        .mn-hero-pad { padding: 56px 20px 48px !important; }
+        .mn-section-pad { padding: 64px 20px !important; }
+      }
+
+      @media (max-width: 480px) {
+        .mn-4col { grid-template-columns: 1fr !important; }
+        .mn-5col { grid-template-columns: 1fr !important; }
+      }
+    `}</style>
+  );
+}
+
+/* ─────────────────────────────────────────────
    NAV
 ───────────────────────────────────────────── */
 function Nav() {
@@ -39,7 +85,7 @@ function Nav() {
 ───────────────────────────────────────────── */
 function Hero() {
   return (
-    <section style={{ maxWidth: 1120, margin: "0 auto", padding: "88px 24px 72px", textAlign: "center" }}>
+    <section className="mn-hero-pad" style={{ maxWidth: 1120, margin: "0 auto", padding: "88px 24px 72px", textAlign: "center" }}>
       <div style={{ display: "flex", justifyContent: "center", marginBottom: 28 }} className="mn-animate">
         <span className="mn-badge mn-badge-green"><Sparkles size={12} />Tutor de IA para universitarios LATAM</span>
       </div>
@@ -81,8 +127,8 @@ function DashboardMockup() {
         <div style={{ width: 12, height: 12, borderRadius: "50%", background: "#34D399" }} />
         <div style={{ flex: 1, textAlign: "center", fontSize: 12, color: "#9E9389", fontFamily: "monospace" }}>mnemora.app/dashboard</div>
       </div>
-      <div style={{ display: "grid", gridTemplateColumns: "200px 1fr", minHeight: 440 }}>
-        <div style={{ background: "#FAFAF8", borderRight: "0.5px solid rgba(26,22,18,0.08)", padding: "16px 12px", display: "flex", flexDirection: "column", gap: 4 }}>
+      <div className="mn-mockup-grid" style={{ minHeight: 440 }}>
+        <div className="mn-mockup-sidebar" style={{ background: "#FAFAF8", borderRight: "0.5px solid rgba(26,22,18,0.08)", padding: "16px 12px", display: "flex", flexDirection: "column", gap: 4 }}>
           {[{ label: "Dashboard", active: true }, { label: "Mi Plan", active: false }, { label: "Flashcards", active: false }, { label: "Mi progreso", active: false }].map(({ label, active }) => (
             <div key={label} style={{ padding: "7px 10px", borderRadius: 8, background: active ? "#E8F1EC" : "transparent", fontSize: 13, fontWeight: active ? 600 : 400, color: active ? "#1B3F2F" : "#6B6259" }}>{label}</div>
           ))}
@@ -193,7 +239,7 @@ function WhyDifferent() {
           </p>
         </div>
         {/* Comparación horizontal Antes → Después */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 40px 1fr", gap: 0, alignItems: "stretch", maxWidth: 820, margin: "0 auto" }}>
+        <div className="mn-why-grid">
           {/* Columna Antes */}
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ padding: "8px 14px", fontSize: 12, fontWeight: 700, color: "#EF4444", textTransform: "uppercase", letterSpacing: "0.08em" }}>Antes</div>
@@ -209,7 +255,7 @@ function WhyDifferent() {
             ))}
           </div>
           {/* Flecha central */}
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, paddingTop: 36 }}>
+          <div className="mn-why-arrow" style={{ display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, paddingTop: 36 }}>
             {[0, 1, 2].map(i => <span key={i} style={{ fontSize: 16, color: "#C4BAAE" }}>→</span>)}
           </div>
           {/* Columna Después */}
@@ -241,7 +287,7 @@ function WhyDifferent() {
 function TutorShowcase() {
   return (
     <section style={{ padding: "96px 24px", background: "#FFFFFF" }}>
-      <div style={{ maxWidth: 1120, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "center" }}>
+      <div className="mn-2col" style={{ maxWidth: 1120, margin: "0 auto" }}>
         <div>
           <span className="mn-badge mn-badge-green" style={{ marginBottom: 20, display: "inline-flex" }}><Brain size={12} /> Tutor con memoria</span>
           <h2 className="font-display" style={{ fontSize: "clamp(26px, 4vw, 42px)", fontWeight: 800, color: "#1A1612", letterSpacing: "-0.02em", lineHeight: 1.15, marginBottom: 20 }}>
@@ -296,7 +342,7 @@ function FlashcardShowcase() {
   const [flipped, setFlipped] = useState(false);
   return (
     <section style={{ padding: "96px 24px", background: "#F7F4EF" }}>
-      <div style={{ maxWidth: 1120, margin: "0 auto", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 64, alignItems: "center" }}>
+      <div className="mn-2col" style={{ maxWidth: 1120, margin: "0 auto" }}>
         <div style={{ position: "relative" }}>
           <div style={{ position: "absolute", top: 12, left: 12, right: -12, bottom: -12, background: "#E8F1EC", borderRadius: 20, border: "0.5px solid rgba(27,63,47,0.15)" }} />
           <div style={{ position: "absolute", top: 6, left: 6, right: -6, bottom: -6, background: "#D1FAE5", borderRadius: 20, border: "0.5px solid rgba(27,63,47,0.12)" }} />
@@ -430,7 +476,7 @@ function StudentJourney() {
           </h2>
           <p style={{ color: "#6B6259", fontSize: 17 }}>El recorrido completo desde que subes el primer apunte hasta que apruebas el final.</p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, alignItems: "stretch" }}>
+        <div className="mn-4col">
           {phases.map((phase, pi) => (
             <div key={phase.title} style={{ background: "var(--mn-surface)", borderRadius: 20, padding: 24, border: "1.5px solid var(--mn-ink-4)", position: "relative" }}>
               {pi < phases.length - 1 && (
@@ -475,16 +521,16 @@ function FlowDiagram() {
           <h2 className="font-display" style={{ fontSize: "clamp(24px, 3.5vw, 38px)", fontWeight: 800, color: "#1A1612", letterSpacing: "-0.02em", marginBottom: 12 }}>¿Cómo funciona Mnemora?</h2>
           <p style={{ color: "#6B6259", fontSize: 16 }}>Tu primer resultado en menos de 5 minutos.</p>
         </div>
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
+        <div className="mn-flow-steps" style={{ display: "flex", alignItems: "center", justifyContent: "center", flexWrap: "wrap" }}>
           {steps.map((step, i) => (
-            <div key={step.label} style={{ display: "flex", alignItems: "center" }}>
+            <div key={step.label} className="mn-flow-step" style={{ display: "flex", alignItems: "center" }}>
               <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 10, padding: "0 8px" }}>
                 <div style={{ width: 52, height: 52, borderRadius: 14, background: i === 5 ? "#1B3F2F" : "#FFFFFF", border: i === 5 ? "none" : "0.5px solid rgba(26,22,18,0.1)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22, boxShadow: i === 5 ? "0 4px 20px rgba(27,63,47,0.3)" : "0 2px 8px rgba(26,22,18,0.06)" }}>
                   {step.icon}
                 </div>
                 <p style={{ fontSize: 12, fontWeight: 600, color: i === 5 ? "#1B3F2F" : "#3D352E", textAlign: "center", maxWidth: 90, lineHeight: 1.3 }}>{step.label}</p>
               </div>
-              {i < steps.length - 1 && <div style={{ width: 24, height: 1, background: "rgba(26,22,18,0.15)", flexShrink: 0, marginBottom: 28 }} />}
+              {i < steps.length - 1 && <div className="mn-flow-arrow" style={{ width: 24, height: 1, background: "rgba(26,22,18,0.15)", flexShrink: 0, marginBottom: 28 }} />}
             </div>
           ))}
         </div>
@@ -516,8 +562,8 @@ function Comparison() {
           <h2 className="font-display" style={{ fontSize: "clamp(26px, 4vw, 40px)", fontWeight: 800, color: "#1A1612", letterSpacing: "-0.02em", marginBottom: 12 }}>Mnemora vs. otras herramientas</h2>
           <p style={{ color: "#6B6259", fontSize: 16 }}>No atacamos a nadie — solo mostramos la diferencia.</p>
         </div>
-        <div style={{ borderRadius: 20, overflow: "hidden", border: "0.5px solid rgba(26,22,18,0.10)", boxShadow: "0 4px 24px rgba(26,22,18,0.07)" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 120px 120px 120px", background: "#F7F4EF", padding: "16px 24px", borderBottom: "0.5px solid rgba(26,22,18,0.08)" }}>
+        <div className="mn-comparison-wrap">
+          <div className="mn-comparison-table" style={{ display: "grid", gridTemplateColumns: "1fr 120px 120px 120px", background: "#F7F4EF", padding: "16px 24px", borderBottom: "0.5px solid rgba(26,22,18,0.08)" }}>
             <div />
             {[{ name: "Mnemora", highlight: true }, { name: "ChatGPT", highlight: false }, { name: "Quizlet", highlight: false }].map(({ name, highlight }) => (
               <div key={name} style={{ textAlign: "center" }}>
@@ -527,7 +573,7 @@ function Comparison() {
             ))}
           </div>
           {rows.map((row, i) => (
-            <div key={row.feature} style={{ display: "grid", gridTemplateColumns: "1fr 120px 120px 120px", padding: "14px 24px", borderBottom: i < rows.length - 1 ? "0.5px solid rgba(26,22,18,0.06)" : "none", background: row.highlight ? "#F0FDF4" : i % 2 === 0 ? "#FFFFFF" : "#FAFAF8" }}>
+            <div key={row.feature} className="mn-comparison-table" style={{ display: "grid", gridTemplateColumns: "1fr 120px 120px 120px", padding: "14px 24px", borderBottom: i < rows.length - 1 ? "0.5px solid rgba(26,22,18,0.06)" : "none", background: row.highlight ? "#F0FDF4" : i % 2 === 0 ? "#FFFFFF" : "#FAFAF8" }}>
               <span style={{ fontSize: 14, color: row.highlight ? "#1B3F2F" : "#3D352E", paddingRight: 16, fontWeight: row.highlight ? 700 : 400 }}>{row.feature}</span>
               {[row.mnemora, row.chatgpt, row.quizlet].map((has, ci) => (
                 <div key={ci} style={{ textAlign: "center" }}><span style={{ fontSize: 18 }}>{has ? "✅" : "❌"}</span></div>
@@ -565,7 +611,7 @@ function Pricing() {
           </div>
         </div>
 
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20, maxWidth: 980, margin: "0 auto" }}>
+        <div className="mn-pricing-grid">
 
           {/* STARTER */}
           <div className="mn-card" style={{ padding: 32 }}>
@@ -712,7 +758,7 @@ function Referrals() {
         </div>
 
         {/* Milestone cards */}
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 12, marginBottom: 40 }}>
+        <div className="mn-5col" style={{ marginBottom: 40 }}>
           {milestones.map((m, i) => (
             <div key={m.count} style={{ background: "#F7F4EF", borderRadius: 16, padding: "20px 16px", textAlign: "center", border: "0.5px solid rgba(26,22,18,0.08)", position: "relative" }}>
               {i < milestones.length - 1 && (
@@ -745,7 +791,7 @@ function Proof() {
   return (
     <section style={{ padding: "80px 24px", background: "#F7F4EF" }}>
       <div style={{ maxWidth: 1120, margin: "0 auto" }}>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 16, alignItems: "stretch" }}>
+        <div className="mn-3col" style={{ alignItems: "stretch" }}>
           <div className="mn-card" style={{ padding: 32, background: "#1B3F2F" }}>
             <Shield size={32} color="#86EFAC" style={{ marginBottom: 16 }} />
             <h3 className="font-display" style={{ fontSize: 22, fontWeight: 800, color: "#FFFFFF", marginBottom: 12 }}>Garantía de 30 días</h3>
@@ -851,7 +897,7 @@ function FinalCTA() {
 function Footer() {
   return (
     <footer style={{ background: "#111810", padding: "40px 24px" }}>
-      <div style={{ maxWidth: 1120, margin: "0 auto", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
+      <div className="mn-footer-inner" style={{ maxWidth: 1120, margin: "0 auto", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
           <div style={{ width: 28, height: 28, background: "#1B3F2F", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center" }}>
             <BookOpen size={14} color="#86EFAC" />
@@ -878,6 +924,7 @@ function Footer() {
 export default function LandingPage() {
   return (
     <main>
+      <LandingStyles />
       <Nav />
       <Hero />
       <Strip />
