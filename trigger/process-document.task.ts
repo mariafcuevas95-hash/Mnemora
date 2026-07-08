@@ -45,15 +45,23 @@ export const processDocumentTask = task({
 
       const buffer = Buffer.from(await fileData.arrayBuffer());
 
-      // Validar que el contenido descargado sea un PDF real
+      // 2. Extraer texto según tipo de archivo
+      let pdfText: string;
+      let strategy: string;
+
       const header = buffer.slice(0, 5).toString("ascii");
       if (!header.startsWith("%PDF")) {
-        const preview = buffer.toString("utf8", 0, 200);
-        throw new Error(`Storage devolvió contenido inválido (no es PDF). Primeros bytes: ${preview}`);
+        // Archivo de texto plano — usar directamente sin OCR
+        pdfText = buffer.toString("utf8");
+        strategy = "plain-text";
+        logger.info("Archivo de texto plano detectado", { chars: pdfText.length });
+      } else {
+        // PDF — OCR por niveles (digital/escaneado, STEM/no STEM)
+        const result = await extractText(buffer, subjectName);
+        pdfText = result.text;
+        strategy = result.strategy;
       }
-
-      // 2. OCR por niveles (digital/escaneado, STEM/no STEM)
-      const { text: pdfText, strategy } = await extractText(buffer, subjectName);
+      logger.info("OCR completado", { strategy, chars: pdfText.length });
       logger.info("OCR completado", { strategy, chars: pdfText.length });
 
       if (type === "syllabus") {
