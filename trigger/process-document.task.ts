@@ -2,13 +2,18 @@ import { task, logger } from "@trigger.dev/sdk/v3";
 import { createClient } from "@supabase/supabase-js";
 import { generateText } from "@/lib/ai";
 import { extractText } from "@/lib/ocr";
+import WebSocket from "ws";
 
 // Usa service_role porque corre en los servidores de Trigger.dev,
 // fuera de la sesión del usuario.
 function getAdmin() {
   return createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!,
+    {
+      auth: { persistSession: false, autoRefreshToken: false },
+      realtime: { transport: WebSocket as unknown as typeof globalThis.WebSocket },
+    }
   );
 }
 
