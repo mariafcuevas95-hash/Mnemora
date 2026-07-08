@@ -5,39 +5,27 @@ export interface OcrResult {
   strategy: OcrStrategy;
 }
 
-// ── Polyfill DOM APIs requeridas por pdfjs-dist en entornos Node.js ──────────
-if (typeof globalThis.DOMMatrix === "undefined") {
-  // @ts-ignore
-  globalThis.DOMMatrix = class DOMMatrix {
-    constructor() { return this; }
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    static fromMatrix() { return new (globalThis as any).DOMMatrix(); }
-  };
-}
-if (typeof globalThis.Path2D === "undefined") {
-  // @ts-ignore
-  globalThis.Path2D = class Path2D {};
+// ── Extracción de texto con unpdf (ESM-native, serverless-compatible) ─────────
+
+async function extractPdfText(buffer: Buffer, maxPages?: number): Promise<string> {
+  const { extractText, getDocumentProxy } = await import("unpdf");
+  const pdf = await getDocumentProxy(new Uint8Array(buffer));
+  const { text } = await extractText(pdf, { mergePages: true });
+  if (maxPages) {
+    // rough truncation by lines for detection purposes
+    return text.split("\n").slice(0, maxPages * 40).join("\n");
+  }
+  return text;
 }
 
 // ── Detección de tipo de PDF ──────────────────────────────────────────────────
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function resolvePdfParse(m: any): (buf: Buffer, opts?: object) => Promise<{ text: string }> {
-  if (typeof m === "function") return m;
-  if (typeof m?.default === "function") return m.default;
-  if (typeof m?.default?.default === "function") return m.default.default;
-  throw new Error("pdf-parse: no function export found");
-}
-
 async function hasExtractableText(buffer: Buffer): Promise<boolean> {
   try {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const pdfModule = await import("pdf-parse") as any;
-    const pdfParse = resolvePdfParse(pdfModule);
-    const { text } = await pdfParse(buffer, { max: 3 }); // solo primeras 3 páginas
+    const text = await extractPdfText(buffer, 3);
     return text.trim().length > 100;
   } catch {
-    return false;
+    return true; // asumir digital si no se puede verificar
   }
 }
 
@@ -112,11 +100,7 @@ async function mistralOcr(buffer: Buffer): Promise<string> {
 // ── pdf-parse fallback (siempre disponible) ───────────────────────────────────
 
 async function pdfParseFallback(buffer: Buffer): Promise<string> {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const pdfModule = await import("pdf-parse") as any;
-  const pdfParse = resolvePdfParse(pdfModule);
-  const { text } = await pdfParse(buffer);
-  return text as string;
+  return extractPdfText(buffer);
 }
 
 // ── Pipeline principal ────────────────────────────────────────────────────────
