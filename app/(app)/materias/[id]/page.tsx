@@ -619,6 +619,7 @@ export default function MateriaPage() {
               onDone={() => {
                 const db = createClient();
                 db.from("documents").select("id, name, processing_status, summary, created_at").eq("subject_id", id).order("created_at", { ascending: false }).then(({ data }) => { if (data) setDocs(data); });
+                db.from("flashcards").select("id, front, back").eq("subject_id", id).order("created_at").then(({ data }) => { if (data) setFlashcards(data); });
               }}
               onViewFlashcards={() => { setProcessingDocId(null); setTab("flashcards"); }}
             />
