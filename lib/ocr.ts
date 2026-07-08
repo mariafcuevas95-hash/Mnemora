@@ -5,6 +5,20 @@ export interface OcrResult {
   strategy: OcrStrategy;
 }
 
+// ── Polyfill DOM APIs requeridas por pdfjs-dist en entornos Node.js ──────────
+if (typeof globalThis.DOMMatrix === "undefined") {
+  // @ts-ignore
+  globalThis.DOMMatrix = class DOMMatrix {
+    constructor() { return this; }
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    static fromMatrix() { return new (globalThis as any).DOMMatrix(); }
+  };
+}
+if (typeof globalThis.Path2D === "undefined") {
+  // @ts-ignore
+  globalThis.Path2D = class Path2D {};
+}
+
 // ── Detección de tipo de PDF ──────────────────────────────────────────────────
 
 async function hasExtractableText(buffer: Buffer): Promise<boolean> {
