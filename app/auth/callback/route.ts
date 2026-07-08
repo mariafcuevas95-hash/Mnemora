@@ -65,6 +65,32 @@ export async function GET(request: NextRequest) {
         }
       }
 
+      // Activate any pending purchase for this email
+      const { getAdmin } = await import("@/lib/supabase/admin");
+      const adminDb = getAdmin();
+      const { data: pendingEvent } = await adminDb
+        .from("payment_events")
+        .select("id, event_type, payload")
+        .eq("buyer_email", data.user.email!)
+        .is("user_id", null)
+        .in("event_type", ["PURCHASE_APPROVED", "PURCHASE_COMPLETE"])
+        .order("created_at", { ascending: false })
+        .limit(1)
+        .maybeSingle();
+
+      if (pendingEvent) {
+        const payload = pendingEvent.payload as Record<string, unknown>;
+        const evData = payload?.data as Record<string, unknown> | undefined;
+        const productId = String((evData?.product as Record<string, unknown>)?.id ?? "");
+        const premiumProductId = process.env.HOTMART_PREMIUM_PRODUCT_ID ?? "";
+        const plan = premiumProductId && productId === premiumProductId ? "premium" : "pro";
+        const planNameStr = String(((evData?.subscription as Record<string, unknown>)?.plan as Record<string, unknown>)?.name ?? "");
+        const isAnnual = planNameStr.toLowerCase().includes("anu") || planNameStr.toLowerCase().includes("year");
+        const expiresAt = new Date(Date.now() + (isAnnual ? 370 : 35) * 86400000).toISOString();
+        await adminDb.from("profiles").update({ plan, trial_ends_at: null, plan_expires_at: expiresAt }).eq("id", data.user.id);
+        await adminDb.from("payment_events").update({ user_id: data.user.id }).eq("id", pendingEvent.id);
+      }
+
       // Check if user has subjects yet — if not, go to onboarding
       const { count } = await supabase
         .from("subjects")

@@ -8,6 +8,7 @@ const PROTECTED = [
   "/analytics", "/referidos", "/biblioteca", "/admin",
 ];
 const AUTH_PAGES = ["/login", "/registro"];
+const PUBLIC_PAGES = ["/bienvenido"];
 
 function sanitizeEnv(v: string | undefined): string {
   if (!v) return "";
@@ -48,6 +49,8 @@ export async function middleware(request: NextRequest) {
 
   const isProtected = PROTECTED.some(p => pathname.startsWith(p));
   const isAuthPage = AUTH_PAGES.some(p => pathname.startsWith(p));
+  const isPublic = PUBLIC_PAGES.some(p => pathname.startsWith(p));
+  if (isPublic) return supabaseResponse;
 
   if (isProtected && !user) {
     const url = request.nextUrl.clone();

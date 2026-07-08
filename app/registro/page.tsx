@@ -1,9 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { BookOpen, ArrowRight, Eye, EyeOff } from "lucide-react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { ArrowRight, Eye, EyeOff } from "lucide-react";
+import { Logo } from "@/components/logo";
 import { createClient } from "@/lib/supabase/client";
 
 function AuthShell({ children, footer }: { children: React.ReactNode; footer?: React.ReactNode }) {
@@ -11,9 +12,7 @@ function AuthShell({ children, footer }: { children: React.ReactNode; footer?: R
     <div style={{ minHeight: "100vh", background: "#F7F4EF", display: "flex", flexDirection: "column" }}>
       <header style={{ padding: "20px 24px", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
         <Link href="/" style={{ display: "flex", alignItems: "center", gap: 8, textDecoration: "none" }}>
-          <div style={{ width: 32, height: 32, background: "#1B3F2F", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <BookOpen size={16} color="#fff" />
-          </div>
+          <Logo size={32} />
           <span className="font-display" style={{ fontWeight: 800, fontSize: 18, color: "#1A1612" }}>Mnemora</span>
         </Link>
         <Link href="/login" style={{ fontSize: 14, color: "#6B6259", textDecoration: "none" }}>
@@ -42,11 +41,17 @@ const inputStyle = {
   boxSizing: "border-box" as const,
 };
 
-export default function RegistroPage() {
+function RegistroPageInner() {
   const router = useRouter();
+  const params = useSearchParams();
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
+  useEffect(() => {
+    const pre = params.get("email");
+    if (pre) setEmail(pre);
+  }, [params]);
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -82,6 +87,7 @@ export default function RegistroPage() {
       const { data: { user } } = await db.auth.getUser();
       if (user) {
         await db.from("profiles").upsert({ id: user.id, email: user.email!, name });
+        await fetch("/api/claim-pending-purchase", { method: "POST" });
         router.push("/onboarding");
       } else {
         router.push(`/registro/confirmar?email=${encodeURIComponent(email)}`);
@@ -222,4 +228,8 @@ export default function RegistroPage() {
       </p>
     </AuthShell>
   );
+}
+
+export default function RegistroPage() {
+  return <Suspense><RegistroPageInner /></Suspense>;
 }
