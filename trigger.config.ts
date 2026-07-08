@@ -1,7 +1,7 @@
 import { defineConfig } from "@trigger.dev/sdk/v3";
 
 export default defineConfig({
-  project: process.env.TRIGGER_PROJECT_ID ?? "proj_mnemora",
+  project: process.env.TRIGGER_PROJECT_ID ?? "proj_rdtpfntbhiyzwhdzkotj",
   dirs: ["./trigger"],
   maxDuration: 300,
   retries: {
