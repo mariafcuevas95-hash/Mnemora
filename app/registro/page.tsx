@@ -45,6 +45,7 @@ function RegistroPageInner() {
   const router = useRouter();
   const params = useSearchParams();
   const [name, setName] = useState("");
+  const [nameTouched, setNameTouched] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -75,9 +76,9 @@ function RegistroPageInner() {
         const msg = signUpError.message ?? "";
         setError(
           msg.includes("already registered") || msg.includes("already exists")
-            ? "Ya existe una cuenta con ese email. ¿Querés iniciar sesión?"
+            ? "Ya existe una cuenta con ese email. ¿Quieres iniciar sesión?"
             : !msg || msg === "{}" || msg === "[object Object]"
-            ? `Error ${(signUpError as any).status ?? ""} ${(signUpError as any).code ?? ""}`.trim() || "Error al crear cuenta. Intentá con otro email."
+            ? `Error ${(signUpError as any).status ?? ""} ${(signUpError as any).code ?? ""}`.trim() || "Error al crear cuenta. Intenta con otro email."
             : msg
         );
         setLoading(false);
@@ -86,7 +87,11 @@ function RegistroPageInner() {
 
       const { data: { user } } = await db.auth.getUser();
       if (user) {
-        await db.from("profiles").upsert({ id: user.id, email: user.email!, name });
+        const { data: codeData } = await db.rpc("generate_referral_code");
+        await db.from("profiles").upsert({
+          id: user.id, email: user.email!, name,
+          ...(codeData ? { referral_code: codeData as string } : {}),
+        });
         await fetch("/api/claim-pending-purchase", { method: "POST" });
         router.push("/onboarding");
       } else {
@@ -115,7 +120,7 @@ function RegistroPageInner() {
   return (
     <AuthShell>
       <h1 className="font-display" style={{ fontSize: 28, fontWeight: 800, color: "#1A1612", marginBottom: 6 }}>
-        Creá tu cuenta
+        Crea tu cuenta
       </h1>
       <p style={{ fontSize: 15, color: "#6B6259", marginBottom: 28 }}>
         7 días Pro gratis. Sin tarjeta de crédito.
@@ -157,13 +162,13 @@ function RegistroPageInner() {
             autoComplete="name"
             style={inputStyle}
             onFocus={e => (e.target.style.borderColor = "#1B3F2F")}
-            onBlur={e => (e.target.style.borderColor = "rgba(26,22,18,0.12)")}
+            onBlur={e => { e.target.style.borderColor = "rgba(26,22,18,0.12)"; if (name) setNameTouched(true); }}
           />
         </div>
 
         <div>
-          <label style={{ fontSize: 13, fontWeight: 600, color: "#1A1612", display: "block", marginBottom: 6 }}>
-            Email universitario
+          <label style={{ fontSize: 13, fontWeight: 600, color: "#1A1612", display: "block", marginBottom: 6, transition: "color 200ms" }}>
+            {nameTouched && name ? `Hola, ${name.split(" ")[0]}. ¿Cuál es tu email?` : "Email"}
           </label>
           <input
             type="email"
@@ -222,7 +227,7 @@ function RegistroPageInner() {
       </form>
 
       <p style={{ fontSize: 12, color: "#9E9389", textAlign: "center", marginTop: 20, lineHeight: 1.6 }}>
-        Al registrarte aceptás los{" "}
+        Al registrarte aceptas los{" "}
         <Link href="/terminos" style={{ color: "#1B3F2F" }}>Términos de uso</Link> y la{" "}
         <Link href="/privacidad" style={{ color: "#1B3F2F" }}>Política de privacidad</Link>.
       </p>

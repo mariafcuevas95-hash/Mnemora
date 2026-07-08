@@ -22,7 +22,7 @@ function ConfirmarPageInner() {
           <Mail size={32} color="#1B3F2F" />
         </div>
         <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: "#1A1612", marginBottom: 12 }}>
-          Revisá tu email
+          Revisa tu email
         </h1>
         <p style={{ fontSize: 15, color: "#6B6259", lineHeight: 1.65, marginBottom: 32 }}>
           Enviamos un link de confirmación a <strong style={{ color: "#1A1612" }}>{email}</strong>.

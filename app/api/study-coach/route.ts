@@ -145,7 +145,7 @@ Genera 3 recomendaciones de estudio para hoy. JSON con este formato exacto:
 Reglas:
 - Si hay exámenes próximos, la primera recomendación siempre es exam_prep.
 - Si hay conceptos pendientes, la segunda es review con el concepto específico.
-- Sé muy concreto: mencioná el concepto o materia por nombre.
+- Sé muy concreto: menciona el concepto o materia por nombre.
 - subjectId debe ser uno de estos IDs: ${subjects.map(s => `${s.name}="${s.id}"`).join(", ")} — o null.`,
       }],
     });
@@ -212,7 +212,7 @@ function buildFallback(
     recs.push({
       type: "review",
       title: "Repaso del día",
-      description: `${dueConcepts.length} concepto${dueConcepts.length !== 1 ? "s" : ""} pendiente${dueConcepts.length !== 1 ? "s" : ""} hoy. Empezá por "${k.subject_concepts?.name}".`,
+      description: `${dueConcepts.length} concepto${dueConcepts.length !== 1 ? "s" : ""} pendiente${dueConcepts.length !== 1 ? "s" : ""} hoy. Empieza por "${k.subject_concepts?.name}".`,
       urgency: "medium",
       subjectId: subId,
       actionLabel: "Practicar ahora",

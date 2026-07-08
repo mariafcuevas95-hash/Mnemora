@@ -213,7 +213,7 @@ function buildFallback(
     plan.push({
       label: "Hoy",
       focus: topCritical,
-      action: `Repasá intensivamente ${topCritical} con flashcards hasta llegar a 70% de confianza.`,
+      action: `Repasa intensivamente ${topCritical} con flashcards hasta llegar a 70% de confianza.`,
       actionHref: `/flashcards/${subjectId}`,
       actionLabel: "Practicar críticos",
     });
@@ -224,7 +224,7 @@ function buildFallback(
     plan.push({
       label: "Mañana",
       focus: top ?? "conceptos de refuerzo",
-      action: `Consolidá "${top}" con el tutor y practicá ejercicios de aplicación.`,
+      action: `Consolida "${top}" con el tutor y practica ejercicios de aplicación.`,
       actionHref: `/tutor/${subjectId}`,
       actionLabel: "Abrir tutor",
     });
@@ -234,7 +234,7 @@ function buildFallback(
     plan.push({
       label: `En ${Math.min(days - 1, 2)} días`,
       focus: "Repaso general",
-      action: `Repasá todos los conceptos de ${subjectName} de principio a fin. Enfocate en los errores frecuentes.`,
+      action: `Repasa todos los conceptos de ${subjectName} de principio a fin. Enfócate en los errores frecuentes.`,
       actionHref: `/flashcards/${subjectId}`,
       actionLabel: "Repaso general",
     });
@@ -244,7 +244,7 @@ function buildFallback(
     plan.push({
       label: "Ahora",
       focus: "Repaso de emergencia",
-      action: `Repasá los conceptos más importantes de ${subjectName} con flashcards.`,
+      action: `Repasa los conceptos más importantes de ${subjectName} con flashcards.`,
       actionHref: `/flashcards/${subjectId}`,
       actionLabel: "Practicar ahora",
     });

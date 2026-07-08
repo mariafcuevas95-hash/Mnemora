@@ -164,6 +164,7 @@ function LiveProcessingCard({ docId, docName, subjectId, onDone, onViewFlashcard
 }) {
   const [stageIdx, setStageIdx]         = useState(0);
   const [done, setDone]                 = useState(false);
+  const [failed, setFailed]             = useState(false);
   const [flashcardCount, setFcCount]    = useState(0);
   const [conceptCount, setCcCount]      = useState(0);
   const [dismissed, setDismissed]       = useState(false);
@@ -191,6 +192,7 @@ function LiveProcessingCard({ docId, docName, subjectId, onDone, onViewFlashcard
         onDone(fcRes.count ?? 0);
       } else if (data?.processing_status === "failed") {
         clearInterval(interval);
+        setFailed(true);
         setDone(true);
       }
     }, 3000);
@@ -203,10 +205,10 @@ function LiveProcessingCard({ docId, docName, subjectId, onDone, onViewFlashcard
     <div style={{ borderRadius: "var(--mn-r-xl)", border: "1px solid var(--mn-ink-4)", marginBottom: 20, overflow: "hidden", animation: "fadeUp 0.3s ease" }}>
       {/* Header */}
       <div style={{ padding: "16px 20px", background: "var(--mn-raised)", borderBottom: "1px solid var(--mn-ink-4)", display: "flex", alignItems: "center", gap: 12 }}>
-        <div style={{ width: 8, height: 8, borderRadius: "50%", background: done ? "#16A34A" : "var(--mn-amber)", flexShrink: 0, animation: done ? "none" : "lpcPulse 1.5s infinite" }} />
+        <div style={{ width: 8, height: 8, borderRadius: "50%", background: done ? (failed ? "#DC2626" : "#16A34A") : "var(--mn-amber)", flexShrink: 0, animation: done ? "none" : "lpcPulse 1.5s infinite" }} />
         <p style={{ fontSize: 13, fontWeight: 600, color: "var(--mn-ink-1)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{docName}</p>
-        <span style={{ fontSize: 11, fontWeight: 600, color: done ? "#16A34A" : "var(--mn-amber)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
-          {done ? "Listo" : "Procesando"}
+        <span style={{ fontSize: 11, fontWeight: 600, color: done ? (failed ? "#DC2626" : "#16A34A") : "var(--mn-amber)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+          {done ? (failed ? "Error" : "Listo") : "Procesando"}
         </span>
       </div>
 
@@ -232,22 +234,50 @@ function LiveProcessingCard({ docId, docName, subjectId, onDone, onViewFlashcard
               );
             })}
           </div>
+        ) : failed ? (
+          <div>
+            <p style={{ fontSize: 14, fontWeight: 600, color: "#DC2626", marginBottom: 6 }}>
+              No se pudo procesar el documento.
+            </p>
+            <p style={{ fontSize: 13, color: "var(--mn-ink-3)", marginBottom: 16, lineHeight: 1.5 }}>
+              Verifica que el archivo no esté protegido o dañado, y vuelve a intentarlo.
+            </p>
+            <button onClick={() => setDismissed(true)} style={{ padding: "9px 16px", borderRadius: "var(--mn-r-md)", border: "1px solid var(--mn-ink-4)", background: "none", fontSize: 13, color: "var(--mn-ink-2)", cursor: "pointer" }}>
+              Cerrar
+            </button>
+          </div>
         ) : (
           <div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
-              <p style={{ fontSize: 14, fontWeight: 600, color: "var(--mn-ink-1)", marginBottom: 4 }}>
-                Listo{flashcardCount > 0 || conceptCount > 0 ? " —" : "."}
-                {flashcardCount > 0 && <> generé <strong>{flashcardCount} flashcard{flashcardCount !== 1 ? "s" : ""}</strong></>}
-                {flashcardCount > 0 && conceptCount > 0 && " y "}
-                {conceptCount > 0 && <> identifiqué <strong>{conceptCount} concepto{conceptCount !== 1 ? "s" : ""} clave</strong></>}
-                {(flashcardCount > 0 || conceptCount > 0) && "."}
-              </p>
-              <p style={{ fontSize: 13, color: "var(--mn-ink-3)" }}>Ya están en tu plan de estudio.</p>
-            </div>
+            {(flashcardCount > 0 || conceptCount > 0) && (
+              <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
+                {flashcardCount > 0 && (
+                  <div style={{ textAlign: "center" }}>
+                    <p className="font-display" style={{ fontSize: 28, fontWeight: 800, color: "var(--mn-green)", lineHeight: 1 }}>{flashcardCount}</p>
+                    <p style={{ fontSize: 11, color: "var(--mn-ink-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginTop: 2 }}>flashcards</p>
+                  </div>
+                )}
+                {flashcardCount > 0 && conceptCount > 0 && (
+                  <div style={{ width: 1, background: "var(--mn-ink-4)", margin: "2px 4px" }} />
+                )}
+                {conceptCount > 0 && (
+                  <div style={{ textAlign: "center" }}>
+                    <p className="font-display" style={{ fontSize: 28, fontWeight: 800, color: "var(--mn-ink-1)", lineHeight: 1 }}>{conceptCount}</p>
+                    <p style={{ fontSize: 11, color: "var(--mn-ink-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginTop: 2 }}>conceptos</p>
+                  </div>
+                )}
+              </div>
+            )}
+            <p style={{ fontSize: 13, color: "var(--mn-ink-3)", marginBottom: 16 }}>
+              {flashcardCount > 0
+                ? "Listas para repasar. El sistema ya sabe cuándo mostrarte cada una."
+                : "El documento fue procesado y sus conceptos ya están en tu materia."}
+            </p>
             <div style={{ display: "flex", gap: 8 }}>
-              <button onClick={() => { setDismissed(true); onViewFlashcards(); }} className="mn-btn-primary" style={{ fontSize: 13, padding: "9px 18px" }}>
-                Ver flashcards
-              </button>
+              {flashcardCount > 0 && (
+                <button onClick={() => { setDismissed(true); onViewFlashcards(); }} className="mn-btn-primary" style={{ fontSize: 13, padding: "9px 18px" }}>
+                  Ver flashcards
+                </button>
+              )}
               <button onClick={() => setDismissed(true)} style={{ padding: "9px 16px", borderRadius: "var(--mn-r-md)", border: "1px solid var(--mn-ink-4)", background: "none", fontSize: 13, color: "var(--mn-ink-2)", cursor: "pointer" }}>
                 Cerrar
               </button>
@@ -294,6 +324,8 @@ export default function MateriaPage() {
   const [goalType, setGoalType]   = useState<GoalType | "">("");
   const [goalValue, setGoalValue] = useState("");
   const [goalSaving, setGoalSaving] = useState(false);
+  const [displayMasteryPct, setDisplayMasteryPct] = useState(0);
+  const masteryAnimRef = useRef<number | null>(null);
 
   useEffect(() => {
     const db   = createClient();
@@ -327,6 +359,25 @@ export default function MateriaPage() {
         });
     });
   }, [id]);
+
+  useEffect(() => {
+    const totalRated = Object.keys(cardRatings).length;
+    if (totalRated === 0) return;
+    const dominadas = Object.values(cardRatings).filter(r => r.mastery === "mastered").length;
+    const target = Math.round((dominadas / totalRated) * 100);
+    if (target === 0) return;
+    const start = performance.now();
+    const duration = 900;
+    if (masteryAnimRef.current) cancelAnimationFrame(masteryAnimRef.current);
+    function step(now: number) {
+      const progress = Math.min((now - start) / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplayMasteryPct(Math.round(eased * target));
+      if (progress < 1) masteryAnimRef.current = requestAnimationFrame(step);
+    }
+    masteryAnimRef.current = requestAnimationFrame(step);
+    return () => { if (masteryAnimRef.current) cancelAnimationFrame(masteryAnimRef.current); };
+  }, [cardRatings]);
 
   async function handleFileUpload(file: File) {
     if (!file.type.includes("pdf") && !file.type.includes("text")) {
@@ -521,7 +572,7 @@ export default function MateriaPage() {
               <span style={{ fontSize: 12, color: "var(--mn-ink-4)", flexShrink: 0 }}>→</span>
               <div style={{ textAlign: "center", flex: 1 }}>
                 <p className="font-display" style={{ fontSize: 20, fontWeight: 800, color: masteryPct !== null && masteryPct > 0 ? "var(--mn-green)" : "var(--mn-ink-3)", lineHeight: 1 }}>
-                  {masteryPct !== null ? `${masteryPct}%` : "—"}
+                  {masteryPct !== null ? `${displayMasteryPct}%` : "—"}
                 </p>
                 <p style={{ fontSize: 10, color: "var(--mn-ink-3)", fontWeight: 600, marginTop: 2, textTransform: "uppercase", letterSpacing: "0.04em" }}>dominio</p>
               </div>

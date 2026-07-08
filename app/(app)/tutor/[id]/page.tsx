@@ -76,9 +76,9 @@ function TutorContextCard({
       {/* Context chips */}
       <div style={{ display: "flex", gap: 7, flexWrap: "wrap", marginBottom: 16 }}>
         {context.sessionCount > 0 && (
-          <div style={{ display: "flex", alignItems: "center", gap: 5, background: "var(--mn-raised)", borderRadius: "var(--mn-r-full)", padding: "3px 11px", fontSize: 12, color: "var(--mn-ink-2)", fontWeight: 500 }}>
-            <BookOpen size={11} />
-            {context.sessionCount} sesión{context.sessionCount !== 1 ? "es" : ""} previas
+          <div style={{ display: "flex", alignItems: "center", gap: 5, background: "var(--mn-green-light, #E8F1EC)", borderRadius: "var(--mn-r-full)", padding: "3px 11px", fontSize: 12, color: "var(--mn-green)", fontWeight: 600, animation: "fade-in-chip 400ms ease" }}>
+            🧠 Continuando desde tu última sesión
+            <style>{`@keyframes fade-in-chip{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:translateY(0)}}`}</style>
           </div>
         )}
         {context.nextExam && (
@@ -150,6 +150,7 @@ function TutorPageInner() {
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showContextCard, setShowContextCard] = useState(false);
   const [greetingLoading, setGreetingLoading] = useState(true);
+  const [showCompletionScreen, setShowCompletionScreen] = useState(false);
   const bottomRef = useRef<HTMLDivElement>(null);
   const abortRef = useRef<AbortController | null>(null);
   const greetingFetched = useRef(false);
@@ -164,7 +165,10 @@ function TutorPageInner() {
       const results: GuidedResults = {};
       if (s.flashcardResult) results.flashcard = s.flashcardResult;
       if (s.quizResult) results.quiz = s.quizResult;
-      if (results.flashcard || results.quiz) setGuidedResults(results);
+      if (results.flashcard || results.quiz) {
+        setGuidedResults(results);
+        setShowCompletionScreen(true);
+      }
     } catch {}
   }, [isGuided]);
 
@@ -193,6 +197,7 @@ function TutorPageInner() {
         setGreetingCtx(data.context);
         setSuggestions(data.suggestions ?? []);
         setSubjectName(data.context.subjectName);
+        try { localStorage.setItem("mn-last-subject", data.context.subjectName); } catch {}
         setMessages([{ id: "init", role: "assistant", content: data.greeting }]);
         setShowContextCard(true);
       })
@@ -304,6 +309,109 @@ function TutorPageInner() {
 
   const hasStartedConversation = messages.length > 1;
   const memoryActive = greetingCtx && greetingCtx.sessionCount > 0;
+
+  if (showCompletionScreen && guidedResults) {
+    const fcPct  = guidedResults.flashcard?.pctCorrect ?? null;
+    const qzPct  = guidedResults.quiz?.pct ?? null;
+    const avgPct = fcPct !== null && qzPct !== null
+      ? Math.round((fcPct + qzPct) / 2)
+      : fcPct ?? qzPct ?? 0;
+    const emoji  = avgPct >= 80 ? "🔥" : avgPct >= 60 ? "💪" : "📚";
+    const headline = avgPct >= 80
+      ? "Sesión completa. Así se consolida."
+      : avgPct >= 60
+      ? "Bien hecho. El tutor continúa desde aquí."
+      : "Práctica lista. El tutor ya sabe dónde enfocarse.";
+
+    return (
+      <div
+        onClick={() => setShowCompletionScreen(false)}
+        style={{
+          minHeight: "100vh",
+          background: "var(--mn-canvas)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "40px 28px",
+          textAlign: "center",
+          cursor: "pointer",
+        }}
+      >
+        <style>{`
+          @keyframes cs-pop {
+            0% { transform: scale(0.85); opacity: 0; }
+            60% { transform: scale(1.06); }
+            100% { transform: scale(1); opacity: 1; }
+          }
+          @keyframes cs-up {
+            from { transform: translateY(10px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+          }
+          @keyframes cs-bar {
+            from { width: 100%; }
+            to { width: 0%; }
+          }
+        `}</style>
+
+        {/* Paso a paso: ✓ Flashcards · ✓ Quiz → Tutor */}
+        <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 28, animation: "cs-up 0.35s ease both" }}>
+          {guidedResults.flashcard && <>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--mn-green)" }}>✓ Flashcards</span>
+            <span style={{ fontSize: 12, color: "var(--mn-ink-4)" }}>·</span>
+          </>}
+          {guidedResults.quiz && <>
+            <span style={{ fontSize: 12, fontWeight: 700, color: "var(--mn-green)" }}>✓ Quiz</span>
+            <span style={{ fontSize: 12, color: "var(--mn-ink-4)" }}>·</span>
+          </>}
+          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--mn-ink-2)" }}>Tutor →</span>
+        </div>
+
+        <div style={{ animation: "cs-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) both" }}>
+          <div style={{ fontSize: 48, marginBottom: 14 }}>{emoji}</div>
+        </div>
+
+        <h1 className="font-display" style={{
+          fontSize: 24, fontWeight: 800, color: "var(--mn-ink-1)",
+          marginBottom: 18, letterSpacing: "-0.02em",
+          animation: "cs-up 0.35s 0.15s ease both",
+        }}>
+          {headline}
+        </h1>
+
+        <div style={{
+          display: "flex", gap: 10, justifyContent: "center",
+          marginBottom: 32, animation: "cs-up 0.35s 0.25s ease both",
+        }}>
+          {guidedResults.flashcard && (
+            <div style={{ padding: "8px 16px", borderRadius: 10, background: "var(--mn-surface)", border: "1px solid var(--mn-ink-4)", textAlign: "center" }}>
+              <p className="font-display" style={{ fontSize: 20, fontWeight: 800, color: "var(--mn-green)", lineHeight: 1 }}>{guidedResults.flashcard.pctCorrect}%</p>
+              <p style={{ fontSize: 10, color: "var(--mn-ink-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginTop: 2 }}>flashcards</p>
+            </div>
+          )}
+          {guidedResults.quiz && (
+            <div style={{ padding: "8px 16px", borderRadius: 10, background: "var(--mn-surface)", border: "1px solid var(--mn-ink-4)", textAlign: "center" }}>
+              <p className="font-display" style={{ fontSize: 20, fontWeight: 800, color: "var(--mn-green)", lineHeight: 1 }}>{guidedResults.quiz.pct}%</p>
+              <p style={{ fontSize: 10, color: "var(--mn-ink-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginTop: 2 }}>quiz</p>
+            </div>
+          )}
+        </div>
+
+        <p style={{ fontSize: 12, color: "var(--mn-ink-4)", animation: "cs-up 0.35s 0.35s ease both" }}>
+          Toca para continuar
+        </p>
+
+        {/* Barra de progreso auto-dismiss */}
+        <div style={{ position: "fixed", bottom: 0, left: 0, right: 0, height: 3, background: "var(--mn-ink-4)" }}>
+          <div style={{
+            height: "100%", background: "var(--mn-green)",
+            animation: "cs-bar 2.5s 0.3s linear forwards",
+            transformOrigin: "left",
+          }} onAnimationEnd={() => setShowCompletionScreen(false)} />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "var(--mn-canvas)" }}>

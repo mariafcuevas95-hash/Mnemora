@@ -10,8 +10,10 @@ export const maxDuration = 60;
 // vercel.json: { "crons": [{ "path": "/api/notifications/daily", "schedule": "0 8 * * *" }] }
 export async function GET(req: NextRequest) {
   // Verify cron secret to prevent unauthorized calls
+  const secret = process.env.CRON_SECRET;
+  if (!secret) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const auth = req.headers.get("authorization");
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (auth !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

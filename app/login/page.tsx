@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowRight, Eye, EyeOff } from "lucide-react";
@@ -35,6 +35,12 @@ function LoginInner() {
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
   const [resetSent, setResetSent] = useState(false);
+  const [lastSubject, setLastSubject] = useState<string | null>(null);
+
+  useEffect(() => {
+    const s = localStorage.getItem("mn-last-subject");
+    if (s) setLastSubject(s);
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -107,14 +113,16 @@ function LoginInner() {
             Inicia sesión
           </h1>
           <p style={{ fontSize: 15, color: "#6B6259", marginBottom: 28 }}>
-            Tu tutor tiene memoria. Continuamos donde lo dejaste.
+            {lastSubject
+              ? <>Tu tutor tiene memoria. Continuamos con <strong style={{ color: "#1A1612" }}>{lastSubject}</strong>.</>
+              : "Tu tutor tiene memoria. Continuamos donde lo dejaste."}
           </p>
 
           {resetSent ? (
             <div style={{ padding: "16px 20px", borderRadius: 12, background: "#E8F1EC", border: "0.5px solid #86EFAC", marginBottom: 20 }}>
               <p style={{ fontSize: 14, fontWeight: 600, color: "#1B3F2F", marginBottom: 4 }}>Email enviado</p>
               <p style={{ fontSize: 13, color: "#16A34A" }}>
-                Revisá tu bandeja de entrada para resetear la contraseña.
+                Revisa tu bandeja de entrada para resetear la contraseña.
               </p>
             </div>
           ) : null}

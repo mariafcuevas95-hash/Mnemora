@@ -65,7 +65,7 @@ async function getMonthlyUsage(userId: string) {
 }
 
 const PRO_BOOLEAN_FEATURES = new Set<Feature>([
-  "advanced_memory", "daily_planner", "mind_maps",
+  "quiz", "advanced_memory", "daily_planner", "mind_maps",
 ]);
 
 const PREMIUM_BOOLEAN_FEATURES = new Set<Feature>([

@@ -32,6 +32,7 @@ function FlashcardsReviewPageInner() {
   const [xpResult, setXpResult] = useState<{ xpEarned: number; streakDays: number; newAchievements: { title: string; icon: string }[] } | null>(null);
   const [xpAwarded, setXpAwarded] = useState(false);
   const [cogStyle, setCogStyle] = useState<string | null>(null);
+  const [cardToast, setCardToast] = useState<string | null>(null);
 
   useEffect(() => {
     const db = createClient();
@@ -42,10 +43,19 @@ function FlashcardsReviewPageInner() {
         db.from("subjects").select("name").eq("id", subjectId).single(),
         db.from("cognitive_profile").select("preferred_style").eq("user_id", user.id).eq("subject_id", subjectId).maybeSingle(),
       ]).then(([fcRes, subRes, cogRes]) => {
-        setCards(fcRes.data ?? []);
+        const fetchedCards = fcRes.data ?? [];
+        setCards(fetchedCards);
         setSubjectName(subRes.data?.name ?? "Flashcards");
         setCogStyle(cogRes.data?.preferred_style ?? null);
         setLoading(false);
+        if (fetchedCards.length > 0) {
+          const key = `mn-fc-toast-${subjectId}`;
+          if (!localStorage.getItem(key)) {
+            localStorage.setItem(key, "1");
+            setCardToast(`Mnemora tiene ${fetchedCards.length} flashcard${fetchedCards.length !== 1 ? "s" : ""} listas para ti.`);
+            setTimeout(() => setCardToast(null), 4000);
+          }
+        }
       });
     });
   }, [subjectId]);
@@ -271,6 +281,14 @@ function FlashcardsReviewPageInner() {
 
   return (
     <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "var(--mn-canvas)" }}>
+
+      {/* Toast: primera carga */}
+      {cardToast && (
+        <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", background: "#1B3F2F", color: "#fff", padding: "10px 20px", borderRadius: 12, fontSize: 13, fontWeight: 600, zIndex: 200, animation: "toast-in 300ms ease", whiteSpace: "nowrap", boxShadow: "0 4px 16px rgba(0,0,0,0.2)" }}>
+          ✨ {cardToast}
+          <style>{`@keyframes toast-in{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}`}</style>
+        </div>
+      )}
 
       {/* Header */}
       <div style={{ padding: "14px 24px", display: "flex", alignItems: "center", gap: 14, borderBottom: "1px solid var(--mn-ink-4)", background: "var(--mn-surface)" }}>

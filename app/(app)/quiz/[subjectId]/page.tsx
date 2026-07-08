@@ -25,6 +25,7 @@ function QuizPageInner() {
   const [selected,   setSelected]   = useState<string | null>(null);
   const [answers,    setAnswers]    = useState<QuizAnswer[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [displayPct, setDisplayPct] = useState(0);
   const [result,     setResult]     = useState<{
     correct: number; total: number; pct: number;
     xp?: { xpEarned: number; streakDays: number; newAchievements: { title: string; icon: string }[] } | null;
@@ -74,6 +75,21 @@ function QuizPageInner() {
         .finally(() => setSubmitting(false));
     }
   }
+
+  useEffect(() => {
+    if (phase !== "result" || !result) return;
+    const target = result.pct || Math.round((result.correct / result.total) * 100);
+    const duration = 900;
+    const startTime = Date.now();
+    const animate = () => {
+      const elapsed = Date.now() - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setDisplayPct(Math.round(target * eased));
+      if (progress < 1) requestAnimationFrame(animate);
+    };
+    requestAnimationFrame(animate);
+  }, [phase, result]);
 
   useEffect(() => {
     function onKey(e: KeyboardEvent) {
@@ -137,10 +153,17 @@ function QuizPageInner() {
         {/* Score protagonista */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <p style={{ fontSize: 13, fontWeight: 600, color: "var(--mn-ink-3)", marginBottom: 4 }}>{session?.subjectName}</p>
-          <p className="font-display" style={{ fontSize: 72, fontWeight: 700, color: "var(--mn-ink-1)", lineHeight: 1, marginBottom: 8 }}>
-            {pct}<span style={{ fontSize: 32, color: "var(--mn-ink-3)" }}>%</span>
+          <p className="font-display" style={{ fontSize: 72, fontWeight: 700, color: "var(--mn-ink-1)", lineHeight: 1, marginBottom: 8, fontVariantNumeric: "tabular-nums" }}>
+            {displayPct}<span style={{ fontSize: 32, color: "var(--mn-ink-3)" }}>%</span>
           </p>
-          <p style={{ fontSize: 15, color: "var(--mn-ink-2)", marginBottom: 16 }}>{grade} · {result.correct} de {result.total} correctas</p>
+          <p style={{ fontSize: 15, color: "var(--mn-ink-2)", marginBottom: 8 }}>{grade} · {result.correct} de {result.total} correctas</p>
+          <p style={{ fontSize: 13, color: "var(--mn-ink-3)", lineHeight: 1.55, fontStyle: "italic", marginBottom: 8 }}>
+            {pct >= 80
+              ? "Impresionante. Ya dominas más de lo que pensabas."
+              : pct >= 50
+              ? "Bien. Tu tutor ya sabe dónde enfocarse contigo."
+              : "Bien que lo hiciste. Ahora Mnemora sabe exactamente dónde trabajar contigo."}
+          </p>
           <div style={{ height: 4, background: "var(--mn-raised)", borderRadius: 2, overflow: "hidden", maxWidth: 200, margin: "0 auto" }}>
             <div style={{ width: `${pct}%`, height: "100%", background: pct >= 70 ? "var(--mn-green)" : "var(--mn-amber)", borderRadius: 2, transition: "width 800ms var(--mn-ease)" }} />
           </div>
@@ -153,7 +176,7 @@ function QuizPageInner() {
           </p>
           <p style={{ fontSize: 15, fontWeight: 600, color: "var(--mn-ink-1)", lineHeight: 1.5, marginBottom: wrong_list.length > 0 ? 8 : 0 }}>
             {pct >= 80
-              ? `Actualicé tu perfil — subí la confianza de ${correct_list.length} concepto${correct_list.length !== 1 ? "s" : ""} en tu historial.`
+              ? `Actualicé tu perfil — aumenté la confianza de ${correct_list.length} concepto${correct_list.length !== 1 ? "s" : ""} en tu historial.`
               : pct >= 60
               ? `Registré ${correct_list.length} concepto${correct_list.length !== 1 ? "s" : ""} reforzados y marqué ${wrong_list.length} para atención extra.`
               : "Detecté los conceptos que necesitan refuerzo y reorganicé tu plan de repasos."}

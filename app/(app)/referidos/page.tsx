@@ -59,8 +59,7 @@ export default function ReferidosPage() {
         .sort((a, b) => b.count - a.count);
       if (topFriends.length > 0) setLeaderboard(topFriends);
     } else {
-      const body = await res.json().catch(() => ({}));
-      setFetchError(JSON.stringify(body));
+      setFetchError("error");
     }
     setLoading(false);
   }, []);
@@ -98,7 +97,7 @@ export default function ReferidosPage() {
   if (fetchError || !data) return (
     <div className="mn-dashboard-wrap" style={{ maxWidth: 560, paddingTop: 48 }}>
       <p style={{ fontSize: 14, color: "var(--mn-ink-2)", marginBottom: 8 }}>No se pudo cargar el programa de referidos.</p>
-      {fetchError && <pre style={{ fontSize: 11, color: "var(--mn-ink-3)", background: "var(--mn-raised)", padding: 12, borderRadius: 8, marginBottom: 16, whiteSpace: "pre-wrap", wordBreak: "break-all" }}>{fetchError}</pre>}
+      {}
       <button onClick={() => { setLoading(true); loadData(); }} className="mn-btn-primary" style={{ fontSize: 13 }}>
         Reintentar
       </button>
@@ -334,7 +333,7 @@ export default function ReferidosPage() {
       )}
 
       <p style={{ fontSize: 12, color: "var(--mn-ink-4)", textAlign: "center", lineHeight: 1.6 }}>
-        Más de 1.247 estudiantes ya estudian gratis gracias a sus referidos.
+        Cada referido que active un plan suma días gratuitos a tu cuenta.
       </p>
     </div>
   );

@@ -10,9 +10,9 @@ type PaywallReason = "materia" | "memoria" | "limite" | "syllabus" | "general";
 const HEADLINES: Record<PaywallReason, { title: string; desc: string }> = {
   materia:  { title: "Desbloquea materias ilimitadas",     desc: "Con el plan Free puedes tener 1 materia activa. Sube a Pro para organizar todo tu semestre." },
   memoria:  { title: "El tutor con memoria es Pro",         desc: "La memoria académica entre sesiones es la función más poderosa de Mnemora — y es exclusiva de Pro." },
-  limite:   { title: "Alcanzaste el límite del plan Free",  desc: "Ya usaste tus preguntas o flashcards del mes. Pro te da acceso sin límites." },
+  limite:   { title: "Recupera el acceso completo",  desc: "Durante tu prueba usaste esta función. Es tuya — te la podemos devolver ahora con Pro." },
   syllabus: { title: "Programas de materia ilimitados",     desc: "Ya usaste tu extracción gratuita. Pro te permite procesar todos los programas del semestre." },
-  general:  { title: "Estudia sin límites",                 desc: "Desbloquea todas las funciones de Mnemora con el plan que mejor se adapte a ti." },
+  general:  { title: "Recupera lo que ya era tuyo",          desc: "Durante tu prueba tuviste acceso completo. Vuélvelo a tener con el plan que mejor te sirve." },
 };
 
 const PRO_FEATURES = [
@@ -263,7 +263,7 @@ function PlanCard({ name, icon, bgColor, accentColor, subtleColor, tagline, pric
       )}
 
       <p style={{ textAlign: "center", fontSize: 11, color: accentColor, marginTop: 10, opacity: 0.7 }}>
-        Procesado por Hotmart · cancela cuando quieras
+        Procesado por Hotmart · cobro inmediato · cancela cuando quieras
       </p>
     </div>
   );

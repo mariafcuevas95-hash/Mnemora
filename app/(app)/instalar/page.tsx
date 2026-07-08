@@ -157,15 +157,15 @@ function PlatformInstructions({ platform, step, setStep, onInstall }: {
 }) {
   if (platform === "ios") {
     const steps = [
-      { icon: "📱", title: "Abrí Safari", desc: "Esta página debe estar abierta en Safari (no en Chrome ni otro navegador)." },
-      { icon: "⬆️", title: "Tocá Compartir", desc: 'Presioná el botón de compartir ↑ en la barra inferior de Safari.' },
-      { icon: "➕", title: "Agregar a inicio", desc: 'Desplazá hacia abajo y tocá "Agregar a pantalla de inicio".' },
-      { icon: "✅", title: "Confirmá", desc: 'Tocá "Agregar" en la esquina superior derecha. ¡Listo!' },
+      { icon: "📱", title: "Abre Safari", desc: "Esta página debe estar abierta en Safari (no en Chrome ni otro navegador)." },
+      { icon: "⬆️", title: "Toca Compartir", desc: 'Presiona el botón de compartir ↑ en la barra inferior de Safari.' },
+      { icon: "➕", title: "Agregar a inicio", desc: 'Desplázate hacia abajo y toca "Agregar a pantalla de inicio".' },
+      { icon: "✅", title: "Confirma", desc: 'Toca "Agregar" en la esquina superior derecha. ¡Listo!' },
     ];
     return (
       <div style={{ width: "100%" }}>
         <p style={{ fontSize: 15, color: "#6B6259", lineHeight: 1.6, marginBottom: 28 }}>
-          Seguí estos pasos para instalar Mnemora en tu iPhone o iPad.
+          Sigue estos pasos para instalar Mnemora en tu iPhone o iPad.
         </p>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {steps.map((s, i) => (
@@ -198,7 +198,7 @@ function PlatformInstructions({ platform, step, setStep, onInstall }: {
   if (platform === "android-prompt" || platform === "desktop-prompt") {
     return (
       <p style={{ fontSize: 16, color: "#6B6259", lineHeight: 1.7, maxWidth: 340 }}>
-        Instalá Mnemora en tu dispositivo para acceder más rápido, sin abrir el navegador, y con soporte sin conexión.
+        Instala Mnemora en tu dispositivo para acceder más rápido, sin abrir el navegador, y con soporte sin conexión.
       </p>
     );
   }
@@ -207,12 +207,12 @@ function PlatformInstructions({ platform, step, setStep, onInstall }: {
     return (
       <div style={{ textAlign: "left", width: "100%" }}>
         <p style={{ fontSize: 15, color: "#6B6259", marginBottom: 16, lineHeight: 1.6 }}>
-          Instalá Mnemora desde Chrome:
+          Instala Mnemora desde Chrome:
         </p>
         {[
-          { icon: "⋮", label: 'Tocá el menú ⋮ arriba a la derecha' },
+          { icon: "⋮", label: 'Toca el menú ⋮ arriba a la derecha' },
           { icon: "➕", label: '"Agregar a pantalla de inicio"' },
-          { icon: "✅", label: 'Tocá "Agregar"' },
+          { icon: "✅", label: 'Toca "Agregar"' },
         ].map((s, i) => (
           <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 10 }}>
             <div style={{ width: 32, height: 32, borderRadius: 8, background: "#1B3F2F", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
@@ -232,7 +232,7 @@ function PlatformInstructions({ platform, step, setStep, onInstall }: {
         La mejor experiencia de Mnemora es desde el teléfono.
       </p>
       <p style={{ fontSize: 14, color: "#9E9389", lineHeight: 1.6 }}>
-        Abrí <strong style={{ color: "#1B3F2F" }}>mnemora.me</strong> en tu celular y seguí las instrucciones para instalar la app.
+        Abre <strong style={{ color: "#1B3F2F" }}>mnemora.me</strong> en tu celular y sigue las instrucciones para instalar la app.
       </p>
     </div>
   );

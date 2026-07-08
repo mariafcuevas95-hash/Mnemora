@@ -400,6 +400,15 @@ function StepSyllabus({ data, update, onNext }: { data: OnboardingData; update: 
   }
 
   const [isDragging, setIsDragging] = useState(false);
+  const [processingMsgIdx, setProcessingMsgIdx] = useState(0);
+  const PROCESSING_MSGS = ["Leyendo el programa...", "Detectando fechas de examen...", "Mapeando temas del semestre...", "Casi listo..."];
+
+  useEffect(() => {
+    if (!processing) return;
+    const t = setInterval(() => setProcessingMsgIdx(i => (i + 1) % PROCESSING_MSGS.length), 2000);
+    return () => clearInterval(t);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [processing]);
 
   return (
     <div>
@@ -474,7 +483,7 @@ function StepSyllabus({ data, update, onNext }: { data: OnboardingData; update: 
             {uploading ? (
               <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Subiendo...</>
             ) : processing ? (
-              <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Procesando programa...</>
+              <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> {PROCESSING_MSGS[processingMsgIdx]}</>
             ) : (
               <>Subir y extraer calendario <ArrowRight size={16} /></>
             )}
@@ -508,7 +517,19 @@ function OnboardingPageInner() {
 function StepListo({ data }: { data: OnboardingData }) {
   const router = useRouter();
   const [countdown, setCountdown] = useState(4);
+  const [visibleItems, setVisibleItems] = useState(0);
+  const [showConfetti, setShowConfetti] = useState(false);
   const destination = data.subjectId ? `/tutor/${data.subjectId}` : "/dashboard";
+
+  useEffect(() => {
+    const timers = [
+      setTimeout(() => setVisibleItems(1), 150),
+      setTimeout(() => setVisibleItems(2), 350),
+      setTimeout(() => setVisibleItems(3), 550),
+      setTimeout(() => { setVisibleItems(4); setShowConfetti(true); }, 800),
+    ];
+    return () => timers.forEach(clearTimeout);
+  }, []);
 
   useEffect(() => {
     if (countdown <= 0) {
@@ -532,19 +553,43 @@ function StepListo({ data }: { data: OnboardingData }) {
         {!data.syllabusSkipped && " El calendario se llenará en segundos."}
       </p>
 
+      {showConfetti && (
+        <div style={{ position: "fixed", inset: 0, pointerEvents: "none", overflow: "hidden", zIndex: 50 }}>
+          {["#1B3F2F","#86EFAC","#D97706","#FCD34D","#1B3F2F","#86EFAC"].map((color, i) => (
+            <div key={i} style={{
+              position: "absolute",
+              top: "-10px",
+              left: `${15 + i * 14}%`,
+              width: 8,
+              height: 8,
+              borderRadius: i % 2 === 0 ? "50%" : 2,
+              background: color,
+              animation: `confetti-fall 1.4s ease-out ${i * 80}ms forwards`,
+            }} />
+          ))}
+        </div>
+      )}
+
       <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
         {[
           { text: "Materia creada en Mnemora", done: true },
           { text: data.syllabusSkipped ? "Programa: puedes subirlo desde la materia" : "Programa recibido · extrayendo fechas", done: !data.syllabusSkipped },
           { text: "Tutor con memoria activado", done: true },
-          { text: "7 días Pro gratis activos", done: true },
-        ].map(({ text, done }) => (
-          <div key={text} style={{ display: "flex", alignItems: "center", gap: 10, background: done ? "#FFFFFF" : "#F7F4EF", borderRadius: 12, padding: "12px 16px", border: "0.5px solid rgba(26,22,18,0.08)" }}>
+          { text: "✨ 7 días Pro gratis activos", done: true },
+        ].map(({ text, done }, idx) => (
+          <div key={text} style={{
+            display: "flex", alignItems: "center", gap: 10,
+            background: done ? "#FFFFFF" : "#F7F4EF", borderRadius: 12,
+            padding: "12px 16px", border: "0.5px solid rgba(26,22,18,0.08)",
+            opacity: visibleItems > idx ? 1 : 0,
+            transform: visibleItems > idx ? "translateY(0)" : "translateY(8px)",
+            transition: "opacity 300ms ease, transform 300ms ease",
+          }}>
             {done
               ? <Check size={16} color="#1B3F2F" />
               : <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid rgba(26,22,18,0.2)", flexShrink: 0 }} />
             }
-            <span style={{ fontSize: 14, color: done ? "#1A1612" : "#9E9389", fontWeight: 500 }}>{text}</span>
+            <span style={{ fontSize: 14, color: done ? "#1A1612" : "#9E9389", fontWeight: idx === 3 ? 700 : 500 }}>{text}</span>
           </div>
         ))}
       </div>
@@ -574,6 +619,9 @@ function StepListo({ data }: { data: OnboardingData }) {
       >
         Ir al dashboard en su lugar
       </button>
+      <style>{`
+        @keyframes confetti-fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+      `}</style>
     </div>
   );
 }

@@ -148,6 +148,7 @@ export default function SettingsPage() {
       <style>{`
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes pulse-sk{0%,100%{opacity:1}50%{opacity:.45}}
+        @keyframes live-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.7)}}
       `}</style>
 
       {/* ── Profile card ── */}
@@ -161,7 +162,8 @@ export default function SettingsPage() {
           </p>
           <p style={{ fontSize: 13, color: "var(--mn-ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{profile.email}</p>
         </div>
-        <span style={{ padding: "3px 11px", borderRadius: "var(--mn-r-full)", background: "var(--mn-raised)", fontSize: 12, fontWeight: 600, color: "var(--mn-ink-2)", flexShrink: 0 }}>
+        <span style={{ display: "flex", alignItems: "center", gap: 6, padding: "3px 11px", borderRadius: "var(--mn-r-full)", background: "var(--mn-raised)", fontSize: 12, fontWeight: 600, color: "var(--mn-ink-2)", flexShrink: 0 }}>
+          {isTrialActive && <span style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--mn-green)", animation: "live-pulse 2s ease infinite", flexShrink: 0 }} />}
           {planLabel}
         </span>
       </div>
@@ -234,16 +236,32 @@ export default function SettingsPage() {
         <div style={{ background: "var(--mn-surface)", borderRadius: "var(--mn-r-xl)", padding: "20px 24px", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
           <Row
             label={planLabel}
-            sub={profile.plan === "free" && !isTrialActive ? "Sin costo · funciones limitadas" : `$${plan.price_usd}/mes`}
-            border={profile.plan !== "free"}
+            sub={
+              isTrialActive
+                ? `${trialDays} ${trialDays === 1 ? "día restante" : "días restantes"} de prueba gratuita`
+                : profile.plan === "free"
+                  ? "Sin costo · funciones del plan Starter"
+                  : `$${plan.price_usd}/mes`
+            }
+            border={false}
             right={
               profile.plan === "free" ? (
                 <Link href="/upgrade" className="mn-btn-primary" style={{ fontSize: 13, padding: "8px 16px", textDecoration: "none" }}>
-                  Mejorar <ArrowRight size={13} />
+                  {isTrialActive ? "Ver planes" : "Mejorar"} <ArrowRight size={13} />
                 </Link>
               ) : null
             }
           />
+          {isTrialActive && trialDays <= 2 && (
+            <p style={{ fontSize: 12, color: "#92400E", lineHeight: 1.6, marginTop: 8, padding: "8px 12px", background: "#FEF3C7", borderRadius: 8 }}>
+              Tu prueba termina pronto. Al finalizar, conservás todo tu contenido y accedés a las funciones del plan Starter.
+            </p>
+          )}
+          {!isTrialActive && profile.plan === "free" && (
+            <p style={{ fontSize: 12, color: "var(--mn-ink-3)", lineHeight: 1.6, marginTop: 4 }}>
+              Tu información y materias están guardadas. Actualizá para recuperar el acceso completo.
+            </p>
+          )}
           {profile.plan !== "free" && (
             <p style={{ fontSize: 12, color: "var(--mn-ink-3)", lineHeight: 1.6 }}>
               Para cancelar o gestionar la suscripción, hazlo desde tu cuenta de Hotmart.

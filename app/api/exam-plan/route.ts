@@ -56,17 +56,17 @@ export async function POST(req: NextRequest) {
 
   const targetSessions = Math.min(Math.max(Math.round(days * 0.6), 3), 12);
 
-  const prompt = `Generá un plan de estudio para el examen "${examTitle}" de ${subjectName}, que es en ${days} día${days !== 1 ? "s" : ""} (fecha: ${examDate}).
+  const prompt = `Genera un plan de estudio para el examen "${examTitle}" de ${subjectName}, que es en ${days} día${days !== 1 ? "s" : ""} (fecha: ${examDate}).
 ${weakStr}
 ${masteredStr}
 
-Generá exactamente ${targetSessions} sesiones de estudio. Devolvé ÚNICAMENTE un JSON válido con este formato exacto, sin texto antes ni después:
+Genera exactamente ${targetSessions} sesiones de estudio. Devuelve ÚNICAMENTE un JSON válido con este formato exacto, sin texto antes ni después:
 {"sessions":[{"daysFromNow":1,"title":"Repasar [tema]","focusAreas":["tema 1","tema 2"],"durationMin":45}]}
 
 Reglas:
 - daysFromNow: entero ≥ 1, distribuido gradualmente hasta ${days - 1} días (no incluir el día del examen)
 - title: acción concreta de máximo 5 palabras
-- focusAreas: 1-3 temas específicos, priorizá áreas débiles al principio
+- focusAreas: 1-3 temas específicos, prioriza áreas débiles al principio
 - durationMin: entre 30 y 90
 - Las últimas 2 sesiones deben ser repaso general / simulacro`;
 

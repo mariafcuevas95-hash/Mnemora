@@ -9,8 +9,10 @@ export const maxDuration = 60;
 // Called by Vercel Cron daily at 12:00 UTC
 // Sends a warning email to users whose trial ends in exactly 2 days
 export async function GET(req: NextRequest) {
+  const secret = process.env.CRON_SECRET;
+  if (!secret) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   const auth = req.headers.get("authorization");
-  if (auth !== `Bearer ${process.env.CRON_SECRET}`) {
+  if (auth !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

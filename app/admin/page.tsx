@@ -1,6 +1,10 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { createClient } from "@/lib/supabase/client";
+
+const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL ?? "mariafcuevas05@gmail.com";
 import {
   Users, DollarSign, TrendingUp, Zap,
   ArrowUpRight, ArrowDownRight, BookOpen,
@@ -79,7 +83,21 @@ const FUNNEL = [
 const FLAG: Record<string, string> = { AR: "🇦🇷", MX: "🇲🇽", CL: "🇨🇱", CO: "🇨🇴", BR: "🇧🇷" };
 
 export default function AdminPage() {
+  const router = useRouter();
+  const [authorized, setAuthorized] = useState(false);
   const [showMock, setShowMock] = useState(false);
+
+  useEffect(() => {
+    createClient().auth.getUser().then(({ data }) => {
+      if (data.user?.email === ADMIN_EMAIL) {
+        setAuthorized(true);
+      } else {
+        router.replace("/dashboard");
+      }
+    });
+  }, [router]);
+
+  if (!authorized) return null;
 
   return (
     <div style={{ minHeight: "100vh", background: "#F7F4EF", padding: "32px" }}>

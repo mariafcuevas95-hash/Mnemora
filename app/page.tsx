@@ -8,6 +8,7 @@ import {
   Shield, TrendingUp, Map, BarChart2, ClipboardCheck,
   GitBranch, RefreshCw, Trophy, Users,
 } from "lucide-react";
+import { Logo } from "@/components/logo";
 
 /* ─────────────────────────────────────────────
    RESPONSIVE STYLES
@@ -106,13 +107,13 @@ function Hero() {
 
       <div className="mn-animate mn-animate-d3" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
         <Link href="/registro" className="mn-btn-primary" style={{ fontSize: 16, padding: "16px 32px" }}>
-          Comenzar gratis durante 7 días <ArrowRight size={16} />
+          Empezar gratis — 7 días Pro incluidos <ArrowRight size={16} />
         </Link>
         <a href="#funciones" className="mn-btn-ghost" style={{ fontSize: 16 }}>Ver funciones</a>
       </div>
 
       <p className="mn-animate mn-animate-d4" style={{ marginTop: 16, color: "#9E9389", fontSize: 13 }}>
-        Se solicita tarjeta · cancela cuando quieras
+        Sin tarjeta · prueba Pro 7 días gratis · después decide
       </p>
 
       <div className="mn-animate mn-animate-d4" style={{ marginTop: 72 }}>
@@ -627,7 +628,7 @@ function Pricing() {
           <h2 className="font-display" style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#1A1612", letterSpacing: "-0.02em", lineHeight: 1.15, marginBottom: 16 }}>
             Elige tu plan
           </h2>
-          <p style={{ color: "#6B6259", fontSize: 17, marginBottom: 28 }}>7 días de prueba gratuita en Pro y Premium. Cancela antes y no pagas nada.</p>
+          <p style={{ color: "#6B6259", fontSize: 17, marginBottom: 28 }}>Prueba Pro 7 días gratis al crear tu cuenta — sin tarjeta. Después, elige el plan que más te sirve.</p>
           {/* Toggle */}
           <div style={{ display: "inline-flex", background: "#EDE9E2", borderRadius: 12, padding: 4, gap: 2 }}>
             {(["monthly", "annual"] as const).map(b => (
@@ -695,10 +696,10 @@ function Pricing() {
               ))}
             </div>
             <Link href={billing === "monthly" ? "https://pay.hotmart.com/X106608100N?off=dc4u4ck4" : "https://pay.hotmart.com/X106608100N?off=rglfytvv"} target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center", padding: "14px", borderRadius: 12, background: "#FFFFFF", fontSize: 15, fontWeight: 700, color: "#1B3F2F", textDecoration: "none" }}>
-              Empieza tu prueba de 7 días
+              Obtener Pro — cobro inmediato
             </Link>
             <p style={{ textAlign: "center", fontSize: 12, color: "#86EFAC", marginTop: 12, lineHeight: 1.5 }}>
-              Se solicitará una tarjeta. Cancela antes de que termine la prueba y no se realizará ningún cobro.
+              Ya usaste tu prueba gratuita de 7 días dentro de Mnemora.
             </p>
           </div>
 
@@ -745,10 +746,10 @@ function Pricing() {
               ))}
             </div>
             <Link href={billing === "monthly" ? "https://pay.hotmart.com/X106608100N?off=ob9wndyf" : "https://pay.hotmart.com/X106608100N?off=5k6odu6s"} target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center", padding: "14px", borderRadius: 12, background: "var(--mn-green)", fontSize: 15, fontWeight: 700, color: "#fff", textDecoration: "none" }}>
-              Prueba Premium durante 7 días
+              Obtener Premium — cobro inmediato
             </Link>
             <p style={{ textAlign: "center", fontSize: 12, color: "#FCD34D", marginTop: 12, lineHeight: 1.5 }}>
-              Se solicitará una tarjeta. Cancela antes de que termine la prueba y no se realizará ningún cobro.
+              Ya usaste tu prueba gratuita de 7 días dentro de Mnemora.
             </p>
           </div>
 
@@ -861,7 +862,7 @@ function Proof() {
 const faqs = [
   { q: "¿Necesito saber usar IA?", a: "No. Solo sube tus documentos y Mnemora hace el resto. No hay comandos, no hay prompts, no hay configuración." },
   { q: "¿Puedo cancelar cuando quiera?", a: "Sí. La suscripción se puede cancelar en cualquier momento desde tu cuenta, sin formularios ni llamadas." },
-  { q: "¿Necesito tarjeta para empezar?", a: "Sí. La prueba dura 7 días y puedes cancelar antes de que termine para no pagar nada. Se solicita la tarjeta al iniciar." },
+  { q: "¿Necesito tarjeta para empezar?", a: "No. Al crear tu cuenta accedés automáticamente a 7 días de Pro gratis, sin tarjeta ni datos de pago. Solo necesitás una tarjeta si decidís comprar Pro o Premium cuando termine la prueba." },
   { q: "¿Mis documentos son privados?", a: "Sí. Solo tú puedes acceder a ellos. No usamos tu contenido para entrenar modelos de IA." },
   { q: "¿En qué idioma funciona el tutor?", a: "100% en español. Entiende vocabulario académico latinoamericano, nombres de materias en español y el formato de las universidades de la región." },
   { q: "¿Qué formatos de documentos acepta?", a: "PDF (el más común para programas de materia y apuntes), texto copiado directamente, e imágenes de apuntes. No requiere formato especial." },
@@ -908,7 +909,7 @@ function FinalCTA() {
           7 días de prueba gratuita. El tutor que recuerda todo — listo en 5 minutos.
         </p>
         <Link href="/registro" className="mn-btn-primary" style={{ fontSize: 17, padding: "18px 40px", background: "#FFFFFF", color: "#1B3F2F" }}>
-          Empieza a estudiar de forma inteligente
+          Crear mi cuenta gratis
           <ArrowRight size={18} />
         </Link>
         <p style={{ marginTop: 20, color: "#6EE7B7", fontSize: 13 }}>
@@ -927,9 +928,7 @@ function Footer() {
     <footer style={{ background: "#111810", padding: "40px 24px" }}>
       <div className="mn-footer-inner" style={{ maxWidth: 1120, margin: "0 auto", display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "center", gap: 16 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <div style={{ width: 28, height: 28, background: "#1B3F2F", borderRadius: 7, display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <BookOpen size={14} color="#86EFAC" />
-          </div>
+          <Logo size={28} />
           <span className="font-display" style={{ fontWeight: 800, fontSize: 16, color: "#FFFFFF" }}>Mnemora</span>
         </div>
         <div style={{ textAlign: "center" }}>

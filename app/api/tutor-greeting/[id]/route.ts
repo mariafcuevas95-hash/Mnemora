@@ -112,7 +112,7 @@ El estudiante acaba de completar una sesión guiada completa: repasó sus flashc
 Contexto adicional:
 ${context}
 
-Escribe el mensaje de apertura de esta sesión de consolidación (máximo 3 oraciones). Reconocé que terminaron la práctica y que ahora van a consolidar con conversación. Sé directo y motivador.
+Escribe el mensaje de apertura de esta sesión de consolidación (máximo 3 oraciones). Reconoce que terminaron la práctica y que ahora van a consolidar con conversación. Sé directo y motivador.
 Ejemplo de tono: "Terminaste las flashcards y el quiz — eso es compromiso real. Ahora vamos a consolidar..."
 NO empieces con "Hola" genérico. Responde solo el mensaje, sin comillas ni explicaciones.`;
   } else if (isFirstSession) {
