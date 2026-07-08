@@ -46,31 +46,32 @@ export default function MateriasPage() {
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {subjects.map(s => (
-            <Link
+            <div
               key={s.id}
-              href={`/materias/${s.id}`}
               className="mn-card"
-              style={{ padding: "16px 20px", textDecoration: "none", display: "flex", alignItems: "center", gap: 14 }}
+              style={{ padding: "16px 20px", display: "flex", alignItems: "center", gap: 14 }}
             >
-              <div style={{ width: 38, height: 38, background: "#E8F1EC", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <FileText size={16} color="#1B3F2F" />
-              </div>
-              <div style={{ flex: 1, overflow: "hidden" }}>
-                <p className="font-display" style={{ fontSize: 15, fontWeight: 800, color: "#1A1612", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.name}</p>
-                {s.professor && <p style={{ fontSize: 12, color: "#9E9389" }}>{s.professor}</p>}
-              </div>
+              <Link href={`/materias/${s.id}`} style={{ display: "flex", alignItems: "center", gap: 14, flex: 1, minWidth: 0, textDecoration: "none" }}>
+                <div style={{ width: 38, height: 38, background: "#E8F1EC", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  <FileText size={16} color="#1B3F2F" />
+                </div>
+                <div style={{ flex: 1, overflow: "hidden" }}>
+                  <p className="font-display" style={{ fontSize: 15, fontWeight: 800, color: "#1A1612", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{s.name}</p>
+                  {s.professor && <p style={{ fontSize: 12, color: "#9E9389" }}>{s.professor}</p>}
+                </div>
+              </Link>
               <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                <Link href={`/tutor/${s.id}`} onClick={e => e.stopPropagation()} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#1B3F2F", fontWeight: 600, textDecoration: "none", padding: "5px 9px", background: "#E8F1EC", borderRadius: 7 }}>
+                <Link href={`/tutor/${s.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#1B3F2F", fontWeight: 600, textDecoration: "none", padding: "5px 9px", background: "#E8F1EC", borderRadius: 7 }}>
                   <Brain size={11} /> Tutor
                 </Link>
-                <Link href={`/flashcards/${s.id}`} onClick={e => e.stopPropagation()} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#6B6259", fontWeight: 600, textDecoration: "none", padding: "5px 9px", background: "#F7F4EF", borderRadius: 7 }}>
+                <Link href={`/flashcards/${s.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#6B6259", fontWeight: 600, textDecoration: "none", padding: "5px 9px", background: "#F7F4EF", borderRadius: 7 }}>
                   <Layers size={11} /> Flashcards
                 </Link>
-                <Link href={`/progreso?subject=${s.id}`} onClick={e => e.stopPropagation()} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#6B6259", fontWeight: 600, textDecoration: "none", padding: "5px 9px", background: "#F7F4EF", borderRadius: 7 }}>
+                <Link href={`/progreso?subject=${s.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#6B6259", fontWeight: 600, textDecoration: "none", padding: "5px 9px", background: "#F7F4EF", borderRadius: 7 }}>
                   <BarChart2 size={11} /> Progreso
                 </Link>
               </div>
-            </Link>
+            </div>
           ))}
         </div>
       )}

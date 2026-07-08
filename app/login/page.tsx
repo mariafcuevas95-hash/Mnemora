@@ -73,7 +73,7 @@ function LoginInner() {
 
   async function handleGoogle() {
     if (!SUPABASE_CONFIGURED) {
-      setError("Google login requiere configurar Supabase. Agregá NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY reales en .env.local.");
+      setError("Google login requiere configurar Supabase. Agrega NEXT_PUBLIC_SUPABASE_URL y NEXT_PUBLIC_SUPABASE_ANON_KEY reales en .env.local.");
       return;
     }
     setGoogleLoading(true);

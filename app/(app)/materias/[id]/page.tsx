@@ -178,7 +178,10 @@ function LiveProcessingCard({ docId, docName, subjectId, onDone, onViewFlashcard
 
   useEffect(() => {
     const db = createClient();
+    let polls = 0;
+    const MAX_POLLS = 60; // 3 min timeout (60 × 3s)
     const interval = setInterval(async () => {
+      polls++;
       const { data } = await db.from("documents").select("processing_status").eq("id", docId).single();
       if (data?.processing_status === "done") {
         clearInterval(interval);
@@ -190,7 +193,7 @@ function LiveProcessingCard({ docId, docName, subjectId, onDone, onViewFlashcard
         setCcCount(cRes.count ?? 0);
         setDone(true);
         onDone(fcRes.count ?? 0);
-      } else if (data?.processing_status === "failed") {
+      } else if (data?.processing_status === "failed" || polls >= MAX_POLLS) {
         clearInterval(interval);
         setFailed(true);
         setDone(true);
