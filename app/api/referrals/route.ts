@@ -25,7 +25,7 @@ export async function GET() {
       .eq("id", user.id)
       .single(),
     db.from("referrals")
-      .select("id, status, created_at, converted_at, profiles!referred_user_id(name, email)")
+      .select("id, status, created_at, converted_at, referred_user_id")
       .eq("referrer_id", user.id)
       .order("created_at", { ascending: false }),
     db.from("referral_rewards")
@@ -53,16 +53,28 @@ export async function GET() {
     referralCode = updated?.referral_code ?? null;
   }
 
+  // Fetch referred user profiles separately to avoid join issues
+  const referredIds = (referralsRes.data ?? []).map(r => r.referred_user_id).filter(Boolean);
+  const referredProfiles: Record<string, { name: string | null; email: string }> = {};
+  if (referredIds.length > 0) {
+    const { data: rProfiles } = await db
+      .from("profiles")
+      .select("id, name, email")
+      .in("id", referredIds);
+    for (const p of rProfiles ?? []) {
+      referredProfiles[p.id] = { name: p.name, email: p.email };
+    }
+  }
+
   const referrals = (referralsRes.data ?? []).map((r) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const p = r.profiles as any;
+    const p = referredProfiles[r.referred_user_id] ?? { name: null, email: "" };
     return {
       id: r.id,
       status: r.status,
       created_at: r.created_at,
       converted_at: r.converted_at,
-      name: p?.name ?? null,
-      email: maskEmail(p?.email ?? ""),
+      name: p.name,
+      email: maskEmail(p.email),
     };
   });
 
