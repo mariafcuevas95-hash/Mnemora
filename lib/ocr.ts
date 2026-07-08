@@ -21,11 +21,19 @@ if (typeof globalThis.Path2D === "undefined") {
 
 // ── Detección de tipo de PDF ──────────────────────────────────────────────────
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function resolvePdfParse(m: any): (buf: Buffer, opts?: object) => Promise<{ text: string }> {
+  if (typeof m === "function") return m;
+  if (typeof m?.default === "function") return m.default;
+  if (typeof m?.default?.default === "function") return m.default.default;
+  throw new Error("pdf-parse: no function export found");
+}
+
 async function hasExtractableText(buffer: Buffer): Promise<boolean> {
   try {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const pdfModule = await import("pdf-parse") as any;
-    const pdfParse = pdfModule.default ?? pdfModule;
+    const pdfParse = resolvePdfParse(pdfModule);
     const { text } = await pdfParse(buffer, { max: 3 }); // solo primeras 3 páginas
     return text.trim().length > 100;
   } catch {
@@ -106,7 +114,7 @@ async function mistralOcr(buffer: Buffer): Promise<string> {
 async function pdfParseFallback(buffer: Buffer): Promise<string> {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const pdfModule = await import("pdf-parse") as any;
-  const pdfParse = pdfModule.default ?? pdfModule;
+  const pdfParse = resolvePdfParse(pdfModule);
   const { text } = await pdfParse(buffer);
   return text as string;
 }
