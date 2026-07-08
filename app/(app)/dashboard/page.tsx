@@ -176,6 +176,12 @@ export default function DashboardPage() {
     fetch("/api/stats").then(r => r.ok ? r.json() : null).then(d => { if (d) setUserCount(d.userCount); }).catch(() => {});
   }, []);
 
+  // Show PWA install screen once if not yet seen
+  useEffect(() => {
+    const seen = localStorage.getItem("mnemora_pwa_seen");
+    if (!seen) router.push("/instalar?next=/dashboard");
+  }, [router]);
+
   // Study Coach — cached per session in sessionStorage
   useEffect(() => {
     const CACHE_KEY = "mn-study-coach";

@@ -255,6 +255,25 @@ export default function SettingsPage() {
       {/* ── Referidos ── */}
       <ReferralSection />
 
+      {/* ── App ── */}
+      <Section title="App">
+        <div style={{ background: "var(--mn-surface)", borderRadius: "var(--mn-r-xl)", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+          <button
+            onClick={() => { localStorage.removeItem("mnemora_pwa_seen"); window.location.href = "/instalar?next=/settings"; }}
+            style={{ width: "100%", padding: "16px 24px", display: "flex", alignItems: "center", gap: 12, background: "none", border: "none", cursor: "pointer", textAlign: "left", transition: "background 100ms" }}
+            onMouseEnter={e => (e.currentTarget.style.background = "var(--mn-raised)")}
+            onMouseLeave={e => (e.currentTarget.style.background = "none")}
+          >
+            <span style={{ fontSize: 16 }}>📲</span>
+            <div style={{ flex: 1 }}>
+              <p style={{ fontSize: 14, fontWeight: 600, color: "var(--mn-ink-1)" }}>Instalar Mnemora</p>
+              <p style={{ fontSize: 12, color: "var(--mn-ink-3)" }}>Agregar a la pantalla de inicio</p>
+            </div>
+            <ArrowRight size={15} color="var(--mn-ink-3)" />
+          </button>
+        </div>
+      </Section>
+
       {/* ── Sesión ── */}
       <Section title="Sesión">
         <div style={{ background: "var(--mn-surface)", borderRadius: "var(--mn-r-xl)", overflow: "hidden", boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
