@@ -45,6 +45,13 @@ export const processDocumentTask = task({
 
       const buffer = Buffer.from(await fileData.arrayBuffer());
 
+      // Validar que el contenido descargado sea un PDF real
+      const header = buffer.slice(0, 5).toString("ascii");
+      if (!header.startsWith("%PDF")) {
+        const preview = buffer.toString("utf8", 0, 200);
+        throw new Error(`Storage devolvió contenido inválido (no es PDF). Primeros bytes: ${preview}`);
+      }
+
       // 2. OCR por niveles (digital/escaneado, STEM/no STEM)
       const { text: pdfText, strategy } = await extractText(buffer, subjectName);
       logger.info("OCR completado", { strategy, chars: pdfText.length });

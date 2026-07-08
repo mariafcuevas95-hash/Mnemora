@@ -100,7 +100,11 @@ async function mistralOcr(buffer: Buffer): Promise<string> {
 // ── pdf-parse fallback (siempre disponible) ───────────────────────────────────
 
 async function pdfParseFallback(buffer: Buffer): Promise<string> {
-  return extractPdfText(buffer);
+  try {
+    return await extractPdfText(buffer);
+  } catch {
+    return ""; // PDF inválido o dañado — el AI generará lo que pueda con contexto vacío
+  }
 }
 
 // ── Pipeline principal ────────────────────────────────────────────────────────
