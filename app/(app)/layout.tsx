@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import {
   BookOpen, LayoutDashboard, Calendar,
-  Layers, Plus, ChevronRight, Settings, TrendingUp, LogOut, Library, GitBranch, Map, BarChart2, RefreshCw, ClipboardCheck, Gift, Mic, Brain, Bell,
+  Layers, Plus, ChevronRight, Settings, TrendingUp, LogOut, Library, GitBranch, Map, BarChart2, RefreshCw, ClipboardCheck, Gift, Mic, Brain, Bell, Target,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -139,6 +139,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/quiz", icon: <Brain size={16} />, label: "Quiz" },
     { href: "/calendario", icon: <Calendar size={16} />, label: "Mi Plan" },
     { href: "/flashcards", icon: <Layers size={16} />, label: "Flashcards" },
+    { href: "/objetivos", icon: <Target size={16} />, label: "Objetivos" },
     { href: "/progreso", icon: <TrendingUp size={16} />, label: "Mi progreso" },
     { href: "/analytics", icon: <BarChart2 size={16} />, label: "Estadísticas" },
     { href: "/replanner", icon: <RefreshCw size={16} />, label: "Ajustar plan" },
