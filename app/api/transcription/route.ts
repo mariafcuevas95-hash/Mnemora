@@ -8,7 +8,7 @@ import { rateLimit } from "@/lib/rate-limit";
 export const runtime = "nodejs";
 export const maxDuration = 120;
 
-const GEMINI_MODEL = "gemini-2.0-flash";
+const GEMINI_MODEL = "gemini-2.5-flash";
 
 interface TranscriptionRequest {
   audioBase64: string;
