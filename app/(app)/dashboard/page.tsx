@@ -53,7 +53,7 @@ function daysUntil(dateStr: string): number {
 }
 
 function formatDate(dateStr: string): string {
-  return new Date(dateStr).toLocaleDateString("es-AR", { day: "numeric", month: "short" });
+  return new Date(dateStr).toLocaleDateString("es", { day: "numeric", month: "short" });
 }
 
 function greeting(): string {

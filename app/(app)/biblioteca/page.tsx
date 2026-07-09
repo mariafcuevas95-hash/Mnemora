@@ -32,14 +32,16 @@ export default function BibliotecaPage() {
     db.auth.getUser().then(async ({ data: { user } }) => {
       if (!user) { setLoading(false); return; }
 
-      const [subRes, docRes, fcRes, cRes] = await Promise.all([
-        db.from("subjects").select("id, name").eq("user_id", user.id).order("name"),
-        db.from("documents").select("id, subject_id, source, created_at").eq("user_id", user.id),
-        db.from("flashcards").select("id, subject_id, source, created_at").eq("user_id", user.id),
-        db.from("subject_concepts").select("id, subject_id").in("subject_id",
-          (await db.from("subjects").select("id").eq("user_id", user.id)).data?.map(s => s.id) ?? []
-        ),
-      ]);
+      const subRes = await db.from("subjects").select("id, name").eq("user_id", user.id).order("name");
+      const subjectIds = (subRes.data ?? []).map(s => s.id);
+
+      const [docRes, fcRes, cRes] = subjectIds.length === 0
+        ? [{ data: [] }, { data: [] }, { data: [] }]
+        : await Promise.all([
+            db.from("documents").select("id, subject_id, source, created_at").eq("user_id", user.id),
+            db.from("flashcards").select("id, subject_id, source, created_at").eq("user_id", user.id),
+            db.from("subject_concepts").select("id, subject_id").in("subject_id", subjectIds),
+          ]);
 
       const subs = subRes.data ?? [];
       const docs = docRes.data ?? [];

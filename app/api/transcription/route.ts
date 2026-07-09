@@ -121,7 +121,7 @@ Required JSON format:
     .insert({
       subject_id: subjectId,
       user_id: user.id,
-      name: `Transcripción de clase · ${new Date().toLocaleDateString("es-AR", { day: "numeric", month: "short" })}`,
+      name: `Transcripción de clase · ${new Date().toLocaleDateString("es", { day: "numeric", month: "short" })}`,
       file_url: null,
       processing_status: "done",
       summary,

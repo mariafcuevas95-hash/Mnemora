@@ -48,7 +48,7 @@ export async function generateText(options: GenerateOptions): Promise<GenerateRe
 
   // ── Google Gemini path ────────────────────────────────────────────────────
   const genAI = await getGoogle();
-  const modelId = GOOGLE_MODELS[model] ?? "gemini-2.0-flash-lite";
+  const modelId = GOOGLE_MODELS[model] ?? "gemini-2.5-flash";
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const gemini = genAI.getGenerativeModel({
