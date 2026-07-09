@@ -229,7 +229,7 @@ function StepMateria({ data, update, onNext }: { data: OnboardingData; update: (
       });
       if (res.status === 403) {
         const json = await res.json();
-        setError(json.message ?? "Límite del plan Free alcanzado.");
+        setError(json.message ?? "Límite del plan alcanzado.");
         setLoading(false);
         return;
       }
