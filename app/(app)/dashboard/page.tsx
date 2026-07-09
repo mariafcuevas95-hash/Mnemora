@@ -805,7 +805,7 @@ export default function DashboardPage() {
               Empecemos.
             </p>
             <p style={{ fontSize: 14, color: "var(--mn-ink-2)", marginBottom: 24, lineHeight: 1.6 }}>
-              Agregá tu primera materia y tu tutor queda listo para estudiar contigo.
+              Agrega tu primera materia y tu tutor queda listo para estudiar contigo.
             </p>
             <Link href="/onboarding" className="mn-btn-primary" style={{ fontSize: 15, padding: "13px 28px" }}>
               Agregar mi primera materia →
@@ -813,6 +813,45 @@ export default function DashboardPage() {
           </div>
         ) : (
           <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+            {/* Checklist de primeros pasos — solo visible si el usuario aún no ha ganado XP */}
+            {loaded && gamification !== null && gamification.xpTotal === 0 && subjects.length > 0 && (() => {
+              const firstSubject = subjects[0];
+              const steps = [
+                { done: subjects.length > 0,         label: "Creaste tu primera materia",         href: null },
+                { done: false,                        label: "Sube el programa de la materia",      href: `/materias/${firstSubject.id}` },
+                { done: false,                        label: "Practica tus primeras flashcards",    href: `/flashcards/${firstSubject.id}` },
+                { done: false,                        label: "Chatea con el tutor",                 href: `/tutor/${firstSubject.id}` },
+              ];
+              const completed = steps.filter(s => s.done).length;
+              if (completed >= steps.length) return null;
+              return (
+                <div style={{ background: "var(--mn-surface)", border: "1px solid var(--mn-ink-4)", borderRadius: "var(--mn-r-xl)", padding: "16px 18px", marginBottom: 4 }}>
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
+                    <p style={{ fontSize: 13, fontWeight: 700, color: "var(--mn-ink-1)" }}>Primeros pasos</p>
+                    <span style={{ fontSize: 11, color: "var(--mn-ink-3)" }}>{completed}/{steps.length}</span>
+                  </div>
+                  <div style={{ height: 4, background: "var(--mn-raised)", borderRadius: "var(--mn-r-full)", marginBottom: 14, overflow: "hidden" }}>
+                    <div style={{ height: "100%", width: `${(completed / steps.length) * 100}%`, background: "var(--mn-green)", borderRadius: "var(--mn-r-full)" }} />
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {steps.map((step, i) => (
+                      <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                        <div style={{ width: 20, height: 20, borderRadius: "50%", border: `1.5px solid ${step.done ? "var(--mn-green)" : "var(--mn-ink-4)"}`, background: step.done ? "var(--mn-green)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                          {step.done && <CheckCircle size={12} color="#fff" />}
+                        </div>
+                        {step.href && !step.done ? (
+                          <Link href={step.href} style={{ fontSize: 13, color: "var(--mn-ink-1)", textDecoration: "none", fontWeight: 500 }}>
+                            {step.label} <ArrowRight size={11} style={{ display: "inline", verticalAlign: "middle" }} />
+                          </Link>
+                        ) : (
+                          <p style={{ fontSize: 13, color: step.done ? "var(--mn-ink-3)" : "var(--mn-ink-2)", textDecoration: step.done ? "line-through" : "none" }}>{step.label}</p>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })()}
             {subjects.map(s => (
               <SubjectControlCard key={s.id} subject={s} stat={subjectStats.get(s.id) ?? null} />
             ))}
