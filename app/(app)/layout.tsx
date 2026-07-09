@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import {
   BookOpen, LayoutDashboard, Calendar,
-  Layers, Plus, ChevronRight, Settings, TrendingUp, LogOut, Library, GitBranch, Map, BarChart2, RefreshCw, ClipboardCheck, Gift, Mic, Brain, Bell, Target,
+  Layers, Plus, ChevronRight, Settings, TrendingUp, LogOut, Library, GitBranch, Map, BarChart2, RefreshCw, ClipboardCheck, Gift, Mic, Brain, Bell, Target, Trophy,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -143,6 +143,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     { href: "/progreso", icon: <TrendingUp size={16} />, label: "Mi progreso" },
     { href: "/analytics", icon: <BarChart2 size={16} />, label: "Estadísticas" },
     { href: "/replanner", icon: <RefreshCw size={16} />, label: "Ajustar plan" },
+    { href: "/gamificacion", icon: <Trophy size={16} />, label: "Logros" },
+    { href: "/biblioteca", icon: <Library size={16} />, label: "Biblioteca" },
     { href: "/referidos", icon: <Gift size={16} />, label: "Referidos" },
   ];
 
