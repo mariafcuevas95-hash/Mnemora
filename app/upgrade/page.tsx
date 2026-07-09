@@ -61,9 +61,29 @@ function UpgradeContent() {
 
   const [billing, setBilling] = useState<"monthly" | "annual">("annual");
   const [userCount, setUserCount] = useState<number | null>(null);
+  const [premiumOpen, setPremiumOpen] = useState(false);
+  const [usageStats, setUsageStats] = useState<{ flashcards: number; tutorMessages: number; subjects: number } | null>(null);
 
   useEffect(() => {
     fetch("/api/stats").then(r => r.ok ? r.json() : null).then(d => { if (d) setUserCount(d.userCount); }).catch(() => {});
+  }, []);
+
+  useEffect(() => {
+    import("@/lib/supabase/client").then(({ createClient }) => {
+      const db = createClient();
+      db.auth.getUser().then(({ data: { user } }) => {
+        if (!user) return;
+        Promise.all([
+          db.from("usage_monthly").select("flashcards, tutor_messages").eq("user_id", user.id).maybeSingle(),
+          db.from("subjects").select("id", { count: "exact", head: true }).eq("user_id", user.id),
+        ]).then(([usage, subs]) => {
+          const f = usage.data?.flashcards ?? 0;
+          const t = usage.data?.tutor_messages ?? 0;
+          const s = subs.count ?? 0;
+          if (f > 0 || t > 0 || s > 0) setUsageStats({ flashcards: f, tutorMessages: t, subjects: s });
+        }).catch(() => {});
+      });
+    });
   }, []);
   const isAnnual = billing === "annual";
 
@@ -109,6 +129,38 @@ function UpgradeContent() {
           </p>
         </div>
 
+        {/* Bloque de valor — lo que el usuario ya construyó */}
+        {usageStats && (
+          <div style={{ background: "#EAF2EC", border: "1px solid #B6D9C0", borderRadius: 14, padding: "14px 18px", marginBottom: 28 }}>
+            <p style={{ fontSize: 12, fontWeight: 700, color: "#1B3F2F", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 10 }}>
+              Lo que ya construiste en Mnemora
+            </p>
+            <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+              {usageStats.subjects > 0 && (
+                <div style={{ background: "#fff", borderRadius: 10, padding: "8px 14px", display: "flex", flexDirection: "column", alignItems: "center", minWidth: 72 }}>
+                  <span style={{ fontSize: 20, fontWeight: 800, color: "#1B3F2F", lineHeight: 1 }}>{usageStats.subjects}</span>
+                  <span style={{ fontSize: 11, color: "#4B7A5E", marginTop: 2 }}>{usageStats.subjects === 1 ? "materia" : "materias"}</span>
+                </div>
+              )}
+              {usageStats.flashcards > 0 && (
+                <div style={{ background: "#fff", borderRadius: 10, padding: "8px 14px", display: "flex", flexDirection: "column", alignItems: "center", minWidth: 72 }}>
+                  <span style={{ fontSize: 20, fontWeight: 800, color: "#1B3F2F", lineHeight: 1 }}>{usageStats.flashcards}</span>
+                  <span style={{ fontSize: 11, color: "#4B7A5E", marginTop: 2 }}>flashcards</span>
+                </div>
+              )}
+              {usageStats.tutorMessages > 0 && (
+                <div style={{ background: "#fff", borderRadius: 10, padding: "8px 14px", display: "flex", flexDirection: "column", alignItems: "center", minWidth: 72 }}>
+                  <span style={{ fontSize: 20, fontWeight: 800, color: "#1B3F2F", lineHeight: 1 }}>{usageStats.tutorMessages}</span>
+                  <span style={{ fontSize: 11, color: "#4B7A5E", marginTop: 2 }}>preguntas al tutor</span>
+                </div>
+              )}
+            </div>
+            <p style={{ fontSize: 12, color: "#4B7A5E", marginTop: 10, marginBottom: 0 }}>
+              Todo esto sigue aquí. Pro lo lleva al siguiente nivel.
+            </p>
+          </div>
+        )}
+
         {/* Billing toggle */}
         <div style={{ display: "flex", background: "#E8E3DA", borderRadius: 12, padding: 4, marginBottom: 20 }}>
           {(["annual", "monthly"] as const).map(b => (
@@ -145,21 +197,41 @@ function UpgradeContent() {
           isAnnual={isAnnual}
         />
 
-        {/* Premium card */}
-        <PlanCard
-          name="Premium"
-          icon={<Star size={16} color="#FBBF24" fill="#FBBF24" />}
-          bgColor="#1C1108"
-          accentColor="#FCD34D"
-          subtleColor="#FEF3C7"
-          tagline="Tu coach académico personal con IA"
-          price={premPrice}
-          priceNote={isAnnual ? `$159 USD/año · equivale a $${PRM_ANNUAL}/mes` : `$${PRM_MONTHLY} USD/mes`}
-          features={PREMIUM_FEATURES}
-          checkoutUrl={premUrl}
-          checkoutsReady={checkoutsReady}
-          isAnnual={isAnnual}
-        />
+        {/* Premium — colapsado por defecto */}
+        {!premiumOpen ? (
+          <button
+            onClick={() => setPremiumOpen(true)}
+            style={{
+              width: "100%", marginBottom: 16, padding: "14px 18px",
+              background: "#1C1108", borderRadius: 16, border: "none", cursor: "pointer",
+              display: "flex", alignItems: "center", justifyContent: "space-between",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+              <Star size={15} color="#FBBF24" fill="#FBBF24" />
+              <div style={{ textAlign: "left" }}>
+                <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#fff" }}>Plan Premium</p>
+                <p style={{ margin: 0, fontSize: 12, color: "#FCD34D", opacity: 0.8 }}>Coach académico con IA · ${premPrice}/mes</p>
+              </div>
+            </div>
+            <span style={{ fontSize: 12, color: "#FCD34D", fontWeight: 600 }}>Ver más ↓</span>
+          </button>
+        ) : (
+          <PlanCard
+            name="Premium"
+            icon={<Star size={16} color="#FBBF24" fill="#FBBF24" />}
+            bgColor="#1C1108"
+            accentColor="#FCD34D"
+            subtleColor="#FEF3C7"
+            tagline="Tu coach académico personal con IA"
+            price={premPrice}
+            priceNote={isAnnual ? `$159 USD/año · equivale a $${PRM_ANNUAL}/mes` : `$${PRM_MONTHLY} USD/mes`}
+            features={PREMIUM_FEATURES}
+            checkoutUrl={premUrl}
+            checkoutsReady={checkoutsReady}
+            isAnnual={isAnnual}
+          />
+        )}
 
         {/* Social proof */}
         {userCount !== null && userCount >= 10 && (
@@ -182,7 +254,7 @@ function UpgradeContent() {
 
         <div style={{ textAlign: "center" }}>
           <Link href="/dashboard" style={{ fontSize: 13, color: "#9E9389", textDecoration: "none" }}>
-            Continuar con plan gratuito →
+            Continuar con plan Starter →
           </Link>
         </div>
       </div>
