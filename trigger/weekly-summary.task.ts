@@ -34,12 +34,19 @@ export const weeklySummaryTask = schedules.task({
     const resend = new Resend(process.env.RESEND_API_KEY);
     const fromEmail = process.env.RESEND_FROM_EMAIL ?? "hola@mnemora.me";
 
-    // Obtener todos los usuarios activos con email
-    const { data: users, error: usersErr } = await admin.auth.admin.listUsers({ perPage: 1000 });
-    if (usersErr) {
-      logger.error("Error listing users", { error: usersErr.message });
-      return;
+    // Obtener todos los usuarios activos con email (paginado)
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const allUsers: any[] = [];
+    let page = 1;
+    const perPage = 1000;
+    while (true) {
+      const { data: batch, error: batchErr } = await admin.auth.admin.listUsers({ page, perPage });
+      if (batchErr) { logger.error("Error listing users", { error: batchErr.message }); return; }
+      allUsers.push(...batch.users);
+      if (batch.users.length < perPage) break;
+      page++;
     }
+    const users = { users: allUsers };
 
     const now = new Date();
     const weekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -56,7 +63,7 @@ export const weeklySummaryTask = schedules.task({
         // Progreso: racha y XP esta semana
         const [progressRes, xpRes, knowledgeRes, examsRes, subjectsRes] = await Promise.all([
           admin.from("user_progress").select("streak_days, xp_total").eq("user_id", user.id).maybeSingle(),
-          admin.from("xp_events").select("xp_awarded").eq("user_id", user.id).gte("created_at", weekAgo),
+          admin.from("xp_events").select("xp_earned").eq("user_id", user.id).gte("created_at", weekAgo),
           admin.from("student_knowledge")
             .select("confidence, mastery_level, next_review, subject_concepts!inner(name, subject_id)")
             .eq("user_id", user.id),
@@ -71,7 +78,7 @@ export const weeklySummaryTask = schedules.task({
         ]);
 
         const progress = progressRes.data;
-        const xpThisWeek = (xpRes.data ?? []).reduce((s, e) => s + (e.xp_awarded ?? 0), 0);
+        const xpThisWeek = (xpRes.data ?? []).reduce((s, e) => s + (e.xp_earned ?? 0), 0);
         const knowledge = knowledgeRes.data ?? [];
         const exams = examsRes.data ?? [];
         const subjects = subjectsRes.data ?? [];
@@ -181,8 +188,8 @@ function buildEmailHtml(data: EmailData): string {
     : "";
 
   const pendingHtml = pendingCount > 0
-    ? `<a href="https://mnemora.me/flashcards" style="display:inline-block;padding:12px 24px;background:#1B3F2F;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;border-radius:10px;margin-top:8px;">Repasar ${pendingCount} flashcard${pendingCount !== 1 ? "s" : ""} pendiente${pendingCount !== 1 ? "s" : ""}</a>`
-    : `<a href="https://mnemora.me/dashboard" style="display:inline-block;padding:12px 24px;background:#1B3F2F;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;border-radius:10px;margin-top:8px;">Ir al dashboard</a>`;
+    ? `<a href="${process.env.NEXT_PUBLIC_APP_URL ?? "https://mnemora.me"}/flashcards" style="display:inline-block;padding:12px 24px;background:#1B3F2F;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;border-radius:10px;margin-top:8px;">Repasar ${pendingCount} flashcard${pendingCount !== 1 ? "s" : ""} pendiente${pendingCount !== 1 ? "s" : ""}</a>`
+    : `<a href="${process.env.NEXT_PUBLIC_APP_URL ?? "https://mnemora.me"}/dashboard" style="display:inline-block;padding:12px 24px;background:#1B3F2F;color:#ffffff;font-size:14px;font-weight:700;text-decoration:none;border-radius:10px;margin-top:8px;">Ir al dashboard</a>`;
 
   return `<!DOCTYPE html>
 <html lang="es">
@@ -229,7 +236,7 @@ function buildEmailHtml(data: EmailData): string {
     <!-- Footer -->
     <div style="text-align:center;padding:24px 0 8px;">
       <p style="font-size:11px;color:#C4BAAE;margin:0;">
-        Mnemora · <a href="https://mnemora.me/settings" style="color:#C4BAAE;">Gestionar notificaciones</a>
+        Mnemora · <a href="${process.env.NEXT_PUBLIC_APP_URL ?? "https://mnemora.me"}/settings" style="color:#C4BAAE;">Gestionar notificaciones</a>
       </p>
     </div>
   </div>

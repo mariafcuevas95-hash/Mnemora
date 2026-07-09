@@ -20,8 +20,11 @@ export async function middleware(request: NextRequest) {
   const supabaseUrl  = sanitizeEnv(process.env.NEXT_PUBLIC_SUPABASE_URL);
   const supabaseAnon = sanitizeEnv(process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
-  // Sin credenciales (dev local sin .env.local) — dejar pasar todo
+  // Sin credenciales — en producción fallar cerrado, en dev dejar pasar
   if (!supabaseUrl || !supabaseAnon) {
+    if (process.env.NODE_ENV === "production") {
+      return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
+    }
     return NextResponse.next({ request });
   }
 

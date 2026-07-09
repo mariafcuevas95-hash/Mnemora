@@ -155,7 +155,7 @@ Responde solo el mensaje, sin comillas ni explicaciones adicionales.`;
 
   if (fromGuided) {
     if (weakConcepts.length > 0) {
-      suggestions.push(`¿Podés explicarme ${weakConcepts[0].concept_name} con tus palabras?`);
+      suggestions.push(`¿Puedes explicarme ${weakConcepts[0].concept_name} con tus palabras?`);
     }
     suggestions.push("¿Cuál de los conceptos del quiz te quedó menos claro?");
     if (nextExam) {

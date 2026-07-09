@@ -4,7 +4,7 @@ function getResend() {
   return new Resend(process.env.RESEND_API_KEY ?? "placeholder");
 }
 const FROM = process.env.RESEND_FROM_EMAIL ?? "hello@mnemora.me";
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://mnemora.app";
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "https://mnemora.me";
 
 export interface DailyDigestData {
   name: string;
@@ -118,7 +118,7 @@ export async function sendWelcomeEmail(to: string, name: string) {
           Ir a mi dashboard →
         </a>
         <p style="color:#9E9389;font-size:13px;margin-top:24px;">
-          Garantía 30 días · cancela cuando quieras · soporte en hola@mnemora.app
+          Garantía 30 días · cancela cuando quieras · soporte en hello@mnemora.me
         </p>
       </div>
     `,
@@ -142,7 +142,7 @@ export async function sendProActivatedEmail(to: string, name: string) {
           Ir a mi dashboard →
         </a>
         <p style="color:#9E9389;font-size:13px;margin-top:24px;">
-          Garantía 30 días · cancela cuando quieras · soporte en hola@mnemora.app
+          Garantía 30 días · cancela cuando quieras · soporte en hello@mnemora.me
         </p>
       </div>
     `,
@@ -161,7 +161,7 @@ const emailShell = (content: string) => `<!DOCTYPE html>
     <hr style="border:none;border-top:1px solid #EDE9E2;margin:24px 0 16px;">
     <p style="margin:0;color:#9E9389;font-size:12px;text-align:center;">
       Garantía 30 días · cancela cuando quieras<br>
-      <a href="mailto:hola@mnemora.app" style="color:#1B3F2F;text-decoration:none;">hola@mnemora.app</a>
+      <a href="mailto:hello@mnemora.me" style="color:#1B3F2F;text-decoration:none;">hello@mnemora.me</a>
     </p>
   </div>
 </div>
@@ -201,11 +201,11 @@ export async function sendPlanCancelledEmail(to: string, name: string) {
       <h1 style="margin:0 0 12px;color:#1A1612;font-size:22px;font-weight:800;">Cancelación confirmada</h1>
       <p style="margin:0 0 16px;color:#6B6259;font-size:15px;line-height:1.6;">Hola ${firstName}, tu suscripción Pro fue cancelada. Sigues en Plan Free — tus materias y datos están guardados.</p>
       <div style="background:#F7F4EF;border-radius:12px;padding:16px 18px;margin-bottom:16px;">
-        <p style="margin:0 0 8px;color:#1A1612;font-size:14px;font-weight:700;">Podés volver cuando quieras</p>
+        <p style="margin:0 0 8px;color:#1A1612;font-size:14px;font-weight:700;">Puedes volver cuando quieras</p>
         <p style="margin:0;color:#6B6259;font-size:13px;line-height:1.6;">Tu historial, flashcards y progreso te esperan. Reactivar el Plan Pro toma menos de 1 minuto.</p>
       </div>
       ${btn(`${APP_URL}/upgrade`, "Reactivar Plan Pro")}
-      <p style="text-align:center;margin:0;color:#9E9389;font-size:13px;">¿Tuviste algún problema? <a href="mailto:hola@mnemora.app" style="color:#1B3F2F;">hola@mnemora.app</a></p>
+      <p style="text-align:center;margin:0;color:#9E9389;font-size:13px;">¿Tuviste algún problema? <a href="mailto:hello@mnemora.me" style="color:#1B3F2F;">hello@mnemora.me</a></p>
     `),
   });
 }
@@ -227,7 +227,7 @@ export async function sendPaymentFailedEmail(to: string, name: string) {
         </ol>
       </div>
       ${btn(`${APP_URL}/upgrade`, "Actualizar método de pago")}
-      <p style="text-align:center;margin:0;color:#9E9389;font-size:13px;">¿Necesitás ayuda? <a href="mailto:hola@mnemora.app" style="color:#1B3F2F;">hola@mnemora.app</a></p>
+      <p style="text-align:center;margin:0;color:#9E9389;font-size:13px;">¿Necesitas ayuda? <a href="mailto:hello@mnemora.me" style="color:#1B3F2F;">hello@mnemora.me</a></p>
     `),
   });
 }

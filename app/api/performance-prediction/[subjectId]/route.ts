@@ -297,7 +297,7 @@ export async function GET(
 
   if (predictedGrade >= 5.5 && predictedGrade < 7) {
     recs.push({
-      action: "Hacé un quiz de diagnóstico",
+      action: "Haz un quiz de diagnóstico",
       reason: "Con nota proyectada cerca del aprobado, un quiz revela qué conceptos están flaqueando antes del examen real.",
       cta: { label: "Iniciar Quiz", href: `/quiz/${subjectId}` },
       urgency: "media",
@@ -306,7 +306,7 @@ export async function GET(
 
   if (recs.length === 0 && predictedGrade >= 7) {
     recs.push({
-      action: "Hacé simulacros de examen",
+      action: "Haz simulacros de examen",
       reason: "Con nota proyectada alta, practicar en condiciones de examen consolida el rendimiento.",
       cta: { label: "Modo Examen", href: `/examen/${subjectId}` },
       urgency: "baja",

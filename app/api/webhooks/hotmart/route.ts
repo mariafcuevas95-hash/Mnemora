@@ -11,6 +11,7 @@
  */
 
 import { NextRequest, NextResponse } from "next/server";
+import { rateLimit } from "@/lib/rate-limit";
 import { getAdmin } from "@/lib/supabase/admin";
 import {
   verifyHottok,
@@ -22,6 +23,11 @@ import { sendProActivatedEmail, sendPlanCancelledEmail, sendPaymentFailedEmail }
 import { handleReferralConversion } from "@/lib/referrals";
 
 export async function POST(req: NextRequest) {
+  const ip = req.headers.get("x-forwarded-for") ?? "unknown";
+  if (!(await rateLimit(`hotmart:${ip}`, 100, 60_000))) {
+    return NextResponse.json({ error: "Too Many Requests" }, { status: 429 });
+  }
+
   // 1. Verify HOTTOK — Hotmart sends it as ?hottok= query param (v2 API)
   //    Also accept the x-hotmart-hottok header for backwards compatibility.
   const hottokParam  = req.nextUrl.searchParams.get("hottok");

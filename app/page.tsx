@@ -6,7 +6,7 @@ import {
   BookOpen, Brain, Calendar, ChevronDown, FileText, Layers,
   Sparkles, Star, Upload, Zap, Check, ArrowRight,
   Shield, TrendingUp, Map, BarChart2, ClipboardCheck,
-  GitBranch, RefreshCw, Trophy, Users,
+  GitBranch, RefreshCw, Trophy, Users, Mic,
 } from "lucide-react";
 import { Logo } from "@/components/logo";
 
@@ -102,7 +102,7 @@ function Hero() {
       </h1>
 
       <p className="mn-animate mn-animate-d2" style={{ fontSize: "clamp(17px, 2.2vw, 20px)", color: "#6B6259", maxWidth: 640, margin: "0 auto 44px", lineHeight: 1.6 }}>
-        Sube tu syllabus y tus apuntes. Mnemora organiza el semestre, crea flashcards, mapas mentales, quizzes y un plan personalizado para ayudarte a llegar preparado a cada examen.
+        Sube tus apuntes, tu syllabus o graba tus clases en audio. Mnemora organiza el semestre, crea flashcards, mapas mentales, quizzes y un plan personalizado para ayudarte a llegar preparado a cada examen.
       </p>
 
       <div className="mn-animate mn-animate-d3" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
@@ -462,6 +462,114 @@ function MindMapShowcase() {
 }
 
 /* ─────────────────────────────────────────────
+   AI CLASS STUDIO
+───────────────────────────────────────────── */
+function AIClassStudio() {
+  const outputs = [
+    { icon: "📝", label: "Apuntes organizados" },
+    { icon: "🗂️", label: "Flashcards" },
+    { icon: "❓", label: "Quiz" },
+    { icon: "🤖", label: "Tutor IA actualizado" },
+    { icon: "📅", label: "Plan de estudio" },
+  ];
+
+  return (
+    <section style={{ padding: "96px 24px", background: "#FFFFFF" }}>
+      <div className="mn-2col" style={{ maxWidth: 1120, margin: "0 auto" }}>
+        {/* Texto */}
+        <div>
+          <span className="mn-badge mn-badge-green" style={{ marginBottom: 20, display: "inline-flex" }}>
+            <Mic size={12} /> AI Class Studio
+          </span>
+          <h2 className="font-display" style={{ fontSize: "clamp(26px, 4vw, 42px)", fontWeight: 800, color: "#1A1612", letterSpacing: "-0.02em", lineHeight: 1.15, marginBottom: 20 }}>
+            Convierte cualquier clase en todo tu material de estudio.
+          </h2>
+          <p style={{ fontSize: 16, color: "#6B6259", lineHeight: 1.75, marginBottom: 28 }}>
+            Graba directamente desde Mnemora o sube un archivo de audio. En minutos, tu clase se convierte en apuntes, flashcards, quiz y más — y tu tutor ya sabe exactamente qué se vio.
+          </p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginBottom: 32 }}>
+            {[
+              "Graba en vivo desde la app o sube un audio",
+              "Transcripción automática del contenido",
+              "Detecta conceptos, fórmulas, fechas y tareas",
+              "Actualiza tu calendario y plan de estudio",
+            ].map(f => (
+              <div key={f} style={{ display: "flex", gap: 10, alignItems: "flex-start" }}>
+                <Check size={16} color="#1B3F2F" style={{ marginTop: 2, flexShrink: 0 }} />
+                <span style={{ fontSize: 14, color: "#3D352E" }}>{f}</span>
+              </div>
+            ))}
+          </div>
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6, padding: "5px 12px", borderRadius: 8, background: "#0F0A04", fontSize: 12, fontWeight: 700, color: "#FCD34D" }}>
+            ⭐ Incluido en Plan Premium
+          </span>
+        </div>
+
+        {/* Visual flow */}
+        <div style={{ background: "#1B3F2F", borderRadius: 24, padding: 32, boxShadow: "0 16px 60px rgba(27,63,47,0.22)", display: "flex", flexDirection: "column", alignItems: "center", gap: 0 }}>
+          {/* Input */}
+          <div style={{ width: "100%", background: "rgba(255,255,255,0.07)", border: "1px solid rgba(110,231,183,0.3)", borderRadius: 14, padding: "14px 18px", display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(110,231,183,0.15)", border: "1px solid rgba(110,231,183,0.3)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Mic size={16} color="#6EE7B7" />
+            </div>
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "#FFFFFF", margin: 0 }}>Grabación o archivo de audio</p>
+              <p style={{ fontSize: 11, color: "#86EFAC", margin: 0, marginTop: 2 }}>Clase de Cálculo II · 47 min</p>
+            </div>
+            <div style={{ marginLeft: "auto", display: "flex", alignItems: "center", gap: 6, padding: "4px 10px", borderRadius: 6, background: "rgba(110,231,183,0.15)" }}>
+              <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#6EE7B7" }} />
+              <span style={{ fontSize: 11, fontWeight: 700, color: "#6EE7B7" }}>Listo</span>
+            </div>
+          </div>
+
+          {/* Arrow down */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "12px 0" }}>
+            {[0,1,2].map(i => <div key={i} style={{ width: 1.5, height: 8, background: `rgba(110,231,183,${0.3 + i * 0.2})` }} />)}
+            <div style={{ fontSize: 14, color: "#6EE7B7" }}>↓</div>
+          </div>
+
+          {/* Processing */}
+          <div style={{ width: "100%", background: "rgba(110,231,183,0.1)", border: "1px solid rgba(110,231,183,0.25)", borderRadius: 14, padding: "14px 18px", display: "flex", alignItems: "center", gap: 12 }}>
+            <div style={{ width: 36, height: 36, borderRadius: 10, background: "#6EE7B7", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+              <Brain size={16} color="#1B3F2F" />
+            </div>
+            <div>
+              <p style={{ fontSize: 13, fontWeight: 700, color: "#FFFFFF", margin: 0 }}>Mnemora analiza el contenido</p>
+              <p style={{ fontSize: 11, color: "#86EFAC", margin: 0, marginTop: 2 }}>Transcripción · extracción · organización</p>
+            </div>
+          </div>
+
+          {/* Arrow down */}
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 4, padding: "12px 0" }}>
+            {[0,1,2].map(i => <div key={i} style={{ width: 1.5, height: 8, background: `rgba(110,231,183,${0.3 + i * 0.2})` }} />)}
+            <div style={{ fontSize: 14, color: "#6EE7B7" }}>↓</div>
+          </div>
+
+          {/* Outputs grid */}
+          <div style={{ width: "100%", display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+            {outputs.map((o, i) => (
+              <div key={o.label} style={{
+                background: "rgba(255,255,255,0.06)",
+                border: "0.5px solid rgba(255,255,255,0.1)",
+                borderRadius: 10,
+                padding: "10px 14px",
+                display: "flex",
+                alignItems: "center",
+                gap: 8,
+                gridColumn: i === 4 ? "1 / -1" : undefined,
+              }}>
+                <span style={{ fontSize: 16 }}>{o.icon}</span>
+                <span style={{ fontSize: 12, fontWeight: 600, color: "#D1FAE5" }}>{o.label}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ─────────────────────────────────────────────
    RECORRIDO DEL ESTUDIANTE
 ───────────────────────────────────────────── */
 function StudentJourney() {
@@ -732,6 +840,7 @@ function Pricing() {
             <p style={{ fontSize: 12, fontWeight: 700, color: "#F59E0B", marginBottom: 10 }}>Todo lo de Pro, más:</p>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
               {[
+                { label: "AI Class Studio (graba o sube audio)", star: true },
                 { label: "Coach académico IA", star: true },
                 { label: "Tutor ilimitado", star: true },
                 { label: "Modo examen intensivo", star: false },
@@ -739,7 +848,6 @@ function Pricing() {
                 { label: "Estrategias personalizadas", star: true },
                 { label: "Cobertura inteligente del examen", star: true },
                 { label: "Perfil cognitivo avanzado", star: true },
-                { label: "Replanificador inteligente", star: false },
               ].map(({ label, star }) => (
                 <div key={label} style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <Check size={15} color={star ? "#F59E0B" : "#FDE68A"} />
@@ -868,6 +976,7 @@ const faqs = [
   { q: "¿Mis documentos son privados?", a: "Sí. Solo tú puedes acceder a ellos. No usamos tu contenido para entrenar modelos de IA." },
   { q: "¿En qué idioma funciona el tutor?", a: "100% en español. Entiende vocabulario académico latinoamericano, nombres de materias en español y el formato de las universidades de la región." },
   { q: "¿Qué formatos de documentos acepta?", a: "PDF (el más común para programas de materia y apuntes), texto copiado directamente, e imágenes de apuntes. No requiere formato especial." },
+  { q: "¿Qué es AI Class Studio?", a: "Es la función que convierte tus clases en material de estudio completo. Puedes grabar directamente desde Mnemora o subir un archivo de audio. La IA transcribe la clase, extrae conceptos, fórmulas, fechas y tareas, genera flashcards y quiz, actualiza tu calendario y le informa a tu tutor qué se vio. Disponible en Plan Premium." },
   { q: "¿Cómo funciona la memoria del tutor?", a: "Mnemora guarda un resumen semántico de cada sesión de estudio por materia. Cuando vuelves, el tutor sabe qué temas viste, cuáles te costaron más y qué hay próximo en tu calendario." },
   { q: "¿Cuál es la diferencia entre Pro y Premium?", a: "Pro incluye todo lo que necesitas para estudiar: tutor con memoria, flashcards, mapas mentales, quiz y planificador. Premium agrega predicción de nota, perfil cognitivo avanzado, modo examen intensivo, cobertura inteligente del examen y el AI Coach personalizado." },
   { q: "¿Cómo funciona el programa de Recompensas?", a: "Cada amigo que invites y active un plan te suma tiempo gratis en Mnemora: 1 referido = 1 semana, 3 = 1 mes, 5 = 2 meses, 10 = 6 meses, 25 = 12 meses + Insignia Embajador." },
@@ -961,6 +1070,7 @@ export default function LandingPage() {
       <TutorShowcase />
       <FlashcardShowcase />
       <MindMapShowcase />
+      <AIClassStudio />
       <StudentJourney />
       <FlowDiagram />
       <Comparison />
