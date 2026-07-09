@@ -28,6 +28,7 @@ type ReviewItem = {
 type KnowledgeRow = {
   confidence: number;
   mastery_level: string;
+  next_review: string | null;
   subject_concepts: { name: string; subject_id: string } | null;
 };
 
@@ -44,6 +45,7 @@ type SubjectStat = {
   daysToExam: number | null;
   knownCount: number;
   totalConcepts: number;
+  pendingReviewCount: number;
 };
 
 function daysUntil(dateStr: string): number {
@@ -266,7 +268,7 @@ export default function DashboardPage() {
           : Promise.resolve({ data: [] }),
         user
           ? db.from("student_knowledge")
-              .select("confidence, mastery_level, subject_concepts!inner(name, subject_id)")
+              .select("confidence, mastery_level, next_review, subject_concepts!inner(name, subject_id)")
               .eq("user_id", user.id)
           : Promise.resolve({ data: [] }),
         user
@@ -328,6 +330,11 @@ export default function DashboardPage() {
         const nextExam = subjectExams[0] ?? null;
         const daysToExam = nextExam ? daysUntil(nextExam.event_date) : null;
 
+        const todayStr = new Date().toISOString().slice(0, 10);
+        const pendingReviewCount = rows.filter(k =>
+          k.next_review !== null && k.next_review <= todayStr && k.mastery_level !== "mastered"
+        ).length;
+
         statsMap.set(s.id, {
           subjectId: s.id,
           coveragePct,
@@ -339,6 +346,7 @@ export default function DashboardPage() {
           daysToExam,
           knownCount: known,
           totalConcepts: total,
+          pendingReviewCount,
         });
       }
       setSubjectStats(statsMap);
@@ -1150,48 +1158,58 @@ function SubjectControlCard({ subject, stat }: { subject: Subject; stat: Subject
         </p>
       )}
 
-      {/* CTA row */}
-      <div style={{ display: "flex", gap: 8 }}>
-        <Link
-          href={`/progreso?subject=${subject.id}`}
-          style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#1B3F2F", fontWeight: 700, textDecoration: "none", padding: "6px 10px", background: "#E8F1EC", borderRadius: 8 }}
-        >
-          <BarChart2 size={11} /> Ver progreso
-        </Link>
-        {stat && stat.predictedGrade > 0 && (
-          <Link
-            href={`/progreso?subject=${subject.id}`}
-            style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#7C3AED", fontWeight: 700, textDecoration: "none", padding: "6px 10px", background: "#EDE9FE", borderRadius: 8 }}
-          >
-            <TrendingUp size={11} /> Predicción
-          </Link>
-        )}
+      {/* CTA row — smart, contextual */}
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
         {examUrgent ? (
-          <Link
-            href={`/examen/${subject.id}`}
-            style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#92400E", fontWeight: 700, textDecoration: "none", padding: "6px 10px", background: "#FEF3C7", border: "0.5px solid #D97706", borderRadius: 8 }}
-          >
-            <Flame size={11} /> Modo Examen
-          </Link>
-        ) : (
+          // Examen en ≤7 días: acción principal es Modo Examen
           <>
-            <Link
-              href={`/tutor/${subject.id}`}
-              style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#6B6259", fontWeight: 600, textDecoration: "none", padding: "6px 10px", background: "#F7F4EF", borderRadius: 8 }}
-            >
+            <Link href={`/examen/${subject.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#92400E", fontWeight: 700, textDecoration: "none", padding: "6px 10px", background: "#FEF3C7", border: "0.5px solid #D97706", borderRadius: 8 }}>
+              <Flame size={11} /> Modo Examen
+            </Link>
+            {stat && stat.pendingReviewCount > 0 && (
+              <Link href={`/flashcards/${subject.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#1B3F2F", fontWeight: 700, textDecoration: "none", padding: "6px 10px", background: "#E8F1EC", borderRadius: 8 }}>
+                <Layers size={11} /> {stat.pendingReviewCount} pendientes
+              </Link>
+            )}
+          </>
+        ) : stat === null || stat.totalConcepts === 0 ? (
+          // Sin contenido: invitar a subir material
+          <>
+            <Link href={`/materias/${subject.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#1B3F2F", fontWeight: 700, textDecoration: "none", padding: "6px 10px", background: "#E8F1EC", borderRadius: 8 }}>
+              <FileText size={11} /> Subir material
+            </Link>
+            <Link href={`/tutor/${subject.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#6B6259", fontWeight: 600, textDecoration: "none", padding: "6px 10px", background: "#F7F4EF", borderRadius: 8 }}>
               <Brain size={11} /> Tutor
             </Link>
-            <Link
-              href={`/flashcards/${subject.id}`}
-              style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#6B6259", fontWeight: 600, textDecoration: "none", padding: "6px 10px", background: "#F7F4EF", borderRadius: 8 }}
-            >
+          </>
+        ) : stat.pendingReviewCount > 0 ? (
+          // Hay flashcards pendientes de repaso: esa es la prioridad
+          <>
+            <Link href={`/flashcards/${subject.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#1B3F2F", fontWeight: 700, textDecoration: "none", padding: "6px 10px", background: "#E8F1EC", borderRadius: 8 }}>
+              <Layers size={11} /> Repasar ({stat.pendingReviewCount})
+            </Link>
+            <Link href={`/tutor/${subject.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#6B6259", fontWeight: 600, textDecoration: "none", padding: "6px 10px", background: "#F7F4EF", borderRadius: 8 }}>
+              <Brain size={11} /> Tutor
+            </Link>
+          </>
+        ) : stat.masteryPct < 40 ? (
+          // Dominio bajo: priorizar tutor para cubrir conceptos
+          <>
+            <Link href={`/tutor/${subject.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#1B3F2F", fontWeight: 700, textDecoration: "none", padding: "6px 10px", background: "#E8F1EC", borderRadius: 8 }}>
+              <Brain size={11} /> Estudiar con tutor
+            </Link>
+            <Link href={`/flashcards/${subject.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#6B6259", fontWeight: 600, textDecoration: "none", padding: "6px 10px", background: "#F7F4EF", borderRadius: 8 }}>
               <Layers size={11} /> Flashcards
             </Link>
-            <Link
-              href={`/quiz/${subject.id}`}
-              style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#7C3AED", fontWeight: 700, textDecoration: "none", padding: "6px 10px", background: "#EDE9FE", borderRadius: 8 }}
-            >
+          </>
+        ) : (
+          // Todo al día: quiz para consolidar + progreso
+          <>
+            <Link href={`/quiz/${subject.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#7C3AED", fontWeight: 700, textDecoration: "none", padding: "6px 10px", background: "#EDE9FE", borderRadius: 8 }}>
               <Target size={11} /> Quiz
+            </Link>
+            <Link href={`/progreso?subject=${subject.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#6B6259", fontWeight: 600, textDecoration: "none", padding: "6px 10px", background: "#F7F4EF", borderRadius: 8 }}>
+              <BarChart2 size={11} /> Progreso
             </Link>
           </>
         )}
