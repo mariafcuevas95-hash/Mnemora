@@ -237,10 +237,10 @@ function WhyDifferent() {
       <div style={{ maxWidth: 1120, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 56 }}>
           <h2 className="font-display" style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#1A1612", letterSpacing: "-0.02em", lineHeight: 1.15, marginBottom: 16 }}>
-            ¿Por qué Mnemora es diferente?
+            Esto es lo que cambia.
           </h2>
           <p style={{ color: "#6B6259", fontSize: 17, maxWidth: 520, margin: "0 auto" }}>
-            No es otro chatbot genérico. Es un sistema diseñado para que aprendas más con menos esfuerzo.
+            El problema no es esfuerzo. Es no saber si ese esfuerzo sirve.
           </p>
         </div>
         {/* Comparación horizontal Antes → Después */}
@@ -267,9 +267,9 @@ function WhyDifferent() {
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
             <div style={{ padding: "8px 14px", fontSize: 12, fontWeight: 700, color: "#1B3F2F", textTransform: "uppercase", letterSpacing: "0.08em" }}>Después</div>
             {[
-              { icon: "🧠", text: "Mnemora ya organizó todo." },
-              { icon: "🎯", text: "Solo repasas lo importante." },
-              { icon: "📈", text: "La IA decide cuándo mostrarte cada tema." },
+              { icon: "✅", text: "Sabes exactamente qué estudiar hoy." },
+              { icon: "🎯", text: "Cada minuto que estudias va a lo que importa." },
+              { icon: "💪", text: "Llegas al examen seguro de que estás listo." },
             ].map(r => (
               <div key={r.text} style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 16px", background: "#F0FDF4", border: "1px solid rgba(27,63,47,0.12)", borderRadius: 12, flex: 1 }}>
                 <span style={{ fontSize: 20, flexShrink: 0 }}>{r.icon}</span>
@@ -278,8 +278,8 @@ function WhyDifferent() {
             ))}
           </div>
         </div>
-        <p style={{ textAlign: "center", fontSize: 15, color: "#6B6259", maxWidth: 560, margin: "32px auto 0", lineHeight: 1.7, fontStyle: "italic" }}>
-          "La mayoría de las apps esperan que tú organices tu estudio. Mnemora hace ese trabajo por ti."
+        <p style={{ textAlign: "center", fontSize: 17, color: "#1A1612", fontWeight: 600, maxWidth: 480, margin: "40px auto 0", lineHeight: 1.6 }}>
+          Tú estudias. Mnemora decide qué viene después.
         </p>
       </div>
     </section>
