@@ -33,7 +33,8 @@ export type Feature =
   | "advanced_mind_maps"   // interactive mind maps with mastery-colored nodes
   | "learning_roadmap"     // roadmap personalizado: qué aprender después según el progreso
   | "exam_coverage"        // cobertura del examen: % dominado + temas que faltan
-  | "academic_goals";      // objetivos académicos personalizados (aprobar, nota, beca, etc.)
+  | "academic_goals"       // objetivos académicos personalizados (aprobar, nota, beca, etc.)
+  | "ai_class_studio";    // AI Class Studio: grabar/subir clases → materiales de estudio
 
 export interface PlanLimits {
   // Numeric (-1 = unlimited)
@@ -59,6 +60,7 @@ export interface PlanLimits {
   learning_roadmap:        boolean;
   exam_coverage:           boolean;
   academic_goals:          boolean;
+  ai_class_studio:         boolean;
 }
 
 export interface Plan {
@@ -83,6 +85,7 @@ const PREMIUM_EXCLUSIVE = {
   learning_roadmap:        true,
   exam_coverage:           true,
   academic_goals:          true,
+  ai_class_studio:         true,
 } as const;
 
 const PREMIUM_EXCLUSIVE_OFF = Object.fromEntries(
@@ -172,6 +175,7 @@ export const FEATURE_LABELS: Record<Feature, string> = {
   learning_roadmap:       "roadmap de aprendizaje personalizado",
   exam_coverage:          "cobertura inteligente del examen",
   academic_goals:         "objetivos académicos personalizados",
+  ai_class_studio:        "AI Class Studio — convierte clases en materiales de estudio",
 };
 
 /** Checks if a trial is still active */

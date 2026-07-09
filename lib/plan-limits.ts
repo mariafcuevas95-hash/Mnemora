@@ -72,6 +72,7 @@ const PREMIUM_BOOLEAN_FEATURES = new Set<Feature>([
   "exam_mode", "ai_coaches", "multimodal", "transcription",
   "advanced_analytics", "performance_prediction", "semester_replanner",
   "advanced_mind_maps", "learning_roadmap", "exam_coverage", "academic_goals",
+  "ai_class_studio",
 ]);
 
 export async function checkLimit(userId: string, feature: Feature): Promise<LimitCheck> {
@@ -206,6 +207,8 @@ export function limitMessage(check: LimitCheck): string {
       return "La cobertura inteligente del examen es exclusiva de Premium.";
     case "academic_goals":
       return "Los objetivos académicos personalizados son exclusivos de Premium.";
+    case "ai_class_studio":
+      return "AI Class Studio es exclusivo de Premium. Sube tus clases y conviértelas en materiales de estudio personalizados.";
     default:
       return "Límite del plan alcanzado. Actualiza para continuar.";
   }

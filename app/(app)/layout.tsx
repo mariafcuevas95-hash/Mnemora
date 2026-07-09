@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import {
   BookOpen, LayoutDashboard, Calendar,
-  Layers, Plus, ChevronRight, Settings, TrendingUp, LogOut, Library, GitBranch, Map, BarChart2, RefreshCw, ClipboardCheck, Gift,
+  Layers, Plus, ChevronRight, Settings, TrendingUp, LogOut, Library, GitBranch, Map, BarChart2, RefreshCw, ClipboardCheck, Gift, Mic,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -131,6 +131,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   const navItems = [
     { href: "/dashboard", icon: <LayoutDashboard size={16} />, label: "Inicio" },
+    { href: "/mis-clases", icon: <Mic size={16} />, label: "Mis clases" },
     { href: "/calendario", icon: <Calendar size={16} />, label: "Mi Plan" },
     { href: "/flashcards", icon: <Layers size={16} />, label: "Flashcards" },
     { href: "/progreso", icon: <TrendingUp size={16} />, label: "Mi progreso" },

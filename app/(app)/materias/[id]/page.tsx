@@ -7,7 +7,7 @@ import React from "react";
 import {
   FileText, Layers, Brain, Upload, Plus,
   Sparkles, ChevronRight, Clock, Loader2, Camera, CheckCircle, BookOpen,
-  Star, LayoutGrid, List, Calendar, Zap, ArrowRight,
+  Star, LayoutGrid, List, Calendar, Zap, ArrowRight, Trash2,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { PaywallModal } from "@/components/paywall-modal";
@@ -34,6 +34,7 @@ const GOAL_LABELS: Record<GoalType, string> = {
 type Document = {
   id: string;
   name: string;
+  file_url: string | null;
   processing_status: "pending" | "processing" | "done" | "failed";
   summary: string | null;
   created_at: string;
@@ -323,6 +324,8 @@ export default function MateriaPage() {
   const [photoAnalyzing, setPhotoAnalyzing] = useState(false);
   const [photoError, setPhotoError]         = useState("");
   const [photoResult, setPhotoResult] = useState<{ extractedText: string; concepts: string[]; count: number } | null>(null);
+  const [deletingDocId, setDeletingDocId]     = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [goalOpen, setGoalOpen]   = useState(false);
   const [goalType, setGoalType]   = useState<GoalType | "">("");
   const [goalValue, setGoalValue] = useState("");
@@ -335,7 +338,7 @@ export default function MateriaPage() {
     const today = new Date().toISOString().slice(0, 10);
     Promise.all([
       db.from("subjects").select("id, name, professor, semester_label, goal_type, goal_value").eq("id", id).single(),
-      db.from("documents").select("id, name, processing_status, summary, created_at").eq("subject_id", id).order("created_at", { ascending: false }),
+      db.from("documents").select("id, name, file_url, processing_status, summary, created_at").eq("subject_id", id).order("created_at", { ascending: false }),
       db.from("flashcards").select("id, front, back").eq("subject_id", id).order("created_at"),
       db.from("calendar_events").select("id, title, event_date, event_type").eq("subject_id", id).eq("event_type", "exam").gte("event_date", today).order("event_date").limit(1).maybeSingle(),
     ]).then(([subRes, docRes, fcRes, evRes]) => {
@@ -397,7 +400,7 @@ export default function MateriaPage() {
     if (storageErr) { setUploadError("Error al subir el archivo. Intenta de nuevo."); setUploading(false); return; }
     const { data: doc, error: docErr } = await db.from("documents").insert({ subject_id: id, user_id: user.id, name: file.name, file_url: path, processing_status: "pending" }).select("id").single();
     if (docErr || !doc) { setUploadError("Error al registrar el documento."); setUploading(false); return; }
-    setDocs(prev => [{ id: doc.id, name: file.name, processing_status: "pending", summary: null, created_at: new Date().toISOString() }, ...prev]);
+    setDocs(prev => [{ id: doc.id, name: file.name, file_url: path, processing_status: "pending", summary: null, created_at: new Date().toISOString() }, ...prev]);
     const res = await fetch("/api/process-document", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -412,6 +415,22 @@ export default function MateriaPage() {
       return;
     }
     if (!res.ok) console.warn("process-document falló:", res.status);
+  }
+
+  async function handleDeleteDoc(doc: Document) {
+    setDeletingDocId(doc.id);
+    setConfirmDeleteId(null);
+    const db = createClient();
+    await db.from("flashcards").delete().eq("document_id", doc.id);
+    await db.from("documents").delete().eq("id", doc.id);
+    if (doc.file_url) {
+      await db.storage.from("documents").remove([doc.file_url]);
+    }
+    setDocs(prev => prev.filter(d => d.id !== doc.id));
+    setDeletingDocId(null);
+    // Refrescar flashcards por si quedaron huérfanas
+    const { data } = await db.from("flashcards").select("id, front, back").eq("subject_id", id).order("created_at");
+    if (data) setFlashcards(data);
   }
 
   async function saveGoal() {
@@ -618,7 +637,7 @@ export default function MateriaPage() {
             <LiveProcessingCard docId={processingDocId} docName={processingDocName} subjectId={id}
               onDone={() => {
                 const db = createClient();
-                db.from("documents").select("id, name, processing_status, summary, created_at").eq("subject_id", id).order("created_at", { ascending: false }).then(({ data }) => { if (data) setDocs(data); });
+                db.from("documents").select("id, name, file_url, processing_status, summary, created_at").eq("subject_id", id).order("created_at", { ascending: false }).then(({ data }) => { if (data) setDocs(data); });
                 db.from("flashcards").select("id, front, back").eq("subject_id", id).order("created_at").then(({ data }) => { if (data) setFlashcards(data); });
               }}
               onViewFlashcards={() => { setProcessingDocId(null); setTab("flashcards"); }}
@@ -720,11 +739,35 @@ export default function MateriaPage() {
                       )}
                     </div>
                   </div>
-                  {doc.processing_status === "done" && (
-                    <button onClick={() => setTab("flashcards")} style={{ padding: "5px 12px", borderRadius: "var(--mn-r-md)", border: "1px solid var(--mn-ink-4)", background: "none", fontSize: 12, color: "var(--mn-ink-2)", cursor: "pointer" }}>
-                      Flashcards
-                    </button>
-                  )}
+                  <div style={{ display: "flex", gap: 6, alignItems: "center", flexShrink: 0 }}>
+                    {doc.processing_status === "done" && (
+                      <button onClick={() => setTab("flashcards")} style={{ padding: "5px 12px", borderRadius: "var(--mn-r-md)", border: "1px solid var(--mn-ink-4)", background: "none", fontSize: 12, color: "var(--mn-ink-2)", cursor: "pointer" }}>
+                        Flashcards
+                      </button>
+                    )}
+                    {confirmDeleteId === doc.id ? (
+                      <>
+                        <button
+                          onClick={() => handleDeleteDoc(doc)}
+                          disabled={deletingDocId === doc.id}
+                          style={{ padding: "5px 12px", borderRadius: "var(--mn-r-md)", border: "1px solid var(--mn-error)", background: "none", fontSize: 12, color: "var(--mn-error)", cursor: "pointer", fontWeight: 600 }}
+                        >
+                          {deletingDocId === doc.id ? "Borrando…" : "Confirmar"}
+                        </button>
+                        <button onClick={() => setConfirmDeleteId(null)} style={{ padding: "5px 8px", borderRadius: "var(--mn-r-md)", border: "1px solid var(--mn-ink-4)", background: "none", fontSize: 12, color: "var(--mn-ink-3)", cursor: "pointer" }}>
+                          Cancelar
+                        </button>
+                      </>
+                    ) : (
+                      <button
+                        onClick={() => setConfirmDeleteId(doc.id)}
+                        disabled={deletingDocId === doc.id}
+                        style={{ width: 30, height: 30, borderRadius: "var(--mn-r-md)", border: "1px solid var(--mn-ink-4)", background: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", color: "var(--mn-ink-3)" }}
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

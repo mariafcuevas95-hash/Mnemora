@@ -144,7 +144,7 @@ ${pdfText.slice(0, 6000)}`,
         const [flashcardsResp, summaryResp, conceptsResp] = await Promise.all([
           generateText({
             model: "processor",
-            maxTokens: 2048,
+            maxTokens: 4096,
             messages: [{
               role: "user",
               content: `Eres un experto en pedagogía universitaria. Genera flashcards de alta calidad para estudiar "${subjectName ?? "la materia"}".
@@ -196,9 +196,21 @@ ${pdfText.slice(0, 6000)}`,
           }),
         ]);
 
-        const { flashcards } = JSON.parse(
-          flashcardsResp.text.replace(/```json\n?|```/g, "").trim()
-        ) as { flashcards: { front: string; back: string }[] };
+        let flashcards: { front: string; back: string }[] = [];
+        try {
+          const parsed = JSON.parse(
+            flashcardsResp.text.replace(/```json\n?|```/g, "").trim()
+          ) as { flashcards: { front: string; back: string }[] };
+          flashcards = parsed.flashcards ?? [];
+        } catch (parseErr) {
+          logger.error("JSON de flashcards truncado o inválido", { error: String(parseErr), preview: flashcardsResp.text.slice(-200) });
+          // Si el JSON está truncado, intentar recuperar flashcards parciales
+          const partial = flashcardsResp.text.match(/\{"front":\s*"[^"]+",\s*"back":\s*"[^"]+"\}/g);
+          if (partial?.length) {
+            flashcards = partial.map(s => JSON.parse(s) as { front: string; back: string });
+            logger.info("Flashcards parciales recuperadas", { count: flashcards.length });
+          }
+        }
 
         const summary = summaryResp.text;
 

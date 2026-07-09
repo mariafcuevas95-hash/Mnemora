@@ -40,6 +40,7 @@ const FEATURE_BENEFITS: Record<Feature, string[]> = {
   learning_roadmap:      ["La IA te muestra qué aprender después según tu avance", "No pierdes tiempo estudiando lo que ya dominas"],
   exam_coverage:         ["Ve qué % del examen ya dominas", "Sabes exactamente qué temas te faltan cubrir"],
   academic_goals:        ["Tu plan se adapta a tu meta: aprobar, sacar buena nota o ganar una beca", "La IA ajusta la estrategia según lo que quieres lograr"],
+  ai_class_studio:       ["Graba o sube cualquier clase y obtén resumen, apuntes, flashcards y quiz automáticamente", "La IA transcribe el audio y genera todos tus materiales de estudio en minutos"],
 };
 
 export function PaywallModal({ feature, message, planRequired = "pro", recovery: recoveryProp = false, onClose }: PaywallModalProps) {
