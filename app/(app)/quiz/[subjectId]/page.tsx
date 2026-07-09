@@ -17,6 +17,7 @@ function QuizPageInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isGuided = searchParams.get("guided") === "1";
+  const documentId = searchParams.get("documentId") ?? undefined;
 
   const [session,    setSession]    = useState<QuizSession | null>(null);
   const [phase,      setPhase]      = useState<Phase>("loading");
@@ -35,7 +36,10 @@ function QuizPageInner() {
     setPhase("loading"); setSession(null); setCurrent(0);
     setSelected(null); setAnswers([]); setResult(null);
 
-    fetch(`/api/quiz/${subjectId}`)
+    const quizUrl = documentId
+      ? `/api/quiz/${subjectId}?documentId=${documentId}`
+      : `/api/quiz/${subjectId}`;
+    fetch(quizUrl)
       .then(async r => {
         if (!r.ok) { const json = await r.json().catch(() => ({})); throw new Error(json.error ?? "Error al generar el quiz"); }
         return r.json() as Promise<QuizSession>;
@@ -67,7 +71,7 @@ function QuizPageInner() {
       fetch(`/api/quiz/${subjectId}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: updated }),
+        body: JSON.stringify({ answers: updated, documentId }),
       })
         .then(r => r.ok ? r.json() : null)
         .then(data => { setResult(data ?? { correct: updated.filter(a => a.correct).length, total: updated.length, pct: 0 }); setPhase("result"); })

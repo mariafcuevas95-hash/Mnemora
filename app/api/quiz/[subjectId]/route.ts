@@ -34,10 +34,11 @@ export interface QuizSession {
 }
 
 export async function GET(
-  _req: NextRequest,
+  req: NextRequest,
   { params }: { params: Promise<{ subjectId: string }> }
 ) {
   const { subjectId } = await params;
+  const documentId = req.nextUrl.searchParams.get("documentId") ?? undefined;
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
@@ -48,6 +49,17 @@ export async function GET(
   const check = await checkLimit(user.id, "quiz");
   if (!check.allowed) return limitExceededResponse(check);
 
+  let flashcardsQuery = supabase
+    .from("flashcards")
+    .select("id, front, back")
+    .eq("subject_id", subjectId)
+    .order("created_at")
+    .limit(40);
+
+  if (documentId) {
+    flashcardsQuery = flashcardsQuery.eq("document_id", documentId);
+  }
+
   const [subjectRes, knowledgeRes, flashcardsRes] = await Promise.all([
     supabase.from("subjects").select("name").eq("id", subjectId).single(),
     supabase
@@ -57,12 +69,7 @@ export async function GET(
       .eq("subject_concepts.subject_id", subjectId)
       .order("confidence", { ascending: true })
       .limit(30),
-    supabase
-      .from("flashcards")
-      .select("id, front, back")
-      .eq("subject_id", subjectId)
-      .order("created_at")
-      .limit(40),
+    flashcardsQuery,
   ]);
 
   const subjectName = subjectRes.data?.name ?? "la materia";

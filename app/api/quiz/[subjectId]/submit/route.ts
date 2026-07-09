@@ -14,6 +14,7 @@ export interface QuizAnswer {
 
 export interface QuizSubmitBody {
   answers: QuizAnswer[];
+  documentId?: string;
 }
 
 export interface QuizResult {
@@ -48,7 +49,7 @@ export async function POST(
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body: QuizSubmitBody = await req.json();
-  const { answers } = body;
+  const { answers, documentId } = body;
   if (!Array.isArray(answers) || answers.length === 0) {
     return NextResponse.json({ error: "Bad request" }, { status: 400 });
   }
@@ -108,6 +109,18 @@ export async function POST(
         { onConflict: "user_id,subject_id" }
       );
   }
+
+  // Guardar sesión en historial
+  try {
+    await admin.from("quiz_sessions").insert({
+      user_id: user.id,
+      subject_id: subjectId,
+      document_id: documentId ?? null,
+      correct,
+      total: answers.length,
+      pct,
+    });
+  } catch { /* non-critical */ }
 
   const xp = await awardXP(user.id, "quiz_complete", {
     score_pct: pct,

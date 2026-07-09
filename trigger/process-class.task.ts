@@ -17,7 +17,7 @@ function getAdmin() {
 async function transcribeWithGemini(buffer: Buffer, mimeType: string, subjectName: string): Promise<string> {
   const { GoogleGenerativeAI } = await import("@google/generative-ai");
   const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
-  const gemini = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+  const gemini = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
   const base64 = buffer.toString("base64");
   const result = await gemini.generateContent([
