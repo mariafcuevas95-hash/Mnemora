@@ -17,30 +17,18 @@ const HEADLINES: Record<PaywallReason, { title: string; desc: string }> = {
 
 const PRO_FEATURES = [
   "Materias ilimitadas — organiza todo el semestre",
-  "Generación de flashcards ilimitada con IA",
-  "Resúmenes y programas de materia ilimitados",
-  "500 preguntas al tutor por mes",
-  "El tutor recuerda tu historia académica entre sesiones",
-  "Planificador diario completo con IA",
-  "Mapas mentales de tus documentos",
-  "Sabes exactamente qué estudiar cada día",
+  "Documentos, flashcards y resúmenes sin límite",
+  "Tutor con memoria — 500 preguntas/mes",
+  "Planificador inteligente y mapas mentales",
 ];
 
 const PREMIUM_FEATURES = [
   "Todo lo de Pro, más:",
-  "Pregunta al tutor sin límites",
-  "La IA reorganiza tu agenda cuando se acerca un examen",
-  "Simulacros adaptativos: te pregunta lo que más te cuesta",
-  "Modo intensivo: entra en preparación total para el parcial",
-  "Fotografía apuntes, ejercicios escritos a mano y pizarrones",
-  "Graba la clase y obtén los conceptos clave automáticamente",
-  "Conoce tu probabilidad de aprobar antes del examen",
-  "Dashboard completo: rendimiento, brechas y tendencias por materia",
-  "La IA te muestra qué aprender después según tu avance actual",
-  "Ve qué % del examen ya dominas y qué temas te faltan",
-  "Tu plan se adapta a tu meta: aprobar, sacar nota o ganar una beca",
-  "Si te atrasas, la IA reorganiza todo el semestre automáticamente",
-  "Mapas mentales interactivos que cambian según lo que aprendes",
+  "AI Class Studio — graba clases y obtén material automáticamente",
+  "Predicción de tu nota y cobertura del examen",
+  "Reorganización automática del semestre",
+  "Análisis de fotos de apuntes y pizarrones",
+  "Dashboard avanzado de rendimiento",
 ];
 
 // Official prices
@@ -160,6 +148,32 @@ function UpgradeContent() {
           </div>
         )}
 
+        {/* Tabla comparativa Starter vs Pro */}
+        <div style={{ marginBottom: 28, borderRadius: 14, overflow: "hidden", border: "1px solid rgba(26,22,18,0.1)" }}>
+          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", background: "#1B3F2F" }}>
+            <div style={{ padding: "10px 14px", fontSize: 12, fontWeight: 700, color: "#A7C4B0", textTransform: "uppercase", letterSpacing: "0.06em" }}></div>
+            <div style={{ padding: "10px 14px", fontSize: 12, fontWeight: 700, color: "#A7C4B0", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.06em" }}>Starter</div>
+            <div style={{ padding: "10px 14px", fontSize: 12, fontWeight: 700, color: "#86EFAC", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.06em" }}>Pro ⚡</div>
+          </div>
+          {[
+            ["Materias",           "1",             "Ilimitadas"],
+            ["Documentos",         "2/mes",         "Ilimitados"],
+            ["Preguntas al tutor", "35/mes",         "500/mes"],
+            ["Planner diario",     "Solo repasos",  "Con IA completo"],
+            ["Memoria del tutor",  "❌",            "✅"],
+            ["Mapas mentales",     "❌",            "✅"],
+          ].map(([label, starter, pro], i) => (
+            <div key={label} style={{
+              display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
+              background: i % 2 === 0 ? "#F7F4EF" : "#EFECE6",
+            }}>
+              <div style={{ padding: "11px 14px", fontSize: 13, color: "#4B4036", fontWeight: 500 }}>{label}</div>
+              <div style={{ padding: "11px 14px", fontSize: 13, color: "#9E9389", textAlign: "center" }}>{starter}</div>
+              <div style={{ padding: "11px 14px", fontSize: 13, color: "#1B3F2F", fontWeight: 700, textAlign: "center" }}>{pro}</div>
+            </div>
+          ))}
+        </div>
+
         {/* Billing toggle */}
         <div style={{ display: "flex", background: "#E8E3DA", borderRadius: 12, padding: 4, marginBottom: 20 }}>
           {(["annual", "monthly"] as const).map(b => (
@@ -196,14 +210,19 @@ function UpgradeContent() {
           isAnnual={isAnnual}
         />
 
-        {/* Premium card */}
+        {/* Premium — identidad propia */}
+        <div style={{ marginBottom: 8 }}>
+          <p style={{ fontSize: 13, color: "#6B6259", textAlign: "center", marginBottom: 8, lineHeight: 1.5 }}>
+            Para quienes quieren <strong style={{ color: "#1A1612" }}>delegar completamente</strong> su organización académica a la IA.
+          </p>
+        </div>
         <PlanCard
           name="Premium"
           icon={<Star size={16} color="#FBBF24" fill="#FBBF24" />}
           bgColor="#1C1108"
           accentColor="#FCD34D"
           subtleColor="#FEF3C7"
-          tagline="Tu coach académico personal con IA"
+          tagline="La IA trabaja contigo durante todo el semestre"
           price={premPrice}
           priceNote={isAnnual ? `$159 USD/año · equivale a $${PRM_ANNUAL}/mes` : `$${PRM_MONTHLY} USD/mes`}
           features={PREMIUM_FEATURES}
@@ -296,12 +315,12 @@ function PlanCard({ name, icon, bgColor, accentColor, subtleColor, tagline, pric
           target="_blank"
           rel="noopener noreferrer"
           style={{
-            display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+            display: "flex", alignItems: "center", justifyContent: "center",
             padding: "14px", borderRadius: 12, background: "#fff",
             fontSize: 15, fontWeight: 700, color: bgColor, textDecoration: "none", width: "100%",
           }}
         >
-          Obtener {name} {isAnnual ? "anual" : "mensual"} — ${price}/mes
+          Comenzar con {name}
         </a>
       ) : (
         <div style={{
@@ -313,7 +332,7 @@ function PlanCard({ name, icon, bgColor, accentColor, subtleColor, tagline, pric
       )}
 
       <p style={{ textAlign: "center", fontSize: 11, color: accentColor, marginTop: 10, opacity: 0.7 }}>
-        Procesado por Hotmart · cobro inmediato · cancela cuando quieras
+        Pago seguro con Hotmart · cancela cuando quieras
       </p>
     </div>
   );
