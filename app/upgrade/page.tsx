@@ -150,26 +150,26 @@ function UpgradeContent() {
 
         {/* Tabla comparativa Starter vs Pro */}
         <div style={{ marginBottom: 28, borderRadius: 14, overflow: "hidden", border: "1px solid rgba(26,22,18,0.1)" }}>
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", background: "#1B3F2F" }}>
-            <div style={{ padding: "10px 14px", fontSize: 12, fontWeight: 700, color: "#A7C4B0", textTransform: "uppercase", letterSpacing: "0.06em" }}></div>
-            <div style={{ padding: "10px 14px", fontSize: 12, fontWeight: 700, color: "#A7C4B0", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.06em" }}>Starter</div>
-            <div style={{ padding: "10px 14px", fontSize: 12, fontWeight: 700, color: "#86EFAC", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.06em" }}>Pro ⚡</div>
+          <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1.1fr", background: "#1B3F2F" }}>
+            <div style={{ padding: "10px 12px", fontSize: 11, fontWeight: 700, color: "#A7C4B0", textTransform: "uppercase", letterSpacing: "0.06em" }}></div>
+            <div style={{ padding: "10px 8px", fontSize: 11, fontWeight: 700, color: "#A7C4B0", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.06em" }}>Starter</div>
+            <div style={{ padding: "10px 8px", fontSize: 11, fontWeight: 700, color: "#86EFAC", textAlign: "center", textTransform: "uppercase", letterSpacing: "0.06em" }}>Pro ⚡</div>
           </div>
           {[
-            ["Materias",           "1",             "Ilimitadas"],
-            ["Documentos",         "2/mes",         "Ilimitados"],
-            ["Preguntas al tutor", "35/mes",         "500/mes"],
-            ["Planner diario",     "Solo repasos",  "Con IA completo"],
-            ["Memoria del tutor",  "❌",            "✅"],
-            ["Mapas mentales",     "❌",            "✅"],
+            ["Materias",    "1",      "Ilimitadas"],
+            ["Documentos",  "2/mes",  "Ilimitados"],
+            ["Tutor IA",    "35/mes", "500/mes"],
+            ["Planner",     "Básico", "Con IA"],
+            ["Memoria",     "❌",     "✅"],
+            ["Mapas ment.", "❌",     "✅"],
           ].map(([label, starter, pro], i) => (
             <div key={label} style={{
-              display: "grid", gridTemplateColumns: "1fr 1fr 1fr",
+              display: "grid", gridTemplateColumns: "2fr 1fr 1.1fr",
               background: i % 2 === 0 ? "#F7F4EF" : "#EFECE6",
             }}>
-              <div style={{ padding: "11px 14px", fontSize: 13, color: "#4B4036", fontWeight: 500 }}>{label}</div>
-              <div style={{ padding: "11px 14px", fontSize: 13, color: "#9E9389", textAlign: "center" }}>{starter}</div>
-              <div style={{ padding: "11px 14px", fontSize: 13, color: "#1B3F2F", fontWeight: 700, textAlign: "center" }}>{pro}</div>
+              <div style={{ padding: "10px 12px", fontSize: 13, color: "#4B4036", fontWeight: 500, whiteSpace: "nowrap" }}>{label}</div>
+              <div style={{ padding: "10px 8px", fontSize: 13, color: "#9E9389", textAlign: "center", whiteSpace: "nowrap" }}>{starter}</div>
+              <div style={{ padding: "10px 8px", fontSize: 13, color: "#1B3F2F", fontWeight: 700, textAlign: "center", whiteSpace: "nowrap" }}>{pro}</div>
             </div>
           ))}
         </div>
@@ -222,7 +222,7 @@ function UpgradeContent() {
           bgColor="#1C1108"
           accentColor="#FCD34D"
           subtleColor="#FEF3C7"
-          tagline="La IA trabaja contigo durante todo el semestre"
+          tagline="La IA que trabaja mientras tú estudias"
           price={premPrice}
           priceNote={isAnnual ? `$159 USD/año · equivale a $${PRM_ANNUAL}/mes` : `$${PRM_MONTHLY} USD/mes`}
           features={PREMIUM_FEATURES}
