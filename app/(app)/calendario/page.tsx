@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import {
   FileText, BookOpen, Plus, X, Loader2, Sparkles,
-  ChevronLeft, ChevronRight, Layers, Zap, Brain, CheckCircle, Circle,
+  ChevronLeft, ChevronRight, Layers, Brain, CheckCircle,
 } from "lucide-react";
 import Link from "next/link";
 import type { ExamPlanSession } from "@/app/api/exam-plan/route";
@@ -206,41 +206,90 @@ function AddEventModal({ subjects, onClose, onSaved }: { subjects: Subject[]; on
 
 // ─── Sesión recomendada ───────────────────────────────────────────────────────
 
+function taskKey(t: PlanTask) { return `${t.type}:${t.subjectId}`; }
+
 function SessionCard({ tasks }: { tasks: PlanTask[] }) {
+  const todayStr = toYMD(new Date());
+  const storageKey = `mn-plan-done:${todayStr}`;
+
+  const [done, setDone] = useState<Set<string>>(() => {
+    try {
+      const raw = localStorage.getItem(storageKey);
+      return new Set(raw ? JSON.parse(raw) : []);
+    } catch { return new Set(); }
+  });
+
+  function toggle(t: PlanTask) {
+    setDone(prev => {
+      const next = new Set(prev);
+      const k = taskKey(t);
+      if (next.has(k)) next.delete(k); else next.add(k);
+      try { localStorage.setItem(storageKey, JSON.stringify([...next])); } catch { /* noop */ }
+      return next;
+    });
+  }
+
   if (tasks.length === 0) return null;
+
+  const completedCount = tasks.filter(t => done.has(taskKey(t))).length;
   const totalMin = tasks.reduce((s, t) => s + t.minutesEst, 0);
-  const primaryHref = tasks[0].ctaHref;
+  const doneMin  = tasks.filter(t => done.has(taskKey(t))).reduce((s, t) => s + t.minutesEst, 0);
+  const pct = Math.round((completedCount / tasks.length) * 100);
+  const allDone = completedCount === tasks.length;
 
   return (
     <div style={{ background: "var(--mn-surface)", border: "1px solid var(--mn-ink-4)", borderRadius: "var(--mn-r-xl)", padding: "20px 22px", marginBottom: 20 }}>
-      <p style={{ fontSize: 13, fontWeight: 700, color: "var(--mn-ink-1)", marginBottom: 16 }}>Sesión recomendada</p>
-      <div style={{ display: "flex", gap: 20, alignItems: "flex-start", flexWrap: "wrap" }}>
-        {/* Left */}
-        <div style={{ display: "flex", alignItems: "center", gap: 14, flex: "0 0 auto" }}>
-          <div style={{ width: 44, height: 44, borderRadius: "50%", background: "var(--mn-canvas)", border: "1px solid var(--mn-ink-4)", display: "flex", alignItems: "center", justifyContent: "center" }}>
-            <Brain size={20} color="var(--mn-ink-2)" />
-          </div>
-          <div>
-            <p style={{ fontSize: 11, color: "var(--mn-ink-3)", marginBottom: 3 }}>Duración total</p>
-            <p className="font-display" style={{ fontSize: 24, fontWeight: 700, color: "var(--mn-ink-1)", lineHeight: 1 }}>{totalMin} min</p>
-          </div>
-        </div>
-
-        {/* Task checklist */}
-        <div style={{ flex: 1, minWidth: 160 }}>
-          {tasks.slice(0, 4).map((t, i) => (
-            <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 7 }}>
-              <Circle size={14} color="var(--mn-ink-4)" style={{ flexShrink: 0 }} />
-              <span style={{ fontSize: 13, color: "var(--mn-ink-1)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{t.title}</span>
-              <span style={{ fontSize: 12, color: "var(--mn-ink-3)", flexShrink: 0 }}>{t.minutesEst} min</span>
-            </div>
-          ))}
-        </div>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: "var(--mn-ink-1)" }}>Plan de hoy</p>
+        <span style={{ fontSize: 12, fontWeight: 600, color: allDone ? "var(--mn-green)" : "var(--mn-ink-3)" }}>
+          {completedCount}/{tasks.length} {allDone ? "✓ Completado" : "tareas"}
+        </span>
       </div>
 
-      <Link href={primaryHref} className="mn-btn-primary" style={{ display: "flex", justifyContent: "center", marginTop: 16, fontSize: 14, textDecoration: "none" }}>
-        Empezar sesión
-      </Link>
+      {/* Progress bar */}
+      <div style={{ height: 4, background: "var(--mn-raised)", borderRadius: 2, overflow: "hidden", marginBottom: 16 }}>
+        <div style={{ width: `${pct}%`, height: "100%", background: allDone ? "var(--mn-green)" : "var(--mn-ink-2)", borderRadius: 2, transition: "width 300ms var(--mn-ease)" }} />
+      </div>
+
+      {/* Task checklist */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+        {tasks.map((t, i) => {
+          const isDone = done.has(taskKey(t));
+          return (
+            <div
+              key={i}
+              style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: "var(--mn-r-lg)", background: isDone ? "var(--mn-raised)" : "var(--mn-canvas)", cursor: "pointer", transition: "background 120ms" }}
+              onClick={() => toggle(t)}
+            >
+              <div style={{ width: 20, height: 20, borderRadius: "50%", border: `2px solid ${isDone ? "var(--mn-green)" : "var(--mn-ink-4)"}`, background: isDone ? "var(--mn-green)" : "transparent", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, transition: "all 150ms" }}>
+                {isDone && <CheckCircle size={12} color="#fff" />}
+              </div>
+              <span style={{ fontSize: 13, fontWeight: 500, color: isDone ? "var(--mn-ink-3)" : "var(--mn-ink-1)", flex: 1, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", textDecoration: isDone ? "line-through" : "none" }}>
+                {t.title}
+              </span>
+              <span style={{ fontSize: 11, color: "var(--mn-ink-3)", flexShrink: 0 }}>{t.minutesEst} min</span>
+              <Link
+                href={t.ctaHref}
+                onClick={e => e.stopPropagation()}
+                style={{ fontSize: 11, fontWeight: 600, color: "var(--mn-green)", textDecoration: "none", flexShrink: 0, padding: "3px 8px", borderRadius: "var(--mn-r-sm)", background: "var(--mn-surface)", border: "1px solid var(--mn-ink-4)" }}
+              >
+                Ir →
+              </Link>
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Footer */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 14, paddingTop: 14, borderTop: "1px solid var(--mn-ink-4)" }}>
+        <p style={{ fontSize: 12, color: "var(--mn-ink-3)" }}>
+          {doneMin} de {totalMin} min completados
+        </p>
+        {allDone && (
+          <p style={{ fontSize: 12, fontWeight: 700, color: "var(--mn-green)" }}>¡Excelente sesión!</p>
+        )}
+      </div>
     </div>
   );
 }
