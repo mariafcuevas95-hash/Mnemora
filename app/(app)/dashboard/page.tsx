@@ -173,27 +173,8 @@ export default function DashboardPage() {
     recentAchievements: { achievement_id: string; earned_at: string }[];
   } | null>(null);
   const [userCount, setUserCount] = useState<number | null>(null);
-  const [trialDaysLeft, setTrialDaysLeft] = useState<number | null>(null);
-  const [showTrialModal, setShowTrialModal] = useState(false);
-
   useEffect(() => {
     fetch("/api/stats").then(r => r.ok ? r.json() : null).then(d => { if (d) setUserCount(d.userCount); }).catch(() => {});
-  }, []);
-
-  useEffect(() => {
-    const db = createClient();
-    db.from("profiles").select("plan, trial_ends_at").single().then(({ data }) => {
-      if (data?.plan === "free" && data.trial_ends_at) {
-        const days = Math.ceil((new Date(data.trial_ends_at).getTime() - Date.now()) / 86_400_000);
-        if (days > 0) {
-          setTrialDaysLeft(days);
-          if (days === 1) {
-            const shown = sessionStorage.getItem("mn-trial-modal-shown");
-            if (!shown) { setShowTrialModal(true); sessionStorage.setItem("mn-trial-modal-shown", "1"); }
-          }
-        }
-      }
-    });
   }, []);
 
   // Mostrar página de instalación solo en móvil cuando el usuario tiene plan pago
@@ -431,53 +412,6 @@ export default function DashboardPage() {
   return (
     <div className="mn-dashboard-wrap">
 
-      {/* Modal último día de trial */}
-      {showTrialModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.4)", zIndex: 100, display: "flex", alignItems: "flex-end", justifyContent: "center", padding: "0 0 0" }}>
-          <div style={{ background: "var(--mn-surface)", borderRadius: "20px 20px 0 0", padding: "28px 28px max(36px, calc(28px + env(safe-area-inset-bottom)))", maxWidth: 480, width: "100%", position: "relative", boxShadow: "0 -8px 40px rgba(0,0,0,0.18)" }}>
-            <button onClick={() => setShowTrialModal(false)} style={{ position: "absolute", top: 16, right: 16, background: "none", border: "none", cursor: "pointer", color: "var(--mn-ink-3)", fontSize: 20, lineHeight: 1 }}>×</button>
-
-            <p style={{ fontSize: 11, fontWeight: 700, color: "var(--mn-amber, #D97706)", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10 }}>
-              Mañana termina tu prueba Pro
-            </p>
-            <h2 className="font-display" style={{ fontSize: 22, fontWeight: 800, color: "var(--mn-ink-1)", marginBottom: 18, lineHeight: 1.2 }}>
-              {gamification && gamification.streakDays >= 3
-                ? `${gamification.streakDays} días seguidos. No lo pierdas ahora.`
-                : subjects.length > 0
-                ? `Organizaste ${subjects.length} materia${subjects.length !== 1 ? "s" : ""}. Sigue así.`
-                : "Todo lo que hiciste esta semana, guardado."}
-            </h2>
-
-            {gamification && (gamification.streakDays > 0 || gamification.xpTotal > 0) && (
-              <div style={{ display: "flex", gap: 0, marginBottom: 20, background: "var(--mn-raised)", borderRadius: 12, overflow: "hidden" }}>
-                {gamification.streakDays > 0 && (
-                  <div style={{ flex: 1, textAlign: "center", padding: "14px 12px", borderRight: gamification.xpTotal > 0 ? "1px solid var(--mn-ink-4)" : "none" }}>
-                    <p className="font-display" style={{ fontSize: 26, fontWeight: 800, color: "var(--mn-ink-1)", lineHeight: 1 }}>{gamification.streakDays}</p>
-                    <p style={{ fontSize: 11, color: "var(--mn-ink-3)", marginTop: 3 }}>días seguidos</p>
-                  </div>
-                )}
-                {gamification.xpTotal > 0 && (
-                  <div style={{ flex: 1, textAlign: "center", padding: "14px 12px" }}>
-                    <p className="font-display" style={{ fontSize: 26, fontWeight: 800, color: "var(--mn-ink-1)", lineHeight: 1 }}>{gamification.xpTotal}</p>
-                    <p style={{ fontSize: 11, color: "var(--mn-ink-3)", marginTop: 3 }}>XP esta semana</p>
-                  </div>
-                )}
-              </div>
-            )}
-
-            <p style={{ fontSize: 14, color: "var(--mn-ink-3)", lineHeight: 1.6, marginBottom: 20 }}>
-              Tus materias y datos siempre quedan guardados. Con Pro sigues con el tutor, las flashcards y el plan diario.
-            </p>
-            <a href="/upgrade" style={{ display: "flex", alignItems: "center", justifyContent: "center", padding: "14px", borderRadius: 12, background: "var(--mn-green)", color: "#fff", textDecoration: "none", fontSize: 15, fontWeight: 700, marginBottom: 10 }}>
-              Mantener acceso Pro →
-            </a>
-            <button onClick={() => setShowTrialModal(false)} style={{ width: "100%", padding: "10px", borderRadius: 12, border: "none", background: "none", fontSize: 13, color: "var(--mn-ink-3)", cursor: "pointer" }}>
-              Seguiré con el plan gratuito
-            </button>
-          </div>
-        </div>
-      )}
-
       {/* 1 — Greeting */}
       <div className="mn-fade-up" style={{ marginBottom: 32, animationDelay: "0ms" }}>
         <h1 className="font-display" style={{ fontSize: "clamp(24px, 3.2vw, 32px)", fontWeight: 800, color: "var(--mn-ink-1)", lineHeight: 1.15, marginBottom: 4 }}>
@@ -489,23 +423,7 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* 1b — Trial countdown (discreta, solo durante prueba) */}
-      {trialDaysLeft !== null && (
-        <div className="mn-fade-up" style={{ marginBottom: 20, animationDelay: "30ms" }}>
-          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "10px 16px", borderRadius: 12, background: trialDaysLeft <= 2 ? "var(--mn-amber-light, #FEF3C7)" : "var(--mn-surface)", border: `1px solid ${trialDaysLeft <= 2 ? "rgba(217,119,6,0.2)" : "var(--mn-ink-4)"}` }}>
-            <p style={{ fontSize: 13, color: trialDaysLeft <= 2 ? "#92400E" : "var(--mn-ink-2)", margin: 0 }}>
-              {trialDaysLeft <= 2
-                ? `⏰ Tu prueba Pro termina en ${trialDaysLeft} ${trialDaysLeft === 1 ? "día" : "días"} — no perderás tu información`
-                : `✨ Prueba Pro activa · ${trialDaysLeft} ${trialDaysLeft === 1 ? "día restante" : "días restantes"}`}
-            </p>
-            <a href="/upgrade" style={{ fontSize: 12, fontWeight: 700, color: trialDaysLeft <= 2 ? "#92400E" : "var(--mn-green)", textDecoration: "none", flexShrink: 0, marginLeft: 12 }}>
-              {trialDaysLeft <= 2 ? "Ver planes →" : "Continuar con Pro →"}
-            </a>
-          </div>
-        </div>
-      )}
-
-      {/* 1c — Social proof (solo cuando hay datos reales) */}
+      {/* 1b — Social proof (solo cuando hay datos reales) */}
       {userCount !== null && userCount >= 10 && (
         <div className="mn-fade-up" style={{ marginBottom: 20, animationDelay: "40ms" }}>
           <p style={{ fontSize: 12, color: "var(--mn-ink-3)" }}>

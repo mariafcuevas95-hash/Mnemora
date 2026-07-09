@@ -8,23 +8,22 @@ import { BookOpen, Check, Shield, Zap, Lock, Star } from "lucide-react";
 type PaywallReason = "materia" | "memoria" | "limite" | "syllabus" | "general";
 
 const HEADLINES: Record<PaywallReason, { title: string; desc: string }> = {
-  materia:  { title: "Desbloquea materias ilimitadas",     desc: "Con el plan Free puedes tener 1 materia activa. Sube a Pro para organizar todo tu semestre." },
-  memoria:  { title: "El tutor con memoria es Pro",         desc: "La memoria académica entre sesiones es la función más poderosa de Mnemora — y es exclusiva de Pro." },
-  limite:   { title: "Recupera el acceso completo",  desc: "Durante tu prueba usaste esta función. Es tuya — te la podemos devolver ahora con Pro." },
-  syllabus: { title: "Programas de materia ilimitados",     desc: "Ya usaste tu extracción gratuita. Pro te permite procesar todos los programas del semestre." },
-  general:  { title: "Recupera lo que ya era tuyo",          desc: "Durante tu prueba tuviste acceso completo. Vuélvelo a tener con el plan que mejor te sirve." },
+  materia:  { title: "Agrega todas tus materias del semestre",   desc: "El plan Starter incluye 1 materia activa. Con Pro organizas todo el semestre sin límites." },
+  memoria:  { title: "El tutor que te recuerda es Pro",          desc: "En Starter el tutor empieza de cero en cada sesión. Con Pro recuerda tu historia académica completa." },
+  limite:   { title: "Alcanzaste el límite del mes",             desc: "El plan Starter tiene un límite generoso para empezar. Pro te da acceso ilimitado a esta función." },
+  syllabus: { title: "Procesa todos tus programas del semestre", desc: "El plan Starter incluye 2 extracciones por mes. Con Pro procesas todos los documentos que necesites." },
+  general:  { title: "Lleva Mnemora al siguiente nivel",         desc: "El plan Starter es perfecto para empezar. Cuando quieras más materias, más tutor o más IA — Pro está listo." },
 };
 
 const PRO_FEATURES = [
-  "Organiza todas tus materias sin límites",
-  "Programas de materia, resúmenes y flashcards ilimitados",
+  "Materias ilimitadas — organiza todo el semestre",
+  "Generación de flashcards ilimitada con IA",
+  "Resúmenes y programas de materia ilimitados",
   "500 preguntas al tutor por mes",
-  "El tutor te recuerda entre sesiones — no empiezas de cero",
-  "Tus fechas de examen en el calendario automáticamente",
+  "El tutor recuerda tu historia académica entre sesiones",
+  "Planificador diario completo con IA",
+  "Mapas mentales de tus documentos",
   "Sabes exactamente qué estudiar cada día",
-  "Ve tu progreso en cada materia",
-  "Visualiza los conceptos clave de tus documentos",
-  "La IA analiza tus sesiones y mejora tus flashcards",
 ];
 
 const PREMIUM_FEATURES = [

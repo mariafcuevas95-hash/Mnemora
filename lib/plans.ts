@@ -95,19 +95,19 @@ const PREMIUM_EXCLUSIVE_OFF = Object.fromEntries(
 export const PLANS: Record<PlanId, Plan> = {
   free: {
     id:             "free",
-    name:           "Free",
+    name:           "Starter",
     price_usd:      0,
     price_usd_year: 0,
     limits: {
-      subjects:       1,
-      syllabuses:     1,
-      summaries:      3,
-      flashcards:     30,
-      tutor_messages: 20,
-      quiz:            false,
-      advanced_memory: false,
-      daily_planner:   false,
-      mind_maps:       false,
+      subjects:       1,       // upgrade natural: segunda materia
+      syllabuses:     2,       // suficiente para 1 materia con reintento
+      summaries:      5,       // generación IA — limitada pero útil
+      flashcards:     60,      // generación IA — cubre 1 materia activa con margen
+      tutor_messages: 35,      // costo IA real; suficiente para uso genuino
+      quiz:            true,   // hábito — hacer el quiz no genera costo por sí mismo
+      advanced_memory: false,  // infraestructura Mem0 — exclusivo Pro
+      daily_planner:   false,  // planner con IA completo — exclusivo Pro
+      mind_maps:       false,  // generación IA — exclusivo Pro
       ...PREMIUM_EXCLUSIVE_OFF,
     },
   },
@@ -144,7 +144,7 @@ export const PLANS: Record<PlanId, Plan> = {
       syllabuses:     -1,
       summaries:      -1,
       flashcards:     -1,
-      tutor_messages: -1,
+      tutor_messages: 2000,   // uso justo — equivale a ~67 preguntas/día
       quiz:            true,
       advanced_memory: true,
       daily_planner:   true,
@@ -159,7 +159,7 @@ export const FEATURE_LABELS: Record<Feature, string> = {
   subjects:               "materias activas",
   syllabuses:             "programas de materia/mes",
   summaries:              "resúmenes con IA/mes",
-  flashcards:             "flashcards generadas/mes",
+  flashcards:             "generaciones de flashcards con IA/mes",
   tutor_messages:         "preguntas al tutor/mes",
   advanced_memory:        "memoria avanzada entre sesiones",
   daily_planner:          "planificador diario",
@@ -178,17 +178,11 @@ export const FEATURE_LABELS: Record<Feature, string> = {
   ai_class_studio:        "AI Class Studio — convierte clases en materiales de estudio",
 };
 
-/** Checks if a trial is still active */
-export function isTrialActive(trialEndsAt: string | null): boolean {
-  if (!trialEndsAt) return false;
-  return new Date(trialEndsAt) > new Date();
-}
+/** @deprecated No trial model — Starter is free forever */
+export function isTrialActive(_trialEndsAt: string | null): boolean { return false; }
 
-/** Effective plan: during trial, Free users get Pro features */
-export function effectivePlan(plan: PlanId, trialEndsAt: string | null): PlanId {
-  if (plan === "free" && isTrialActive(trialEndsAt)) return "pro";
-  return plan;
-}
+/** @deprecated No trial model — plan is always the stored value */
+export function effectivePlan(plan: PlanId, _trialEndsAt: string | null): PlanId { return plan; }
 
 export interface LimitCheck {
   allowed:      boolean;
