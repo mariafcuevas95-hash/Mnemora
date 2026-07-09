@@ -123,7 +123,7 @@ function RegistroPageInner() {
         Crea tu cuenta
       </h1>
       <p style={{ fontSize: 15, color: "#6B6259", marginBottom: 28 }}>
-        7 días Pro gratis. Sin tarjeta de crédito.
+        Gratis para siempre. Sin tarjeta de crédito.
       </p>
 
       {/* Google */}

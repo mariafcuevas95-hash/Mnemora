@@ -39,16 +39,6 @@ function OnboardingInner() {
   const searchParams = useSearchParams();
   const returning = searchParams.get("returning") === "true";
   const [step, setStep] = useState(returning ? 2 : 0);
-  const [userPlan, setUserPlan] = useState<string | null>(null);
-
-  useEffect(() => {
-    const db = createClient();
-    db.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
-      db.from("profiles").select("plan").eq("id", user.id).single()
-        .then(({ data }) => setUserPlan(data?.plan ?? "free"));
-    });
-  }, []);
   const [data, setData] = useState<OnboardingData>({
     university: "",
     career: "",
@@ -109,7 +99,7 @@ function OnboardingInner() {
               ← Atrás
             </button>
           )}
-          {step === 0 && <StepBienvenida onNext={next} plan={userPlan} />}
+          {step === 0 && <StepBienvenida onNext={next} />}
           {step === 1 && <StepCarrera data={data} update={update} onNext={next} />}
           {step === 2 && <StepMateria data={data} update={update} onNext={next} />}
           {step === 3 && <StepSyllabus data={data} update={update} onNext={next} />}
@@ -121,40 +111,35 @@ function OnboardingInner() {
 }
 
 /* ─── Step 0: Bienvenida ─── */
-function StepBienvenida({ onNext, plan }: { onNext: () => void; plan: string | null }) {
+function StepBienvenida({ onNext }: { onNext: () => void }) {
   return (
     <div style={{ textAlign: "center" }}>
-      <div style={{ width: 80, height: 80, background: "#E8F1EC", borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
-        <span style={{ fontSize: 40 }}>🎓</span>
+      <div style={{ width: 72, height: 72, background: "#E8F1EC", borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+        <span style={{ fontSize: 36 }}>🎓</span>
       </div>
-      <h1 className="font-display" style={{ fontSize: 32, fontWeight: 800, color: "#1A1612", lineHeight: 1.2, marginBottom: 16 }}>
+      <h1 className="font-display" style={{ fontSize: 30, fontWeight: 800, color: "#1A1612", lineHeight: 1.2, marginBottom: 10 }}>
         Bienvenido a Mnemora
       </h1>
-      <p style={{ fontSize: 16, color: "#6B6259", lineHeight: 1.65, marginBottom: 32, maxWidth: 400, margin: "0 auto 32px" }}>
-        En 3 minutos organizamos tu semestre y tu tutor personal queda listo para estudiar contigo.
+      <p style={{ fontSize: 15, color: "#6B6259", lineHeight: 1.6, marginBottom: 28, maxWidth: 360, margin: "0 auto 28px" }}>
+        En los próximos minutos vamos a preparar todo para que puedas estudiar mejor.
       </p>
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 12, background: "#FFFFFF", borderRadius: 16, padding: 20, marginBottom: 32, border: "0.5px solid rgba(26,22,18,0.08)", textAlign: "left" }}>
+      <div style={{ display: "flex", flexDirection: "column", gap: 10, background: "#FFFFFF", borderRadius: 16, padding: "18px 20px", marginBottom: 28, border: "0.5px solid rgba(26,22,18,0.08)", textAlign: "left" }}>
         {[
-          { icon: <GraduationCap size={18} color="#1B3F2F" />, text: "Configuramos tu carrera y materias" },
-          { icon: <Calendar size={18} color="#1B3F2F" />, text: "Extraemos tu calendario del programa de la materia" },
-          { icon: <BookMarked size={18} color="#1B3F2F" />, text: "Tu tutor queda listo con memoria" },
-        ].map(({ icon, text }) => (
-          <div key={text} style={{ display: "flex", alignItems: "center", gap: 12 }}>
-            <div style={{ width: 32, height: 32, background: "#E8F1EC", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              {icon}
-            </div>
+          "Crear tu primera materia",
+          "Organizar tu semestre",
+          "Preparar a tu tutor",
+        ].map(text => (
+          <div key={text} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <Check size={15} color="#1B3F2F" />
             <span style={{ fontSize: 14, color: "#1A1612", fontWeight: 500 }}>{text}</span>
           </div>
         ))}
       </div>
 
       <button onClick={onNext} className="mn-btn-primary" style={{ fontSize: 16, padding: "14px 32px" }}>
-        Empezar <ArrowRight size={16} />
+        Comenzar <ArrowRight size={16} />
       </button>
-      {plan === "free" && (
-        <p style={{ fontSize: 12, color: "#9E9389", marginTop: 14 }}>Tu prueba Pro de 7 días ya está activa 🎉</p>
-      )}
     </div>
   );
 }
@@ -226,6 +211,7 @@ function StepCarrera({ data, update, onNext }: { data: OnboardingData; update: (
 function StepMateria({ data, update, onNext }: { data: OnboardingData; update: (d: Partial<OnboardingData>) => void; onNext: () => void }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [showOptional, setShowOptional] = useState(false);
   const semestres = ["2026-I", "2026-II", "2025-II", "Otro"];
 
   async function handleNext() {
@@ -274,10 +260,14 @@ function StepMateria({ data, update, onNext }: { data: OnboardingData; update: (
             onBlur={e => (e.target.style.borderColor = "rgba(26,22,18,0.12)")}
           />
         </div>
-        <div>
-          <label style={{ fontSize: 13, fontWeight: 600, color: "#1A1612", display: "block", marginBottom: 6 }}>
-            Profesor/a <span style={{ fontWeight: 400, color: "#9E9389" }}>(opcional)</span>
-          </label>
+        <button
+          type="button"
+          onClick={() => setShowOptional(v => !v)}
+          style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#9E9389", textAlign: "left", padding: 0, display: "flex", alignItems: "center", gap: 4 }}
+        >
+          {showOptional ? "▾" : "▸"} Agregar profesor/a (opcional)
+        </button>
+        {showOptional && (
           <input
             type="text" value={data.professor}
             onChange={e => update({ professor: e.target.value })}
@@ -286,7 +276,7 @@ function StepMateria({ data, update, onNext }: { data: OnboardingData; update: (
             onFocus={e => (e.target.style.borderColor = "#1B3F2F")}
             onBlur={e => (e.target.style.borderColor = "rgba(26,22,18,0.12)")}
           />
-        </div>
+        )}
         <div>
           <label style={{ fontSize: 13, fontWeight: 600, color: "#1A1612", display: "block", marginBottom: 8 }}>Semestre</label>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
@@ -412,12 +402,27 @@ function StepSyllabus({ data, update, onNext }: { data: OnboardingData; update: 
 
   return (
     <div>
-      <h2 className="font-display" style={{ fontSize: 28, fontWeight: 800, color: "#1A1612", marginBottom: 8 }}>
-        ¿Tienes el programa de la materia?
-      </h2>
-      <p style={{ fontSize: 15, color: "#6B6259", marginBottom: 32 }}>
-        Súbelo y Mnemora extrae todas las fechas importantes en segundos. Si no lo tienes, puedes omitir este paso.
-      </p>
+      <div style={{ background: "#1B3F2F", borderRadius: 16, padding: "20px 22px", marginBottom: 24 }}>
+        <p style={{ fontSize: 13, fontWeight: 700, color: "#86EFAC", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>
+          Tu materia está lista ✓
+        </p>
+        <h2 className="font-display" style={{ fontSize: 22, fontWeight: 800, color: "#fff", lineHeight: 1.2, marginBottom: 10 }}>
+          Ahora sube el programa de la materia.
+        </h2>
+        <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
+          {[
+            "Detectamos tus fechas de examen",
+            "Creamos tu calendario del semestre",
+            "Preparamos a tu tutor con el temario",
+            "Organizamos qué estudiar cada día",
+          ].map(t => (
+            <div key={t} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+              <Check size={13} color="#86EFAC" />
+              <span style={{ fontSize: 13, color: "#D1FAE5" }}>{t}</span>
+            </div>
+          ))}
+        </div>
+      </div>
 
       <input
         ref={fileRef}
@@ -513,12 +518,17 @@ function OnboardingPageInner() {
   );
 }
 
-/* ─── Step 4: ¡Listo! — auto-redirect al tutor en 4s ─── */
+type AhaMoment = {
+  exams: { title: string; event_date: string }[];
+  conceptCount: number;
+};
+
+/* ─── Step 4: ¡Listo! ─── */
 function StepListo({ data }: { data: OnboardingData }) {
   const router = useRouter();
-  const [countdown, setCountdown] = useState(4);
   const [visibleItems, setVisibleItems] = useState(0);
   const [showConfetti, setShowConfetti] = useState(false);
+  const [aha, setAha] = useState<AhaMoment | null>(null);
   const destination = data.subjectId ? `/tutor/${data.subjectId}` : "/dashboard";
 
   useEffect(() => {
@@ -531,96 +541,130 @@ function StepListo({ data }: { data: OnboardingData }) {
     return () => timers.forEach(clearTimeout);
   }, []);
 
+  // Fetch aha-moment data if syllabus was uploaded
   useEffect(() => {
-    if (countdown <= 0) {
-      router.push(destination);
-      return;
-    }
-    const t = setTimeout(() => setCountdown(c => c - 1), 1000);
-    return () => clearTimeout(t);
-  }, [countdown, destination, router]);
+    if (!data.subjectId || data.syllabusSkipped) return;
+    import("@/lib/supabase/client").then(({ createClient }) => {
+      const db = createClient();
+      Promise.all([
+        db.from("calendar_events")
+          .select("title, event_date")
+          .eq("subject_id", data.subjectId!)
+          .eq("event_type", "exam")
+          .order("event_date")
+          .limit(3),
+        db.from("subject_concepts")
+          .select("id", { count: "exact", head: true })
+          .eq("subject_id", data.subjectId!),
+      ]).then(([events, concepts]) => {
+        const exams = events.data ?? [];
+        const conceptCount = concepts.count ?? 0;
+        if (exams.length > 0 || conceptCount > 0) {
+          setAha({ exams, conceptCount });
+        }
+      }).catch(() => {});
+    });
+  }, [data.subjectId, data.syllabusSkipped]);
 
-  const progress = ((4 - countdown) / 4) * 100;
+  const fmtDate = (d: string) =>
+    new Date(d).toLocaleDateString("es", { day: "numeric", month: "long" });
 
   return (
     <div style={{ textAlign: "center" }}>
-      <div style={{ width: 80, height: 80, background: "#E8F1EC", borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 24px" }}>
-        <span style={{ fontSize: 44 }}>🎉</span>
+      <div style={{ width: 72, height: 72, background: "#E8F1EC", borderRadius: 20, display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
+        <span style={{ fontSize: 40 }}>🎉</span>
       </div>
-      <h2 className="font-display" style={{ fontSize: 30, fontWeight: 800, color: "#1A1612", marginBottom: 12 }}>¡Todo listo!</h2>
-      <p style={{ fontSize: 16, color: "#6B6259", lineHeight: 1.65, marginBottom: 28 }}>
-        Tu tutor ya conoce <strong style={{ color: "#1A1612" }}>{data.subjectName}</strong>.
-        {!data.syllabusSkipped && " El calendario se llenará en segundos."}
-      </p>
 
       {showConfetti && (
         <div style={{ position: "fixed", inset: 0, pointerEvents: "none", overflow: "hidden", zIndex: 50 }}>
-          {["#1B3F2F","#86EFAC","#D97706","#FCD34D","#1B3F2F","#86EFAC"].map((color, i) => (
+          {["#1B3F2F","#86EFAC","#D97706","#FCD34D","#1B3F2F","#86EFAC","#D97706","#FCD34D","#86EFAC","#1B3F2F"].map((color, i) => (
             <div key={i} style={{
-              position: "absolute",
-              top: "-10px",
-              left: `${15 + i * 14}%`,
-              width: 8,
-              height: 8,
+              position: "absolute", top: "-10px",
+              left: `${8 + i * 9}%`,
+              width: i % 3 === 0 ? 10 : 7,
+              height: i % 3 === 0 ? 10 : 7,
               borderRadius: i % 2 === 0 ? "50%" : 2,
               background: color,
-              animation: `confetti-fall 1.4s ease-out ${i * 80}ms forwards`,
+              animation: `confetti-fall ${1.2 + i * 0.1}s ease-out ${i * 60}ms forwards`,
             }} />
           ))}
         </div>
       )}
 
-      <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
+      {/* Aha moment — datos reales del syllabus */}
+      {aha && (aha.exams.length > 0 || aha.conceptCount > 0) ? (
+        <>
+          <h2 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: "#1A1612", marginBottom: 8 }}>
+            Ya encontramos lo que necesitas saber.
+          </h2>
+          <p style={{ fontSize: 15, color: "#6B6259", marginBottom: 20 }}>
+            Esto es lo que Mnemora detectó en el programa de <strong style={{ color: "#1A1612" }}>{data.subjectName}</strong>:
+          </p>
+          <div style={{ background: "#FFFFFF", borderRadius: 16, padding: "18px 20px", marginBottom: 24, border: "0.5px solid rgba(26,22,18,0.08)", textAlign: "left" }}>
+            {aha.exams.map(ev => (
+              <div key={ev.title} style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 10 }}>
+                <span style={{ fontSize: 16 }}>📅</span>
+                <span style={{ fontSize: 14, color: "#1A1612", fontWeight: 500 }}>{ev.title} — {fmtDate(ev.event_date)}</span>
+              </div>
+            ))}
+            {aha.conceptCount > 0 && (
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginTop: aha.exams.length > 0 ? 4 : 0 }}>
+                <span style={{ fontSize: 16 }}>🧠</span>
+                <span style={{ fontSize: 14, color: "#1A1612", fontWeight: 500 }}>{aha.conceptCount} conceptos identificados</span>
+              </div>
+            )}
+          </div>
+        </>
+      ) : (
+        <>
+          <h2 className="font-display" style={{ fontSize: 28, fontWeight: 800, color: "#1A1612", marginBottom: 10 }}>¡Todo listo!</h2>
+          <p style={{ fontSize: 15, color: "#6B6259", lineHeight: 1.6, marginBottom: 24 }}>
+            Tu tutor ya conoce <strong style={{ color: "#1A1612" }}>{data.subjectName}</strong>.
+            {!data.syllabusSkipped && " Tu calendario se llenará en segundos."}
+          </p>
+        </>
+      )}
+
+      {/* Checklist de confirmación */}
+      <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 28 }}>
         {[
-          { text: "Materia creada en Mnemora", done: true },
-          { text: data.syllabusSkipped ? "Programa: puedes subirlo desde la materia" : "Programa recibido · extrayendo fechas", done: !data.syllabusSkipped },
+          { text: "Materia creada", done: true },
+          { text: data.syllabusSkipped ? "Programa: puedes subirlo desde la materia" : "Programa procesado", done: !data.syllabusSkipped },
           { text: "Tutor con memoria activado", done: true },
-          { text: "✨ 7 días Pro gratis activos", done: true },
         ].map(({ text, done }, idx) => (
           <div key={text} style={{
             display: "flex", alignItems: "center", gap: 10,
             background: done ? "#FFFFFF" : "#F7F4EF", borderRadius: 12,
-            padding: "12px 16px", border: "0.5px solid rgba(26,22,18,0.08)",
+            padding: "11px 16px", border: "0.5px solid rgba(26,22,18,0.08)",
             opacity: visibleItems > idx ? 1 : 0,
             transform: visibleItems > idx ? "translateY(0)" : "translateY(8px)",
             transition: "opacity 300ms ease, transform 300ms ease",
           }}>
             {done
-              ? <Check size={16} color="#1B3F2F" />
-              : <div style={{ width: 16, height: 16, borderRadius: "50%", border: "2px solid rgba(26,22,18,0.2)", flexShrink: 0 }} />
+              ? <Check size={15} color="#1B3F2F" />
+              : <div style={{ width: 15, height: 15, borderRadius: "50%", border: "2px solid rgba(26,22,18,0.2)", flexShrink: 0 }} />
             }
-            <span style={{ fontSize: 14, color: done ? "#1A1612" : "#9E9389", fontWeight: idx === 3 ? 700 : 500 }}>{text}</span>
+            <span style={{ fontSize: 14, color: done ? "#1A1612" : "#9E9389", fontWeight: 500 }}>{text}</span>
           </div>
         ))}
       </div>
 
-      {/* Auto-redirect CTA */}
       <button
         onClick={() => router.push(destination)}
         className="mn-btn-primary"
         style={{ fontSize: 16, padding: "14px 32px", justifyContent: "center", width: "100%", marginBottom: 12 }}
       >
-        Hablar con mi tutor ahora <ArrowRight size={16} />
+        Entrar a Mnemora <ArrowRight size={16} />
       </button>
-
-      {/* Progress bar + countdown */}
-      <div style={{ marginBottom: 10 }}>
-        <div style={{ height: 3, background: "#EDE9E2", borderRadius: 99, overflow: "hidden", marginBottom: 8 }}>
-          <div style={{ height: "100%", width: `${progress}%`, background: "#1B3F2F", borderRadius: 99, transition: "width 900ms linear" }} />
-        </div>
-        <p style={{ fontSize: 12, color: "#9E9389" }}>
-          Te llevamos en {countdown}s...
-        </p>
-      </div>
 
       <button
         onClick={() => router.push("/dashboard")}
         style={{ background: "none", border: "none", cursor: "pointer", fontSize: 13, color: "#C4BAAE", textDecoration: "underline" }}
       >
-        Ir al dashboard en su lugar
+        Ir al dashboard
       </button>
       <style>{`
-        @keyframes confetti-fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(100vh) rotate(720deg); opacity: 0; } }
+        @keyframes confetti-fall { 0% { transform: translateY(0) rotate(0deg); opacity: 1; } 100% { transform: translateY(105vh) rotate(720deg); opacity: 0; } }
       `}</style>
     </div>
   );
