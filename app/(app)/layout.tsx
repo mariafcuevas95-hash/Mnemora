@@ -5,7 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import {
   BookOpen, LayoutDashboard, Calendar,
-  Layers, Plus, ChevronRight, Settings, TrendingUp, LogOut, Library, GitBranch, Map, BarChart2, RefreshCw, ClipboardCheck, Gift, Mic, Brain,
+  Layers, Plus, ChevronRight, Settings, TrendingUp, LogOut, Library, GitBranch, Map, BarChart2, RefreshCw, ClipboardCheck, Gift, Mic, Brain, Bell,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
@@ -107,6 +107,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loggingOut, setLoggingOut] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [unreadNotifs, setUnreadNotifs] = useState(0);
 
   useEffect(() => { setSidebarOpen(false); }, [pathname]);
 
@@ -119,6 +120,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
       db.from("subjects").select("id, name").order("created_at")
         .then(({ data }) => setSubjects(data ?? []));
     });
+    fetch("/api/notifications/unread-count")
+      .then(r => r.ok ? r.json() : { count: 0 })
+      .then(d => setUnreadNotifs(d.count ?? 0));
   }, []);
 
   async function handleLogout() {
@@ -324,6 +328,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             );
           })()}
 
+          <Link href="/notifications" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 8, color: "#9E9389", textDecoration: "none", fontSize: 13, position: "relative" }}>
+            <span style={{ position: "relative" }}>
+              <Bell size={15} />
+              {unreadNotifs > 0 && (
+                <span style={{ position: "absolute", top: -4, right: -4, width: 14, height: 14, borderRadius: "50%", background: "#1B3F2F", color: "#fff", fontSize: 9, fontWeight: 700, display: "flex", alignItems: "center", justifyContent: "center", lineHeight: 1 }}>
+                  {unreadNotifs > 9 ? "9+" : unreadNotifs}
+                </span>
+              )}
+            </span>
+            Notificaciones
+          </Link>
           <Link href="/settings" style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 10px", borderRadius: 8, color: "#9E9389", textDecoration: "none", fontSize: 13 }}>
             <Settings size={15} /> Configuración
           </Link>
