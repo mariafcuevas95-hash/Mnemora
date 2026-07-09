@@ -532,9 +532,9 @@ export default function DashboardPage() {
                 Tu tutor detectó algo importante
               </p>
               <p style={{ fontSize: 12, color: "var(--mn-ink-2)", lineHeight: 1.55 }}>
-                Tenés {reviewItems.length} conceptos sin repasar y el examen de{" "}
+                Tienes {reviewItems.length} conceptos sin repasar y el examen de{" "}
                 <strong>{(nextExam.subjects as { name: string } | undefined)?.name ?? "tu materia"}</strong>{" "}
-                es en {daysToExam} {daysToExam === 1 ? "día" : "días"}. Entrá a hablar.
+                es en {daysToExam} {daysToExam === 1 ? "día" : "días"}. Entra a hablar.
               </p>
             </div>
             <ArrowRight size={14} color="var(--mn-ink-3)" style={{ marginTop: 2, flexShrink: 0 }} />
@@ -638,15 +638,44 @@ export default function DashboardPage() {
         </>
       )}
 
-      {/* 5 — Alerta de examen próximo */}
-      {nextExam && daysToExam !== null && daysToExam <= 7 && (
-        <div className="mn-fade-up" style={{ padding: "12px 16px", borderLeft: "3px solid var(--mn-amber)", marginBottom: 24, animationDelay: "240ms" }}>
-          <p style={{ fontSize: 14, color: "var(--mn-ink-1)", lineHeight: 1.5 }}>
-            <strong>{nextExam.title}</strong> en {daysToExam === 0 ? "¡hoy!" : `${daysToExam} día${daysToExam !== 1 ? "s" : ""}`}
-            {nextExam.subjects && ` · ${(nextExam.subjects as any).name}`}
-          </p>
-        </div>
-      )}
+      {/* 5 — Strip de exámenes próximos (todos los próximos 30 días) */}
+      {loaded && (() => {
+        const upcomingExams = events
+          .filter(e => e.event_type === "exam")
+          .map(e => ({ ...e, days: daysUntil(e.event_date) }))
+          .filter(e => e.days >= 0 && e.days <= 30)
+          .slice(0, 5);
+        if (upcomingExams.length === 0) return null;
+        return (
+          <div className="mn-fade-up" style={{ marginBottom: 24, animationDelay: "240ms" }}>
+            <p style={{ fontSize: 11, fontWeight: 700, color: "var(--mn-ink-3)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 10 }}>
+              Próximos exámenes
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {upcomingExams.map(exam => {
+                const urgent = exam.days <= 7;
+                return (
+                  <div key={exam.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 14px", borderRadius: "var(--mn-r-lg)", background: urgent ? "var(--mn-amber-light, #FEF3C7)" : "var(--mn-surface)", border: `1px solid ${urgent ? "rgba(217,119,6,0.25)" : "var(--mn-ink-4)"}` }}>
+                    <div style={{ width: 36, height: 36, borderRadius: "var(--mn-r-md)", background: urgent ? "rgba(217,119,6,0.15)" : "var(--mn-raised)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <span style={{ fontSize: 14, fontWeight: 800, color: urgent ? "#D97706" : "var(--mn-ink-1)", lineHeight: 1 }}>{exam.days === 0 ? "!" : exam.days}</span>
+                      <span style={{ fontSize: 8, fontWeight: 600, color: urgent ? "#D97706" : "var(--mn-ink-3)", textTransform: "uppercase", letterSpacing: "0.04em" }}>{exam.days === 0 ? "hoy" : exam.days === 1 ? "día" : "días"}</span>
+                    </div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontSize: 13, fontWeight: 600, color: "var(--mn-ink-1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{exam.title}</p>
+                      {exam.subjects && <p style={{ fontSize: 11, color: "var(--mn-ink-3)" }}>{(exam.subjects as any).name} · {formatDate(exam.event_date)}</p>}
+                    </div>
+                    {exam.days <= 14 && exam.subject_id && (
+                      <Link href={`/examen/${exam.subject_id}`} style={{ fontSize: 11, fontWeight: 700, color: urgent ? "#D97706" : "var(--mn-green)", textDecoration: "none", flexShrink: 0, padding: "5px 10px", background: urgent ? "rgba(217,119,6,0.1)" : "var(--mn-raised)", borderRadius: "var(--mn-r-md)" }}>
+                        Preparar
+                      </Link>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* 6 — Daily Planner */}
       <div id="plan" className="mn-fade-up" style={{ marginBottom: 24, animationDelay: "260ms" }}>
@@ -852,7 +881,18 @@ export default function DashboardPage() {
                 </div>
               );
             })()}
-            {subjects.map(s => (
+            {[...subjects].sort((a, b) => {
+              const sa = subjectStats.get(a.id);
+              const sb = subjectStats.get(b.id);
+              // Examen más próximo primero
+              const daysA = sa?.daysToExam ?? 999;
+              const daysB = sb?.daysToExam ?? 999;
+              if (daysA !== daysB) return daysA - daysB;
+              // Luego menor dominio (más necesita atención)
+              const mastA = sa?.masteryPct ?? 100;
+              const mastB = sb?.masteryPct ?? 100;
+              return mastA - mastB;
+            }).map(s => (
               <SubjectControlCard key={s.id} subject={s} stat={subjectStats.get(s.id) ?? null} />
             ))}
           </div>
