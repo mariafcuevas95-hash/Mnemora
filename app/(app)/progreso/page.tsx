@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import type { PredictionData } from "@/app/api/performance-prediction/[subjectId]/route";
+import type { CognitiveProfileData } from "@/app/api/cognitive-profile/route";
 
 type Subject = { id: string; name: string };
 
@@ -240,6 +241,9 @@ function ProgresoPageInner() {
         </div>
       ) : (
         <>
+          {/* Perfil cognitivo */}
+          <CognitiveProfileCard />
+
           {/* Filtro */}
           <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 24 }}>
             <button className={`mn-chip-filter ${activeSubject === "all" ? "active" : ""}`} onClick={() => setActive("all")}>
@@ -524,6 +528,123 @@ function SubjectView({ analysis: a, expandedRoadmap, setExpandedRoadmap }: {
           )}
         </div>
       </div>
+    </div>
+  );
+}
+
+/* ─── Cognitive Profile Card ─── */
+function CognitiveProfileCard() {
+  const [data, setData]     = useState<CognitiveProfileData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch("/api/cognitive-profile")
+      .then(r => r.ok ? r.json() : null)
+      .then(setData)
+      .catch(() => null)
+      .finally(() => setLoading(false));
+  }, []);
+
+  if (loading) return (
+    <div style={{ padding: "20px 24px", background: "var(--mn-surface)", borderRadius: "var(--mn-r-xl)", border: "1px solid var(--mn-ink-4)", marginBottom: 24 }}>
+      {[140, 90, 110].map((w, i) => (
+        <div key={i} style={{ height: 12, width: w, background: "var(--mn-raised)", borderRadius: "var(--mn-r-sm)", marginBottom: 10, animation: "pulse-sk 1.4s ease infinite" }} />
+      ))}
+    </div>
+  );
+
+  if (!data) return null;
+
+  const meters = [
+    { label: "Velocidad",  value: data.learningSpeed,     color: "#2563EB" },
+    { label: "Retención",  value: data.retentionStrength, color: "#16A34A" },
+    { label: "Cobertura",  value: data.coverageDepth,     color: "var(--mn-amber)" },
+  ];
+
+  return (
+    <div style={{ background: "var(--mn-surface)", borderRadius: "var(--mn-r-xl)", border: "1px solid var(--mn-ink-4)", padding: "22px 24px", marginBottom: 24 }}>
+      {/* Header */}
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 18, flexWrap: "wrap" }}>
+        <div>
+          <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+            <Brain size={15} color="var(--mn-ink-2)" />
+            <p className="font-display" style={{ fontSize: 14, fontWeight: 700, color: "var(--mn-ink-1)" }}>Perfil cognitivo</p>
+            {data.dataQuality === "low" && (
+              <span style={{ fontSize: 10, fontWeight: 700, color: "var(--mn-amber)", padding: "2px 7px", borderRadius: "var(--mn-r-full)", background: "var(--mn-raised)", textTransform: "uppercase", letterSpacing: "0.05em" }}>En construcción</span>
+            )}
+          </div>
+          <p style={{ fontSize: 12, color: "var(--mn-ink-3)" }}>{data.totalConcepts} conceptos · {data.quizSessions} quizzes en los últimos 30 días</p>
+        </div>
+        <div style={{ display: "flex", alignItems: "center", gap: 8, padding: "6px 14px", borderRadius: "var(--mn-r-full)", background: "var(--mn-raised)", flexShrink: 0 }}>
+          <div style={{ width: 8, height: 8, borderRadius: "50%", background: "var(--mn-green)" }} />
+          <span style={{ fontSize: 12, fontWeight: 700, color: "var(--mn-ink-1)" }}>{data.style}</span>
+        </div>
+      </div>
+
+      {/* Medidores */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 12, marginBottom: 18 }}>
+        {meters.map(m => (
+          <div key={m.label} style={{ padding: "12px 14px", background: "var(--mn-raised)", borderRadius: "var(--mn-r-lg)" }}>
+            <p style={{ fontSize: 11, color: "var(--mn-ink-3)", marginBottom: 6 }}>{m.label}</p>
+            <p className="font-display" style={{ fontSize: 22, fontWeight: 700, color: "var(--mn-ink-1)", lineHeight: 1, marginBottom: 6, fontVariantNumeric: "tabular-nums" }}>
+              {m.value}<span style={{ fontSize: 12, fontWeight: 400, color: "var(--mn-ink-3)" }}>/100</span>
+            </p>
+            <div style={{ height: 3, background: "var(--mn-canvas)", borderRadius: 2, overflow: "hidden" }}>
+              <div style={{ width: `${m.value}%`, height: "100%", background: m.color, borderRadius: 2, transition: "width 600ms ease" }} />
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Insight */}
+      <p style={{ fontSize: 13, color: "var(--mn-ink-2)", lineHeight: 1.65, marginBottom: 16, paddingLeft: 12, borderLeft: "3px solid var(--mn-ink-4)", fontStyle: "italic" }}>
+        {data.insight}
+      </p>
+
+      {/* Fortalezas y debilidades */}
+      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+        <div>
+          <p style={{ fontSize: 11, fontWeight: 600, color: "#16A34A", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>Fortalezas</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            {data.strengths.map((s, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 7 }}>
+                <CheckCircle size={12} color="#16A34A" style={{ flexShrink: 0, marginTop: 1 }} />
+                <span style={{ fontSize: 12, color: "var(--mn-ink-2)", lineHeight: 1.4 }}>{s}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+        <div>
+          <p style={{ fontSize: 11, fontWeight: 600, color: "var(--mn-amber)", textTransform: "uppercase", letterSpacing: "0.06em", marginBottom: 8 }}>A mejorar</p>
+          <div style={{ display: "flex", flexDirection: "column", gap: 5 }}>
+            {data.weaknesses.map((w, i) => (
+              <div key={i} style={{ display: "flex", alignItems: "flex-start", gap: 7 }}>
+                <TrendingUp size={12} color="var(--mn-amber)" style={{ flexShrink: 0, marginTop: 1 }} />
+                <span style={{ fontSize: 12, color: "var(--mn-ink-2)", lineHeight: 1.4 }}>{w}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+
+      {data.quizSessions > 0 && (
+        <div style={{ marginTop: 16, paddingTop: 14, borderTop: "1px solid var(--mn-ink-4)", display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ textAlign: "center" }}>
+            <p className="font-display" style={{ fontSize: 20, fontWeight: 700, color: "var(--mn-ink-1)", fontVariantNumeric: "tabular-nums" }}>{data.avgQuizScore}%</p>
+            <p style={{ fontSize: 11, color: "var(--mn-ink-3)" }}>Promedio quiz</p>
+          </div>
+          <div style={{ width: 1, height: 36, background: "var(--mn-ink-4)" }} />
+          <div style={{ textAlign: "center" }}>
+            <p className="font-display" style={{ fontSize: 20, fontWeight: 700, color: "var(--mn-ink-1)", fontVariantNumeric: "tabular-nums" }}>{data.masteredConcepts}</p>
+            <p style={{ fontSize: 11, color: "var(--mn-ink-3)" }}>Dominados</p>
+          </div>
+          <div style={{ width: 1, height: 36, background: "var(--mn-ink-4)" }} />
+          <div style={{ textAlign: "center" }}>
+            <p className="font-display" style={{ fontSize: 20, fontWeight: 700, color: "var(--mn-ink-1)", fontVariantNumeric: "tabular-nums" }}>{data.quizSessions}</p>
+            <p style={{ fontSize: 11, color: "var(--mn-ink-3)" }}>Quizzes</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
