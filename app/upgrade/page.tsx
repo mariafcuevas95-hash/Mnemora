@@ -61,7 +61,6 @@ function UpgradeContent() {
 
   const [billing, setBilling] = useState<"monthly" | "annual">("annual");
   const [userCount, setUserCount] = useState<number | null>(null);
-  const [premiumOpen, setPremiumOpen] = useState(false);
   const [usageStats, setUsageStats] = useState<{ flashcards: number; tutorMessages: number; subjects: number } | null>(null);
 
   useEffect(() => {
@@ -197,41 +196,21 @@ function UpgradeContent() {
           isAnnual={isAnnual}
         />
 
-        {/* Premium — colapsado por defecto */}
-        {!premiumOpen ? (
-          <button
-            onClick={() => setPremiumOpen(true)}
-            style={{
-              width: "100%", marginBottom: 16, padding: "14px 18px",
-              background: "#1C1108", borderRadius: 16, border: "none", cursor: "pointer",
-              display: "flex", alignItems: "center", justifyContent: "space-between",
-            }}
-          >
-            <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
-              <Star size={15} color="#FBBF24" fill="#FBBF24" />
-              <div style={{ textAlign: "left" }}>
-                <p style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#fff" }}>Plan Premium</p>
-                <p style={{ margin: 0, fontSize: 12, color: "#FCD34D", opacity: 0.8 }}>Coach académico con IA · ${premPrice}/mes</p>
-              </div>
-            </div>
-            <span style={{ fontSize: 12, color: "#FCD34D", fontWeight: 600 }}>Ver más ↓</span>
-          </button>
-        ) : (
-          <PlanCard
-            name="Premium"
-            icon={<Star size={16} color="#FBBF24" fill="#FBBF24" />}
-            bgColor="#1C1108"
-            accentColor="#FCD34D"
-            subtleColor="#FEF3C7"
-            tagline="Tu coach académico personal con IA"
-            price={premPrice}
-            priceNote={isAnnual ? `$159 USD/año · equivale a $${PRM_ANNUAL}/mes` : `$${PRM_MONTHLY} USD/mes`}
-            features={PREMIUM_FEATURES}
-            checkoutUrl={premUrl}
-            checkoutsReady={checkoutsReady}
-            isAnnual={isAnnual}
-          />
-        )}
+        {/* Premium card */}
+        <PlanCard
+          name="Premium"
+          icon={<Star size={16} color="#FBBF24" fill="#FBBF24" />}
+          bgColor="#1C1108"
+          accentColor="#FCD34D"
+          subtleColor="#FEF3C7"
+          tagline="Tu coach académico personal con IA"
+          price={premPrice}
+          priceNote={isAnnual ? `$159 USD/año · equivale a $${PRM_ANNUAL}/mes` : `$${PRM_MONTHLY} USD/mes`}
+          features={PREMIUM_FEATURES}
+          checkoutUrl={premUrl}
+          checkoutsReady={checkoutsReady}
+          isAnnual={isAnnual}
+        />
 
         {/* Social proof */}
         {userCount !== null && userCount >= 10 && (
