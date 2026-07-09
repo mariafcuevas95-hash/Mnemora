@@ -92,24 +92,24 @@ function Hero() {
   return (
     <section className="mn-hero-pad" style={{ maxWidth: 1120, margin: "0 auto", padding: "88px 24px 72px", textAlign: "center" }}>
       <div style={{ display: "flex", justifyContent: "center", marginBottom: 28 }} className="mn-animate">
-        <span className="mn-badge mn-badge-green"><Sparkles size={12} />Tutor de IA para universitarios LATAM</span>
+        <span className="mn-badge mn-badge-green"><Sparkles size={12} />Para estudiantes universitarios LATAM</span>
       </div>
 
       <h1 className="font-display mn-animate mn-animate-d1" style={{ fontSize: "clamp(38px, 6vw, 70px)", fontWeight: 800, lineHeight: 1.06, letterSpacing: "-0.025em", color: "#1A1612", maxWidth: 900, margin: "0 auto 24px" }}>
-        Tu entrenador académico con IA.
+        Para de adivinar qué estudiar.
         <br />
-        <span style={{ color: "#1B3F2F" }}>Estudia menos. Recuerda más.</span>
+        <span style={{ color: "#1B3F2F" }}>Mnemora ya lo sabe.</span>
       </h1>
 
-      <p className="mn-animate mn-animate-d2" style={{ fontSize: "clamp(17px, 2.2vw, 20px)", color: "#6B6259", maxWidth: 640, margin: "0 auto 44px", lineHeight: 1.6 }}>
-        Sube tus apuntes, tu syllabus o graba tus clases en audio. Mnemora organiza el semestre, crea flashcards, mapas mentales, quizzes y un plan personalizado para ayudarte a llegar preparado a cada examen.
+      <p className="mn-animate mn-animate-d2" style={{ fontSize: "clamp(17px, 2.2vw, 20px)", color: "#6B6259", maxWidth: 580, margin: "0 auto 44px", lineHeight: 1.6 }}>
+        Sube tus apuntes o graba tu clase. Mnemora organiza todo, crea tu plan y te dice exactamente qué repasar hoy para llegar preparado al examen.
       </p>
 
       <div className="mn-animate mn-animate-d3" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
         <Link href="/registro" className="mn-btn-primary" style={{ fontSize: 16, padding: "16px 32px" }}>
-          Empezar gratis <ArrowRight size={16} />
+          Crear mi cuenta gratis <ArrowRight size={16} />
         </Link>
-        <a href="#funciones" className="mn-btn-ghost" style={{ fontSize: 16 }}>Ver funciones</a>
+        <a href="#funciones" className="mn-btn-ghost" style={{ fontSize: 16 }}>Ver cómo funciona</a>
       </div>
 
       <p className="mn-animate mn-animate-d4" style={{ marginTop: 16, color: "#9E9389", fontSize: 13 }}>
