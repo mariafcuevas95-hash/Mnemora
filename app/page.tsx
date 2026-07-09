@@ -107,13 +107,13 @@ function Hero() {
 
       <div className="mn-animate mn-animate-d3" style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
         <Link href="/registro" className="mn-btn-primary" style={{ fontSize: 16, padding: "16px 32px" }}>
-          Empezar gratis — 7 días Pro incluidos <ArrowRight size={16} />
+          Empezar gratis <ArrowRight size={16} />
         </Link>
         <a href="#funciones" className="mn-btn-ghost" style={{ fontSize: 16 }}>Ver funciones</a>
       </div>
 
       <p className="mn-animate mn-animate-d4" style={{ marginTop: 16, color: "#9E9389", fontSize: 13 }}>
-        Sin tarjeta · prueba Pro 7 días gratis · después decide
+        Sin tarjeta · plan Free para siempre · actualiza cuando quieras
       </p>
 
       <div className="mn-animate mn-animate-d4" style={{ marginTop: 72 }}>
@@ -214,7 +214,7 @@ function Strip() {
       <div style={{ maxWidth: 1120, margin: "0 auto", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "24px 56px", alignItems: "center" }}>
         {[
           { icon: <Shield size={18} color="#86EFAC" />, text: "Garantía de 30 días sin preguntas" },
-          { icon: <Sparkles size={18} color="#86EFAC" />, text: "7 días Pro gratis con tu prueba" },
+          { icon: <Sparkles size={18} color="#86EFAC" />, text: "Plan Free disponible sin tarjeta" },
           { icon: <Star size={18} color="#86EFAC" />, text: "Diseñado para universidades LATAM" },
           { icon: <span style={{ fontSize: 18 }}>🎁</span>, text: "Invita amigos y estudia gratis" },
         ].map(({ icon, text }) => (
@@ -466,10 +466,10 @@ function MindMapShowcase() {
 ───────────────────────────────────────────── */
 function StudentJourney() {
   const phases = [
-    { title: "Organiza", num: "01", items: [{ icon: <FileText size={15} color="var(--mn-ink-2)" />, label: "Sube tus apuntes" }, { icon: <Upload size={15} color="var(--mn-ink-2)" />, label: "Extrae el programa" }, { icon: <BookOpen size={15} color="var(--mn-ink-2)" />, label: "Genera resúmenes" }] },
+    { title: "Organiza", num: "01", items: [{ icon: <FileText size={15} color="var(--mn-ink-2)" />, label: "Sube tus apuntes" }, { icon: <Upload size={15} color="var(--mn-ink-2)" />, label: "Graba o sube clases en audio" }, { icon: <BookOpen size={15} color="var(--mn-ink-2)" />, label: "Biblioteca inteligente" }] },
     { title: "Aprende", num: "02", items: [{ icon: <Layers size={15} color="var(--mn-ink-2)" />, label: "Flashcards inteligentes" }, { icon: <Brain size={15} color="var(--mn-ink-2)" />, label: "Tutor IA" }, { icon: <ClipboardCheck size={15} color="var(--mn-ink-2)" />, label: "Quizzes automáticos" }] },
-    { title: "Mejora",  num: "03", items: [{ icon: <GitBranch size={15} color="var(--mn-ink-2)" />, label: "Mapas mentales" }, { icon: <BarChart2 size={15} color="var(--mn-ink-2)" />, label: "Perfil cognitivo" }, { icon: <Map size={15} color="var(--mn-ink-2)" />, label: "Roadmap personalizado" }] },
-    { title: "Domina",  num: "04", items: [{ icon: <Trophy size={15} color="var(--mn-ink-2)" />, label: "Modo examen" }, { icon: <TrendingUp size={15} color="var(--mn-ink-2)" />, label: "Predicción de nota" }, { icon: <RefreshCw size={15} color="var(--mn-ink-2)" />, label: "Replanificador" }] },
+    { title: "Mejora",  num: "03", items: [{ icon: <GitBranch size={15} color="var(--mn-ink-2)" />, label: "Mapas mentales" }, { icon: <BarChart2 size={15} color="var(--mn-ink-2)" />, label: "Perfil cognitivo" }, { icon: <Map size={15} color="var(--mn-ink-2)" />, label: "Objetivos por materia" }] },
+    { title: "Domina",  num: "04", items: [{ icon: <Trophy size={15} color="var(--mn-ink-2)" />, label: "Modo examen intensivo" }, { icon: <TrendingUp size={15} color="var(--mn-ink-2)" />, label: "Predicción de nota" }, { icon: <RefreshCw size={15} color="var(--mn-ink-2)" />, label: "XP y logros académicos" }] },
   ];
 
   return (
@@ -510,11 +510,11 @@ function StudentJourney() {
 ───────────────────────────────────────────── */
 function FlowDiagram() {
   const steps = [
-    { icon: "📄", label: "Subes tus apuntes" },
+    { icon: "📄", label: "Subes apuntes o grabas tu clase" },
     { icon: "🤖", label: "La IA analiza el contenido" },
     { icon: "🃏", label: "Genera flashcards y quizzes" },
     { icon: "🗺", label: "Construye el mapa mental" },
-    { icon: "📅", label: "Organiza tu calendario" },
+    { icon: "🎯", label: "Rastrea tus objetivos" },
     { icon: "⚡", label: "Te dice qué estudiar hoy" },
     { icon: "📊", label: "Predice tu rendimiento" },
   ];
@@ -553,11 +553,13 @@ function Comparison() {
     { feature: "Recuerda tu progreso entre sesiones",  mnemora: true,  chatgpt: false, quizlet: false, highlight: false },
     { feature: "Tutor IA en español universitario",    mnemora: true,  chatgpt: true,  quizlet: false, highlight: false },
     { feature: "Flashcards automáticas desde PDF",     mnemora: true,  chatgpt: false, quizlet: true,  highlight: false },
+    { feature: "Transcripción de clases con IA",       mnemora: true,  chatgpt: false, quizlet: false, highlight: false },
     { feature: "Roadmap personalizado por materia",    mnemora: true,  chatgpt: false, quizlet: false, highlight: false },
     { feature: "Perfil cognitivo y puntos débiles",    mnemora: true,  chatgpt: false, quizlet: false, highlight: false },
     { feature: "Mapa mental automático",               mnemora: true,  chatgpt: false, quizlet: false, highlight: false },
     { feature: "Predicción de rendimiento",            mnemora: true,  chatgpt: false, quizlet: false, highlight: false },
     { feature: "Modo examen intensivo",                mnemora: true,  chatgpt: false, quizlet: false, highlight: false },
+    { feature: "Resumen semanal por email",            mnemora: true,  chatgpt: false, quizlet: false, highlight: false },
   ];
 
   return (
@@ -628,7 +630,7 @@ function Pricing() {
           <h2 className="font-display" style={{ fontSize: "clamp(28px, 4vw, 44px)", fontWeight: 800, color: "#1A1612", letterSpacing: "-0.02em", lineHeight: 1.15, marginBottom: 16 }}>
             Elige tu plan
           </h2>
-          <p style={{ color: "#6B6259", fontSize: 17, marginBottom: 28 }}>Prueba Pro 7 días gratis al crear tu cuenta — sin tarjeta. Después, elige el plan que más te sirve.</p>
+          <p style={{ color: "#6B6259", fontSize: 17, marginBottom: 28 }}>Empieza gratis, sin tarjeta. Elige el plan que más te sirve cuando estés listo.</p>
           {/* Toggle */}
           <div style={{ display: "inline-flex", background: "#EDE9E2", borderRadius: 12, padding: 4, gap: 2 }}>
             {(["monthly", "annual"] as const).map(b => (
@@ -699,7 +701,7 @@ function Pricing() {
               Obtener Pro — cobro inmediato
             </Link>
             <p style={{ textAlign: "center", fontSize: 12, color: "#86EFAC", marginTop: 12, lineHeight: 1.5 }}>
-              Ya usaste tu prueba gratuita de 7 días dentro de Mnemora.
+              Cobro inmediato al confirmar. Cancela cuando quieras.
             </p>
           </div>
 
@@ -749,7 +751,7 @@ function Pricing() {
               Obtener Premium — cobro inmediato
             </Link>
             <p style={{ textAlign: "center", fontSize: 12, color: "#FCD34D", marginTop: 12, lineHeight: 1.5 }}>
-              Ya usaste tu prueba gratuita de 7 días dentro de Mnemora.
+              Cobro inmediato al confirmar. Cancela cuando quieras.
             </p>
           </div>
 
@@ -862,7 +864,7 @@ function Proof() {
 const faqs = [
   { q: "¿Necesito saber usar IA?", a: "No. Solo sube tus documentos y Mnemora hace el resto. No hay comandos, no hay prompts, no hay configuración." },
   { q: "¿Puedo cancelar cuando quiera?", a: "Sí. La suscripción se puede cancelar en cualquier momento desde tu cuenta, sin formularios ni llamadas." },
-  { q: "¿Necesito tarjeta para empezar?", a: "No. Al crear tu cuenta accedés automáticamente a 7 días de Pro gratis, sin tarjeta ni datos de pago. Solo necesitás una tarjeta si decidís comprar Pro o Premium cuando termine la prueba." },
+  { q: "¿Necesito tarjeta para empezar?", a: "No. El plan Free es permanente y no requiere tarjeta ni datos de pago. Solo necesitas una tarjeta si decides actualizar a Pro o Premium." },
   { q: "¿Mis documentos son privados?", a: "Sí. Solo tú puedes acceder a ellos. No usamos tu contenido para entrenar modelos de IA." },
   { q: "¿En qué idioma funciona el tutor?", a: "100% en español. Entiende vocabulario académico latinoamericano, nombres de materias en español y el formato de las universidades de la región." },
   { q: "¿Qué formatos de documentos acepta?", a: "PDF (el más común para programas de materia y apuntes), texto copiado directamente, e imágenes de apuntes. No requiere formato especial." },
@@ -906,7 +908,7 @@ function FinalCTA() {
           <span style={{ color: "#86EFAC" }}>de forma inteligente</span>
         </h2>
         <p style={{ color: "#D1FAE5", fontSize: 17, marginBottom: 40, lineHeight: 1.6 }}>
-          7 días de prueba gratuita. El tutor que recuerda todo — listo en 5 minutos.
+          El tutor que recuerda todo lo que estudias — listo en 5 minutos.
         </p>
         <Link href="/registro" className="mn-btn-primary" style={{ fontSize: 17, padding: "18px 40px", background: "#FFFFFF", color: "#1B3F2F" }}>
           Crear mi cuenta gratis

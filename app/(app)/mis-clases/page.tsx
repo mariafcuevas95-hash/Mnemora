@@ -4,7 +4,7 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import {
   Mic, Upload, ChevronRight, Loader2, CheckCircle, AlertCircle,
-  Clock, Layers, BookOpen, HelpCircle, FileAudio, Plus, X,
+  Clock, Layers, BookOpen, HelpCircle, FileAudio, Plus, X, Trash2,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 import { PaywallModal } from "@/components/paywall-modal";
@@ -59,6 +59,8 @@ export default function MisClasesPage() {
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [paywall, setPaywall] = useState<PaywallState>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
   // Upload state
   const [step, setStep] = useState<"choose" | "form" | "uploading" | "processing">("choose");
@@ -105,6 +107,19 @@ export default function MisClasesPage() {
     const interval = setInterval(loadClasses, 4000);
     return () => clearInterval(interval);
   }, [classes, loadClasses]);
+
+  async function handleDelete(id: string) {
+    setDeletingId(id);
+    try {
+      const res = await fetch(`/api/classes/${id}`, { method: "DELETE" });
+      if (res.ok) {
+        setClasses(prev => prev.filter(c => c.id !== id));
+      }
+    } finally {
+      setDeletingId(null);
+      setConfirmDeleteId(null);
+    }
+  }
 
   function resetModal() {
     setStep("choose");
@@ -325,10 +340,46 @@ export default function MisClasesPage() {
                     <p style={{ fontSize: 12, color: "var(--mn-amber)", marginTop: 4 }}>{cls.processing_stage}</p>
                   )}
                 </div>
-                {cls.processing_status === "done" && <ChevronRight size={16} color="var(--mn-ink-4)" style={{ flexShrink: 0, marginTop: 2 }} />}
+                <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+                  <button
+                    onClick={e => { e.preventDefault(); e.stopPropagation(); setConfirmDeleteId(cls.id); }}
+                    style={{ background: "none", border: "none", cursor: "pointer", color: "var(--mn-ink-4)", padding: 4, display: "flex", alignItems: "center", borderRadius: 6 }}
+                    title="Eliminar clase"
+                  >
+                    <Trash2 size={14} />
+                  </button>
+                  {cls.processing_status === "done" && <ChevronRight size={16} color="var(--mn-ink-4)" />}
+                </div>
               </div>
             </Link>
           ))}
+        </div>
+      )}
+
+      {/* Modal confirmación eliminar */}
+      {confirmDeleteId && (
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 300, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }}
+          onClick={() => setConfirmDeleteId(null)}>
+          <div style={{ background: "var(--mn-surface)", borderRadius: "var(--mn-r-xl)", padding: "28px 24px", maxWidth: 380, width: "100%", boxShadow: "0 20px 60px rgba(0,0,0,0.25)" }}
+            onClick={e => e.stopPropagation()}>
+            <p style={{ fontSize: 16, fontWeight: 700, color: "var(--mn-ink-1)", marginBottom: 8 }}>¿Eliminar esta clase?</p>
+            <p style={{ fontSize: 14, color: "var(--mn-ink-3)", marginBottom: 24, lineHeight: 1.6 }}>
+              Se eliminarán también las flashcards y el quiz generados de esta clase. Esta acción no se puede deshacer.
+            </p>
+            <div style={{ display: "flex", gap: 10 }}>
+              <button onClick={() => setConfirmDeleteId(null)} style={{ flex: 1, padding: "10px", borderRadius: "var(--mn-r-lg)", border: "1px solid var(--mn-ink-4)", background: "var(--mn-surface)", fontSize: 14, fontWeight: 600, color: "var(--mn-ink-2)", cursor: "pointer" }}>
+                Cancelar
+              </button>
+              <button
+                onClick={() => handleDelete(confirmDeleteId)}
+                disabled={deletingId === confirmDeleteId}
+                style={{ flex: 1, padding: "10px", borderRadius: "var(--mn-r-lg)", border: "none", background: "var(--mn-error)", fontSize: 14, fontWeight: 700, color: "#fff", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 6, opacity: deletingId === confirmDeleteId ? 0.7 : 1 }}
+              >
+                {deletingId === confirmDeleteId ? <Loader2 size={14} style={{ animation: "spin 1s linear infinite" }} /> : <Trash2 size={14} />}
+                Eliminar
+              </button>
+            </div>
+          </div>
         </div>
       )}
 

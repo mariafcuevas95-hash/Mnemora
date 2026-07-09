@@ -66,8 +66,8 @@ export default function ReferidosPage() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  const displayUrl = data ? `mnemora.app/r/${data.referralCode}` : "mnemora.app/r/…";
-  const copyUrl    = data ? `${typeof window !== "undefined" ? window.location.origin : "https://mnemora.app"}/r/${data.referralCode}` : "";
+  const displayUrl = data ? `mnemora.me/r/${data.referralCode}` : "mnemora.me/r/…";
+  const copyUrl    = data ? `${typeof window !== "undefined" ? window.location.origin : "https://mnemora.me"}/r/${data.referralCode}` : "";
 
   async function copyLink() {
     if (!copyUrl) return;

@@ -93,14 +93,15 @@ export async function GET(
   let useFlashcardMode = false;
   let sessionFlashcards: typeof flashcards = [];
 
+  const MIN_QUESTIONS = 10;
+
   if (hasKnowledge) {
-    // Prioritize low confidence concepts, take up to 15
     const critical = knowledge.filter(k => k.confidence < 0.4);
     const medium   = knowledge.filter(k => k.confidence >= 0.4 && k.confidence < 0.75);
     const good     = knowledge.filter(k => k.confidence >= 0.75);
     session.push(...critical.slice(0, 7));
     session.push(...medium.slice(0, 5));
-    if (session.length < 10) session.push(...good.slice(0, 10 - session.length));
+    if (session.length < MIN_QUESTIONS) session.push(...good.slice(0, MIN_QUESTIONS - session.length));
     session = session.slice(0, 15);
   }
 
@@ -125,23 +126,32 @@ export async function GET(
     contentBlock = session.map((k, i) => {
       const name = k.subject_concepts?.name ?? "";
       const conf = Math.round(k.confidence * 100);
-      // Try to find matching flashcard
       const matchedFc = sessionFlashcards.find(f =>
         f.front.toLowerCase().includes(name.toLowerCase()) ||
         name.toLowerCase().includes(f.front.toLowerCase().slice(0, 15))
       );
-      fcMap; // suppress unused warning
+      fcMap;
       const fcContext = matchedFc ? ` | Flashcard: "${matchedFc.front}" → "${matchedFc.back}"` : "";
       return `${i + 1}. "${name}" (confianza: ${conf}%)${fcContext}`;
     }).join("\n");
+
+    // Si hay pocas entradas de conocimiento, complementar con flashcards disponibles
+    if (session.length < MIN_QUESTIONS && sessionFlashcards.length > 0) {
+      const extra = sessionFlashcards.slice(0, MIN_QUESTIONS - session.length);
+      contentBlock += "\n" + extra.map((f, i) =>
+        `${session.length + i + 1}. Concepto: "${f.front}" → Respuesta: "${f.back}"`
+      ).join("\n");
+    }
   }
 
-  const questionCount = useFlashcardMode ? sessionFlashcards.length : session.length;
+  // Garantiza un mínimo de 10 preguntas independientemente del contenido disponible
+  const rawCount = useFlashcardMode ? sessionFlashcards.length : Math.max(session.length, MIN_QUESTIONS);
+  const questionCount = Math.min(Math.max(rawCount, MIN_QUESTIONS), 15);
 
   try {
     const resp = await generateText({
       model: "processor",
-      maxTokens: 2500,
+      maxTokens: 4000,
       system: `Eres un generador experto de preguntas de quiz para estudiantes universitarios de ${subjectName}.
 Genera preguntas desafiantes, precisas y pedagógicas. Cada pregunta tiene exactamente 4 opciones (a, b, c, d).
 Devuelve SOLO JSON válido. Sin texto extra. Sin markdown.`,
@@ -235,30 +245,33 @@ function buildFallback(
   session: any[],
   flashcards: { id: string; front: string; back: string }[]
 ): QuizSession {
-  const source = session.length > 0 ? session : null;
-  const questions: QuizQuestion[] = source
-    ? source.slice(0, 5).map(k => ({
-        id: k.concept_id,
-        conceptName: k.subject_concepts?.name ?? "",
-        type: "true_false" as QuestionType,
-        question: `¿"${k.subject_concepts?.name}" es un concepto clave de ${subjectName}?`,
-        options: [{ id: "a", text: "Verdadero" }, { id: "b", text: "Falso" }],
-        correctId: "a",
-        explanation: `"${k.subject_concepts?.name}" es un concepto importante de ${subjectName}.`,
-        currentConfidence: k.confidence,
-        masteryLevel: k.mastery_level,
-      }))
-    : flashcards.slice(0, 5).map(f => ({
-        id: f.id,
-        conceptName: f.front.length > 50 ? f.front.slice(0, 49) + "…" : f.front,
-        type: "true_false" as QuestionType,
-        question: `¿Es correcto que: "${f.back}"?`,
-        options: [{ id: "a", text: "Verdadero" }, { id: "b", text: "Falso" }],
-        correctId: "a",
-        explanation: f.back,
-        currentConfidence: 0,
-        masteryLevel: "unknown",
-      }));
+  const knowledgeQs: QuizQuestion[] = session.slice(0, 10).map(k => ({
+    id: k.concept_id,
+    conceptName: k.subject_concepts?.name ?? "",
+    type: "true_false" as QuestionType,
+    question: `¿"${k.subject_concepts?.name}" es un concepto clave de ${subjectName}?`,
+    options: [{ id: "a", text: "Verdadero" }, { id: "b", text: "Falso" }],
+    correctId: "a",
+    explanation: `"${k.subject_concepts?.name}" es un concepto importante de ${subjectName}.`,
+    currentConfidence: k.confidence,
+    masteryLevel: k.mastery_level,
+  }));
+
+  const flashcardQs: QuizQuestion[] = flashcards
+    .slice(0, Math.max(0, 10 - knowledgeQs.length))
+    .map(f => ({
+      id: f.id,
+      conceptName: f.front.length > 50 ? f.front.slice(0, 49) + "…" : f.front,
+      type: "true_false" as QuestionType,
+      question: `¿Es correcto que: "${f.back}"?`,
+      options: [{ id: "a", text: "Verdadero" }, { id: "b", text: "Falso" }],
+      correctId: "a",
+      explanation: f.back,
+      currentConfidence: 0,
+      masteryLevel: "unknown",
+    }));
+
+  const questions: QuizQuestion[] = [...knowledgeQs, ...flashcardQs];
 
   return { subjectId, subjectName, questions, generatedAt: new Date().toISOString() };
 }

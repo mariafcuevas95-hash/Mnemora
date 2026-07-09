@@ -280,7 +280,7 @@ function FlashcardsReviewPageInner() {
   const card = cards[idx];
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", height: "100vh", background: "var(--mn-canvas)" }}>
+    <div style={{ display: "flex", flexDirection: "column", height: "100dvh", maxHeight: "100dvh", overflow: "hidden", background: "var(--mn-canvas)" }}>
 
       {/* Toast: primera carga */}
       {cardToast && (

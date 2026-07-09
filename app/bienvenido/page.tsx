@@ -40,7 +40,7 @@ function BienvenidoContent() {
             ⚠️ Importante
           </p>
           <p style={{ fontSize: 14, color: "#2D5540", lineHeight: 1.6 }}>
-            Utilizá el mismo correo electrónico con el que realizaste la compra
+            Utiliza el mismo correo electrónico con el que realizaste la compra
             {email && <> (<strong>{email}</strong>)</>} para que tu plan quede activado automáticamente.
           </p>
         </div>

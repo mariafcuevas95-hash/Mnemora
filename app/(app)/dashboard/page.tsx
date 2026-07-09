@@ -196,10 +196,18 @@ export default function DashboardPage() {
     });
   }, []);
 
-  // Show PWA install screen once if not yet seen
+  // Mostrar página de instalación solo en móvil cuando el usuario tiene plan pago
   useEffect(() => {
     const seen = localStorage.getItem("mnemora_pwa_seen");
-    if (!seen) router.push("/instalar?next=/dashboard");
+    if (seen) return;
+    const isMobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+    if (!isMobile) return;
+    const db = createClient();
+    db.from("profiles").select("plan").single().then(({ data }) => {
+      if (data?.plan && data.plan !== "free") {
+        router.push("/instalar?next=/dashboard");
+      }
+    });
   }, [router]);
 
   // Study Coach — cached per session in sessionStorage
