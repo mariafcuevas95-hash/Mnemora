@@ -95,6 +95,7 @@ function RegistroPageInner() {
           ...(codeData ? { referral_code: codeData as string } : {}),
         });
         await fetch("/api/claim-pending-purchase", { method: "POST" });
+        fetch("/api/welcome-email", { method: "POST" }).catch(() => {});
         router.push("/onboarding");
       } else {
         router.push(`/registro/confirmar?email=${encodeURIComponent(email)}`);
