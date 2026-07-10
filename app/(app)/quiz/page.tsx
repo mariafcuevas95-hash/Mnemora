@@ -21,6 +21,7 @@ export default function QuizHubPage() {
   const [loading, setLoading] = useState(true);
   const [selectedSubject, setSelectedSubject] = useState<Subject | null>(null);
   const [selectedDoc, setSelectedDoc] = useState<string>("");
+  const [studioQuizCount, setStudioQuizCount] = useState(0);
 
   useEffect(() => {
     fetch("/api/quiz/hub")
@@ -28,6 +29,15 @@ export default function QuizHubPage() {
       .then(setSubjects)
       .catch(() => setSubjects([]))
       .finally(() => setLoading(false));
+
+    fetch("/api/classes")
+      .then(r => r.ok ? r.json() : [])
+      .then((classes: { quiz_count?: number; processing_status?: string }[]) => {
+        const count = classes.filter(c => c.processing_status === "done" && (c.quiz_count ?? 0) > 0)
+          .reduce((sum, c) => sum + (c.quiz_count ?? 0), 0);
+        setStudioQuizCount(count);
+      })
+      .catch(() => {});
   }, []);
 
   function handleStart(subject: Subject) {
@@ -73,9 +83,22 @@ export default function QuizHubPage() {
           <Brain size={32} style={{ marginBottom: 12, opacity: 0.4 }} />
           <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 6, color: "var(--mn-ink-2)" }}>Sin contenido procesado aún</p>
           <p style={{ fontSize: 13, marginBottom: 20 }}>Sube documentos a una materia para generar tu primer quiz.</p>
-          <Link href="/materias" className="mn-btn-primary" style={{ fontSize: 13, textDecoration: "none" }}>
+          <Link href="/materias" className="mn-btn-primary" style={{ fontSize: 13, textDecoration: "none", marginBottom: 12, display: "inline-flex" }}>
             Ir a mis materias
           </Link>
+          {studioQuizCount > 0 && (
+            <div style={{ marginTop: 16, padding: "14px 18px", borderRadius: "var(--mn-r-lg)", background: "var(--mn-surface)", border: "1px solid var(--mn-ink-4)", textAlign: "left" }}>
+              <p style={{ fontSize: 13, fontWeight: 600, color: "var(--mn-ink-1)", marginBottom: 4 }}>
+                Tienes {studioQuizCount} preguntas de tus clases grabadas
+              </p>
+              <p style={{ fontSize: 12, color: "var(--mn-ink-3)", marginBottom: 10 }}>
+                Los quizzes de AI Class Studio se encuentran en cada clase procesada.
+              </p>
+              <Link href="/mis-clases" style={{ fontSize: 12, fontWeight: 600, color: "var(--mn-green)", textDecoration: "none" }}>
+                Ver mis clases →
+              </Link>
+            </div>
+          )}
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
@@ -145,6 +168,23 @@ export default function QuizHubPage() {
               </div>
             );
           })}
+
+          {studioQuizCount > 0 && (
+            <div style={{ padding: "14px 18px", borderRadius: "var(--mn-r-lg)", background: "var(--mn-raised)", border: "1px solid var(--mn-ink-4)", display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                <FileText size={15} color="var(--mn-ink-3)" />
+                <div>
+                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--mn-ink-1)" }}>
+                    {studioQuizCount} preguntas de clases grabadas
+                  </p>
+                  <p style={{ fontSize: 11, color: "var(--mn-ink-3)" }}>Disponibles en AI Class Studio</p>
+                </div>
+              </div>
+              <Link href="/mis-clases" style={{ fontSize: 12, fontWeight: 700, color: "var(--mn-green)", textDecoration: "none", whiteSpace: "nowrap" }}>
+                Ver clases →
+              </Link>
+            </div>
+          )}
         </div>
       )}
 

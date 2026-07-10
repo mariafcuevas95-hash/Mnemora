@@ -121,7 +121,14 @@ Escribe un saludo breve y cálido de bienvenida (máximo 3 oraciones). Presénta
 NO uses "¿En qué puedo ayudarte?" — sé más específico y personal.
 Responde solo el mensaje, sin comillas ni explicaciones adicionales.`;
   } else {
-    prompt = `Eres el tutor de Mnemora para la materia "${subjectName}".
+    const hasRealData = weakConcepts.length > 0 || nextExam !== null || lastAssistantMsg !== null;
+    if (!hasRealData) {
+      prompt = `Eres el tutor de Mnemora para la materia "${subjectName}". El estudiante tiene ${sessionCount} sesión${sessionCount !== 1 ? "es" : ""} previas pero todavía no hay conceptos practicados ni exámenes registrados.
+Escribe un mensaje breve (máximo 3 oraciones): reconoce que están comenzando, explica honestamente que necesitas más datos para personalizar tu análisis, y sugiere una acción concreta para empezar (practicar flashcards, subir un apunte, registrar un examen).
+NO inventes datos ni prometas análisis que no tienes. NO empieces con "Hola" genérico.
+Responde solo el mensaje, sin comillas ni explicaciones adicionales.`;
+    } else {
+      prompt = `Eres el tutor de Mnemora para la materia "${subjectName}".
 Contexto del estudiante:
 ${context}
 
@@ -131,6 +138,7 @@ Si hay un examen próximo, menciónalo con urgencia pero sin alarmar.
 Termina con una propuesta concreta de lo que harán hoy.
 NO empieces con "Hola" genérico — puedes empezar con "Antes de empezar...", "Estuve revisando...", "Noté algo...", etc.
 Responde solo el mensaje, sin comillas ni explicaciones adicionales.`;
+    }
   }
 
   let greeting: string;
@@ -147,7 +155,9 @@ Responde solo el mensaje, sin comillas ni explicaciones adicionales.`;
     // Fallback graceful si Anthropic falla
     greeting = isFirstSession
       ? `Bienvenido a tu primera sesión de **${subjectName}**. Soy tu tutor y voy a acompañarte durante todo el semestre.\n\n¿Por dónde quieres empezar?`
-      : `Hola. Tengo acceso a tu historial de sesiones en **${subjectName}** y a tu perfil de aprendizaje.\n\n¿Qué quieres trabajar hoy?`;
+      : (weakConcepts.length > 0 || nextExam)
+        ? `Estuve revisando tu progreso en **${subjectName}**${nextExam ? ` — tienes un examen próximo` : ""}${weakConcepts.length > 0 ? ` y detecté conceptos que vale la pena reforzar` : ""}.\n\n¿Empezamos?`
+        : `Listo para trabajar **${subjectName}** contigo. Practica tus flashcards o sube un apunte para que pueda darte análisis personalizados.\n\n¿Por dónde empezamos?`;
   }
 
   // Generate 3 contextual suggestions

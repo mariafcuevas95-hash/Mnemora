@@ -82,7 +82,7 @@ export default function ReplannerPage() {
       <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
 
       <div style={{ marginBottom: 28 }}>
-        <h1 className="font-display" style={{ fontSize: 22, fontWeight: 800, color: "var(--mn-ink-1)", marginBottom: 4 }}>Replanificador</h1>
+        <h1 className="font-display" style={{ fontSize: 22, fontWeight: 800, color: "var(--mn-ink-1)", marginBottom: 4 }}>Ajustar plan</h1>
         <p style={{ fontSize: 13, color: "var(--mn-ink-3)" }}>
           La IA analiza tu cobertura, exámenes próximos y conceptos débiles para proponer un plan semanal.
         </p>

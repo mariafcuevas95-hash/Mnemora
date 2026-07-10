@@ -72,11 +72,20 @@ function todayLabel(): string {
 
 type BriefingResult = { title: string; subtitle: string; estimatedMinutes: number | null; cta: { label: string; href: string } | null };
 
-function buildBriefing({ reviewItems, nextExam, daysToExam, subjects, subjectStats, planTasks }: {
+function buildBriefing({ reviewItems, nextExam, daysToExam, subjects, subjectStats, planTasks, hasDocument }: {
   reviewItems: ReviewItem[]; nextExam: Event | null; daysToExam: number | null;
   subjects: Subject[]; subjectStats: Map<string, SubjectStat>; planTasks: PlanTask[] | null;
+  hasDocument: boolean;
 }): BriefingResult | null {
   if (subjects.length === 0) return null;
+  if (!hasDocument) {
+    return {
+      title: "Sube tu primer apunte o clase para empezar.",
+      subtitle: "Mnemora genera tus flashcards, resumen y plan de estudio automáticamente.",
+      estimatedMinutes: null,
+      cta: { label: "Ir a mi materia", href: `/materias/${subjects[0].id}` },
+    };
+  }
 
   const n = reviewItems.length;
   const subjectName = reviewItems[0]?.subject_name ?? "";
@@ -127,10 +136,11 @@ function buildBriefing({ reviewItems, nextExam, daysToExam, subjects, subjectSta
   };
 }
 
-function buildActivityNote({ reviewItems, nextExam, daysToExam, subjects }: {
-  reviewItems: ReviewItem[]; nextExam: Event | null; daysToExam: number | null; subjects: Subject[];
+function buildActivityNote({ reviewItems, nextExam, daysToExam, subjects, hasDocument }: {
+  reviewItems: ReviewItem[]; nextExam: Event | null; daysToExam: number | null; subjects: Subject[]; hasDocument: boolean;
 }): string | null {
   if (subjects.length === 0) return null;
+  if (!hasDocument) return null;
   const n = reviewItems.length;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const examSubjectName = (nextExam?.subjects as any)?.name ?? "";
@@ -144,7 +154,7 @@ function buildActivityNote({ reviewItems, nextExam, daysToExam, subjects }: {
   if (nextExam && daysToExam !== null && daysToExam <= 30) {
     return `calculé tu ritmo de estudio y actualicé los repasos. El examen de ${examSubjectName} está en ${daysToExam} días — vas bien.`;
   }
-  return `calculé tu progreso de la semana y programé los repasos para que no pierdas lo que ya estudiaste.`;
+  return null;
 }
 
 type MnSession = {
@@ -393,8 +403,8 @@ export default function DashboardPage() {
   }
 
   // Build natural-language daily briefing from available data
-  const briefing = buildBriefing({ reviewItems, nextExam: nextExam ?? null, daysToExam, subjects, subjectStats, planTasks });
-  const activityNote = buildActivityNote({ reviewItems, nextExam: nextExam ?? null, daysToExam, subjects });
+  const briefing = buildBriefing({ reviewItems, nextExam: nextExam ?? null, daysToExam, subjects, subjectStats, planTasks, hasDocument });
+  const activityNote = buildActivityNote({ reviewItems, nextExam: nextExam ?? null, daysToExam, subjects, hasDocument });
   const profileLabel = bestCogProfile?.preferred_style
     ? ({ visual: "Visual", conceptual: "Conceptual", practical: "Práctico", balanced: "Mixto" })[bestCogProfile.preferred_style] ?? bestCogProfile.preferred_style
     : null;

@@ -118,7 +118,7 @@ function StepBienvenida({ onNext }: { onNext: () => void }) {
         <span style={{ fontSize: 36 }}>🎓</span>
       </div>
       <h1 className="font-display" style={{ fontSize: 30, fontWeight: 800, color: "#1A1612", lineHeight: 1.2, marginBottom: 10 }}>
-        Bienvenido a Mnemora
+        Te damos la bienvenida a Mnemora
       </h1>
       <p style={{ fontSize: 15, color: "#6B6259", lineHeight: 1.6, marginBottom: 28, maxWidth: 360, margin: "0 auto 28px" }}>
         En los próximos minutos vamos a preparar todo para que puedas estudiar mejor.

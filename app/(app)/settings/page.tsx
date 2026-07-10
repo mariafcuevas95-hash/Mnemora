@@ -240,17 +240,17 @@ export default function SettingsPage() {
             }
           />
           {profile.plan !== "free" && (
-            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 14 }}>
-              <p style={{ fontSize: 12, color: "var(--mn-ink-3)", lineHeight: 1.6 }}>
-                Gestiona o cancela tu suscripción en Hotmart.
+            <div style={{ borderTop: "0.5px solid var(--mn-border)", marginTop: 14, paddingTop: 14 }}>
+              <p style={{ fontSize: 12, color: "var(--mn-ink-3)", lineHeight: 1.6, marginBottom: 10 }}>
+                Para cancelar o modificar tu suscripción, inicia sesión en Hotmart con el email de tu compra y ve a <strong>Mis compras</strong>.
               </p>
               <a
-                href="https://app.hotmart.com/products"
+                href="https://app.hotmart.com/"
                 target="_blank"
                 rel="noopener noreferrer"
-                style={{ fontSize: 12, fontWeight: 600, color: "var(--mn-green)", textDecoration: "none", whiteSpace: "nowrap", marginLeft: 16 }}
+                style={{ display: "inline-block", fontSize: 13, fontWeight: 600, color: "var(--mn-green)", textDecoration: "none", padding: "8px 14px", borderRadius: "var(--mn-r-md)", border: "1px solid rgba(27,63,47,0.2)", background: "rgba(27,63,47,0.04)" }}
               >
-                Ir a Hotmart →
+                Gestionar suscripción en Hotmart →
               </a>
             </div>
           )}

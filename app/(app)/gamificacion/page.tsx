@@ -74,7 +74,7 @@ export default function GamificacionPage() {
       {/* Header */}
       <div style={{ marginBottom: 28 }}>
         <h1 className="font-display" style={{ fontSize: 22, fontWeight: 800, color: "var(--mn-ink-1)", marginBottom: 4 }}>
-          Mi progreso
+          Logros
         </h1>
         <p style={{ fontSize: 13, color: "var(--mn-ink-3)" }}>
           {earned.length} logro{earned.length !== 1 ? "s" : ""} desbloqueado{earned.length !== 1 ? "s" : ""} de {data.achievements.length}

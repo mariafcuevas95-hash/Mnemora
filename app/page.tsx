@@ -970,10 +970,13 @@ function Proof() {
    FAQ
 ───────────────────────────────────────────── */
 const faqs = [
-  { q: "¿Necesito saber usar IA?", a: "No. Solo sube tus documentos y Mnemora hace el resto. No hay comandos, no hay prompts, no hay configuración." },
-  { q: "¿Puedo cancelar cuando quiera?", a: "Sí. La suscripción se puede cancelar en cualquier momento desde tu cuenta, sin formularios ni llamadas." },
-  { q: "¿Necesito tarjeta para empezar?", a: "No. El plan Starter es gratuito para siempre y no requiere tarjeta ni datos de pago. Solo necesitas una tarjeta si decides actualizar a Pro o Premium." },
+  { q: "¿Mnemora funciona para cualquier universidad?", a: "Sí. Mnemora funciona con cualquier universidad latinoamericana. No importa el país ni el área de estudio: puedes subir tus apuntes, PDFs o grabaciones de clase y Mnemora genera tu material de estudio automáticamente." },
   { q: "¿Mis documentos son privados?", a: "Sí. Solo tú puedes acceder a ellos. No usamos tu contenido para entrenar modelos de IA." },
+  { q: "¿Cuánto tarda el procesamiento?", a: "Un PDF o texto demora entre 30 segundos y 2 minutos, según el tamaño. Una grabación de clase puede tardar de 3 a 8 minutos. Puedes cerrar la app mientras tanto — cuando termine, tu material ya estará listo." },
+  { q: "¿Puedo cancelar cuando quiera?", a: "Sí. Puedes cancelar en cualquier momento desde el portal de Hotmart (app.hotmart.com) con el email de tu compra, sin formularios ni llamadas. Tu acceso se mantiene activo hasta el fin del período pagado." },
+  { q: "¿Qué incluye el plan Starter?", a: "El plan Starter es gratuito para siempre e incluye 1 materia activa, 60 generaciones de flashcards al mes, 5 resúmenes al mes y 35 mensajes al tutor al mes. No requiere tarjeta." },
+  { q: "¿Necesito saber usar IA?", a: "No. Solo sube tus documentos y Mnemora hace el resto. No hay comandos, no hay prompts, no hay configuración." },
+  { q: "¿Necesito tarjeta para empezar?", a: "No. El plan Starter es gratuito para siempre y no requiere tarjeta ni datos de pago. Solo necesitas una tarjeta si decides actualizar a Pro o Premium." },
   { q: "¿En qué idioma funciona el tutor?", a: "100% en español. Entiende vocabulario académico latinoamericano, nombres de materias en español y el formato de las universidades de la región." },
   { q: "¿Qué formatos de documentos acepta?", a: "PDF (el más común para programas de materia y apuntes), texto copiado directamente, e imágenes de apuntes. No requiere formato especial." },
   { q: "¿Qué es AI Class Studio?", a: "Es la función que convierte tus clases en material de estudio completo. Puedes grabar directamente desde Mnemora o subir un archivo de audio. La IA transcribe la clase, extrae conceptos, fórmulas, fechas y tareas, genera flashcards y quiz, actualiza tu calendario y le informa a tu tutor qué se vio. Disponible en Plan Premium." },

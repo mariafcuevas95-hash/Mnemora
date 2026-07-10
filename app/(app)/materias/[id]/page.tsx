@@ -524,7 +524,7 @@ export default function MateriaPage() {
       <div className="mn-fade-up" style={{ marginBottom: 28 }}>
         {/* Breadcrumb */}
         <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 10 }}>
-          <Link href="/dashboard" style={{ fontSize: 12, color: "var(--mn-ink-3)", textDecoration: "none" }}>Dashboard</Link>
+          <Link href="/dashboard" style={{ fontSize: 12, color: "var(--mn-ink-3)", textDecoration: "none" }}>Inicio</Link>
           <ChevronRight size={12} color="var(--mn-ink-4)" />
           <Link href="/materias" style={{ fontSize: 12, color: "var(--mn-ink-3)", textDecoration: "none" }}>Materias</Link>
           <ChevronRight size={12} color="var(--mn-ink-4)" />
@@ -602,7 +602,7 @@ export default function MateriaPage() {
           : masteryPct >= 70 ? "~7.5–8.5"
           : masteryPct >= 50 ? "~6–7"
           : masteryPct >= 30 ? "~5–5.5"
-          : "< 5";
+          : "Sin est.";
         const now = new Date();
         const pendientes = Object.values(cardRatings).filter(r => r.nextReview && new Date(r.nextReview) <= now).length;
         return (

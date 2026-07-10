@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Layers, BookOpen } from "lucide-react";
+import { Layers, BookOpen, FileText } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
 
 type Subject = { id: string; name: string; professor?: string };
@@ -12,6 +12,7 @@ export default function FlashcardsIndexPage() {
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [stats, setStats] = useState<Map<string, KnowledgeStat>>(new Map());
   const [loaded, setLoaded] = useState(false);
+  const [studioFlashcardCount, setStudioFlashcardCount] = useState(0);
 
   useEffect(() => {
     const db = createClient();
@@ -57,6 +58,15 @@ export default function FlashcardsIndexPage() {
       setStats(statsMap);
       setLoaded(true);
     })();
+
+    fetch("/api/classes")
+      .then(r => r.ok ? r.json() : [])
+      .then((classes: { flashcards_count?: number; processing_status?: string }[]) => {
+        const count = classes.filter(c => c.processing_status === "done" && (c.flashcards_count ?? 0) > 0)
+          .reduce((sum, c) => sum + (c.flashcards_count ?? 0), 0);
+        setStudioFlashcardCount(count);
+      })
+      .catch(() => {});
   }, []);
 
   return (
@@ -82,6 +92,22 @@ export default function FlashcardsIndexPage() {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+          {studioFlashcardCount > 0 && (
+            <Link
+              href="/mis-clases"
+              className="mn-card"
+              style={{ padding: "16px 20px", textDecoration: "none", display: "flex", alignItems: "center", gap: 14 }}
+            >
+              <div style={{ width: 36, height: 36, background: "var(--mn-canvas)", border: "1px solid var(--mn-ink-4)", borderRadius: "var(--mn-r-md)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <FileText size={16} color="var(--mn-ink-3)" />
+              </div>
+              <div style={{ flex: 1, overflow: "hidden" }}>
+                <p className="font-display" style={{ fontSize: 14, fontWeight: 800, color: "var(--mn-ink-1)" }}>Clases grabadas</p>
+                <p style={{ fontSize: 12, color: "var(--mn-ink-3)" }}>{studioFlashcardCount} tarjeta{studioFlashcardCount !== 1 ? "s" : ""} de AI Class Studio</p>
+              </div>
+              <span style={{ fontSize: 11, fontWeight: 600, color: "var(--mn-ink-3)" }}>Ver →</span>
+            </Link>
+          )}
           {subjects.map(s => {
             const stat = stats.get(s.id);
             const hasDue = (stat?.due ?? 0) > 0;
