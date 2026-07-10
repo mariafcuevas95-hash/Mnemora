@@ -91,7 +91,7 @@ function LoginInner() {
     setLoading(true);
     const db = createClient();
     await db.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/settings/password`,
+      redirectTo: `${window.location.origin}/reset-password`,
     });
     setResetSent(true);
     setLoading(false);
