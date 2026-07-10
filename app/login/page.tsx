@@ -89,9 +89,10 @@ function LoginInner() {
   async function handleForgotPassword() {
     if (!email) { setError("Ingresa tu email primero."); return; }
     setLoading(true);
-    const db = createClient();
-    await db.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/reset-password`,
+    await fetch("/api/auth/forgot-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email }),
     });
     setResetSent(true);
     setLoading(false);

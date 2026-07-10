@@ -101,6 +101,24 @@ export async function sendDailyDigest(data: DailyDigestData) {
   });
 }
 
+export async function sendPasswordResetEmail(to: string, resetLink: string) {
+  await getResend().emails.send({
+    from: FROM,
+    to,
+    subject: "Restablece tu contraseña — Mnemora",
+    html: emailShell(`
+      <h1 style="margin:0 0 12px;color:#1A1612;font-size:22px;font-weight:800;">Restablecer contraseña</h1>
+      <p style="margin:0 0 16px;color:#6B6259;font-size:15px;line-height:1.6;">
+        Recibimos una solicitud para restablecer la contraseña de tu cuenta. Haz clic en el botón para continuar.
+      </p>
+      ${btn(resetLink, "Restablecer contraseña →")}
+      <p style="text-align:center;margin:0;color:#9E9389;font-size:13px;">
+        Si no solicitaste esto, ignora este correo. El enlace expira en 1 hora.
+      </p>
+    `),
+  });
+}
+
 export async function sendWelcomeEmail(to: string, name: string) {
   const firstName = name.split(" ")[0] || "estudiante";
   await getResend().emails.send({
