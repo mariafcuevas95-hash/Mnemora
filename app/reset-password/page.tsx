@@ -25,28 +25,7 @@ function ResetPasswordInner() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
-  const [ready, setReady] = useState(false);
-
-  useEffect(() => {
-    const db = createClient();
-
-    // Detect recovery session: Supabase fires PASSWORD_RECOVERY when processing
-    // the #access_token hash with type=recovery. Also accept SIGNED_IN as fallback
-    // (fired when client already consumed the hash before the listener registered).
-    const { data: { subscription } } = db.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
-        setReady(true);
-      }
-    });
-
-    // If the hash was already consumed (navigation to same URL with hash),
-    // check for an active session directly.
-    db.auth.getSession().then(({ data: { session } }) => {
-      if (session) setReady(true);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const [done, setDone] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -59,11 +38,17 @@ function ResetPasswordInner() {
     const db = createClient();
     const { error: updateError } = await db.auth.updateUser({ password });
     if (updateError) {
-      setError(updateError.message ?? "Error al actualizar la contraseña.");
+      const msg = updateError.message ?? "";
+      setError(
+        msg.includes("session") || msg.includes("Auth")
+          ? "El enlace expiró o ya fue usado. Solicita uno nuevo desde la pantalla de inicio de sesión."
+          : msg
+      );
       setLoading(false);
       return;
     }
-    router.replace("/dashboard");
+    setDone(true);
+    setTimeout(() => router.replace("/dashboard"), 1500);
   }
 
   return (
@@ -84,8 +69,11 @@ function ResetPasswordInner() {
             Elige una contraseña segura para tu cuenta.
           </p>
 
-          {!ready ? (
-            <p style={{ fontSize: 14, color: "#9E9389", textAlign: "center" }}>Verificando enlace...</p>
+          {done ? (
+            <div style={{ padding: "16px 20px", borderRadius: 12, background: "#D1FAE5", border: "0.5px solid #6EE7B7", textAlign: "center" }}>
+              <p style={{ fontSize: 15, fontWeight: 700, color: "#065F46" }}>¡Contraseña actualizada!</p>
+              <p style={{ fontSize: 13, color: "#047857", marginTop: 4 }}>Redirigiendo al dashboard…</p>
+            </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
               <div>
@@ -117,6 +105,7 @@ function ResetPasswordInner() {
               {error && (
                 <div style={{ padding: "10px 14px", borderRadius: 10, background: "#FEE2E2", border: "0.5px solid #FCA5A5" }}>
                   <p style={{ fontSize: 13, color: "#DC2626" }}>{error}</p>
+                  <Link href="/login" style={{ fontSize: 13, color: "#1B3F2F", fontWeight: 600 }}>Volver al inicio de sesión →</Link>
                 </div>
               )}
 
