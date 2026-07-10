@@ -172,6 +172,7 @@ export default function DashboardPage() {
     studiedToday: boolean;
     recentAchievements: { achievement_id: string; earned_at: string }[];
   } | null>(null);
+  const [hasDocument, setHasDocument] = useState(false);
   const [userCount, setUserCount] = useState<number | null>(null);
   useEffect(() => {
     fetch("/api/stats").then(r => r.ok ? r.json() : null).then(d => { if (d) setUserCount(d.userCount); }).catch(() => {});
@@ -241,7 +242,7 @@ export default function DashboardPage() {
     (async () => {
       const { data: { user } } = await db.auth.getUser();
 
-      const [subjRes, evRes, reviewRes, knowledgeRes, cogRes] = await Promise.all([
+      const [subjRes, evRes, reviewRes, knowledgeRes, cogRes, docRes] = await Promise.all([
         db.from("subjects").select("id, name, professor, goal_type, goal_value").order("created_at"),
         db.from("calendar_events")
           .select("id, title, event_date, event_type, subject_id, subjects(name)")
@@ -265,12 +266,14 @@ export default function DashboardPage() {
               .select("subject_id, performance_estimate, learning_speed, preferred_style")
               .eq("user_id", user.id)
           : Promise.resolve({ data: [] }),
+        db.from("documents").select("id", { count: "exact", head: true }),
       ]);
 
       const subjectList: Subject[] = subjRes.data ?? [];
       const eventList: Event[] = (evRes.data ?? []) as Event[];
       setSubjects(subjectList);
       setEvents(eventList);
+      setHasDocument((docRes.count ?? 0) > 0);
 
       const items = ((reviewRes.data ?? []) as any[]).map((row) => ({
         concept_name: row.subject_concepts?.name ?? "",
@@ -743,7 +746,9 @@ export default function DashboardPage() {
           </div>
         ) : coach ? (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(180px, 1fr))", gap: 10 }}>
-            {coach.recommendations.map((rec, i) => <CoachCard key={i} rec={rec} />)}
+            {coach.recommendations
+              .filter((rec, i, arr) => arr.findIndex(r => r.type === rec.type && r.title === rec.title) === i)
+              .map((rec, i) => <CoachCard key={i} rec={rec} />)}
           </div>
         ) : null}
       </div>
@@ -781,7 +786,7 @@ export default function DashboardPage() {
               const firstSubject = subjects[0];
               const steps = [
                 { done: subjects.length > 0,         label: "Creaste tu primera materia",         href: null },
-                { done: false,                        label: "Sube el programa de la materia",      href: `/materias/${firstSubject.id}` },
+                { done: hasDocument,                  label: "Sube un documento a tu materia",     href: `/materias/${firstSubject.id}` },
                 { done: false,                        label: "Practica tus primeras flashcards",    href: `/flashcards/${firstSubject.id}` },
                 { done: false,                        label: "Chatea con el tutor",                 href: `/tutor/${firstSubject.id}` },
               ];

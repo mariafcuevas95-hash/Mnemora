@@ -67,7 +67,7 @@ export default function SettingsPage() {
           name:                data?.name ?? "",
           email:               user.email ?? "",
           plan:                data?.plan ?? "free",
-          notifications_email: data?.notifications_email ?? false,
+          notifications_email: data?.notifications_email ?? true,
         };
         setProfile(p); setName(p.name); setLoading(false);
       } catch {

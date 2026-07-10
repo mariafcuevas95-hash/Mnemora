@@ -71,7 +71,7 @@ export default function QuizHubPage() {
       {subjects.length === 0 ? (
         <div style={{ textAlign: "center", padding: "48px 24px", color: "var(--mn-ink-3)" }}>
           <Brain size={32} style={{ marginBottom: 12, opacity: 0.4 }} />
-          <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 6, color: "var(--mn-ink-2)" }}>Sin materias aún</p>
+          <p style={{ fontSize: 15, fontWeight: 600, marginBottom: 6, color: "var(--mn-ink-2)" }}>Sin contenido procesado aún</p>
           <p style={{ fontSize: 13, marginBottom: 20 }}>Sube documentos a una materia para generar tu primer quiz.</p>
           <Link href="/materias" className="mn-btn-primary" style={{ fontSize: 13, textDecoration: "none" }}>
             Ir a mis materias

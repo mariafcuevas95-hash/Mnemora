@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import {
@@ -34,6 +34,23 @@ type DetectedSuggestion = { title: string; due_date: string; event_type: "exam" 
 
 type TabId = "resumen" | "apuntes" | "flashcards" | "quiz" | "transcript";
 
+function cleanTitle(title: string): string {
+  return title
+    .replace(/\s*\[[^\]]+\]/g, "")
+    .replace(/\s*\([A-ZÁÉÍÓÚÑ\s]{4,}\)/g, "")
+    .replace(/\s*\|\s*CURSO:\s*/g, " — ")
+    .trim();
+}
+
+function renderInline(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  return parts.map((p, i) =>
+    p.startsWith("**") && p.endsWith("**")
+      ? <strong key={i} style={{ fontWeight: 700, color: "var(--mn-ink-1)" }}>{p.slice(2, -2)}</strong>
+      : p
+  );
+}
+
 function renderMarkdown(md: string) {
   const lines = md.split("\n");
   const nodes: React.ReactNode[] = [];
@@ -41,12 +58,16 @@ function renderMarkdown(md: string) {
   while (i < lines.length) {
     const line = lines[i].trim();
     if (!line) { i++; continue; }
-    if (line.startsWith("## ")) {
-      nodes.push(<h3 key={i} style={{ fontSize: 15, fontWeight: 700, color: "var(--mn-ink-1)", margin: "20px 0 8px", paddingBottom: 6, borderBottom: "1px solid var(--mn-ink-4)" }}>{line.slice(3)}</h3>);
+    if (line.startsWith("#### ")) {
+      nodes.push(<p key={i} style={{ fontSize: 12, fontWeight: 700, color: "var(--mn-ink-3)", margin: "12px 0 4px", textTransform: "uppercase", letterSpacing: "0.05em" }}>{line.slice(5)}</p>);
       i++; continue;
     }
     if (line.startsWith("### ")) {
-      nodes.push(<h4 key={i} style={{ fontSize: 13, fontWeight: 700, color: "var(--mn-ink-2)", margin: "14px 0 6px" }}>{line.slice(4)}</h4>);
+      nodes.push(<h4 key={i} style={{ fontSize: 13, fontWeight: 700, color: "var(--mn-ink-2)", margin: "14px 0 6px" }}>{renderInline(line.slice(4))}</h4>);
+      i++; continue;
+    }
+    if (line.startsWith("## ")) {
+      nodes.push(<h3 key={i} style={{ fontSize: 15, fontWeight: 700, color: "var(--mn-ink-1)", margin: "20px 0 8px", paddingBottom: 6, borderBottom: "1px solid var(--mn-ink-4)" }}>{renderInline(line.slice(3))}</h3>);
       i++; continue;
     }
     if (/^[-•*]\s/.test(line)) {
@@ -60,14 +81,14 @@ function renderMarkdown(md: string) {
           {bullets.map((b, bi) => (
             <li key={bi} style={{ display: "flex", gap: 8, alignItems: "flex-start", fontSize: 13, color: "var(--mn-ink-1)", lineHeight: 1.65 }}>
               <span style={{ width: 5, height: 5, borderRadius: "50%", background: "var(--mn-ink-3)", flexShrink: 0, marginTop: 8 }} />
-              <span>{b}</span>
+              <span>{renderInline(b)}</span>
             </li>
           ))}
         </ul>
       );
       continue;
     }
-    nodes.push(<p key={i} style={{ fontSize: 13, color: "var(--mn-ink-1)", lineHeight: 1.7, marginBottom: 6 }}>{line}</p>);
+    nodes.push(<p key={i} style={{ fontSize: 13, color: "var(--mn-ink-1)", lineHeight: 1.7, marginBottom: 6 }}>{renderInline(line)}</p>);
     i++;
   }
   return nodes;
@@ -163,14 +184,14 @@ export default function ClaseDetailPage() {
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
         <Link href="/mis-clases" style={{ fontSize: 12, color: "var(--mn-ink-3)", textDecoration: "none" }}>Mis clases</Link>
         <ChevronRight size={12} color="var(--mn-ink-4)" />
-        <span style={{ fontSize: 12, color: "var(--mn-ink-2)" }}>{cls.title}</span>
+        <span style={{ fontSize: 12, color: "var(--mn-ink-2)" }}>{cleanTitle(cls.title)}</span>
       </div>
 
       {/* Header */}
       <div style={{ marginBottom: 24 }}>
         <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12, marginBottom: 8 }}>
           <div>
-            <h1 className="font-display" style={{ fontSize: 22, fontWeight: 800, color: "var(--mn-ink-1)", marginBottom: 4 }}>{cls.title}</h1>
+            <h1 className="font-display" style={{ fontSize: 22, fontWeight: 800, color: "var(--mn-ink-1)", marginBottom: 4 }}>{cleanTitle(cls.title)}</h1>
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
               {cls.subject_name && (
                 <Link href={`/materias/${cls.subject_id}`} style={{ fontSize: 12, color: "var(--mn-green)", fontWeight: 600, textDecoration: "none" }}>{cls.subject_name}</Link>

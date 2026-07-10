@@ -56,12 +56,13 @@ function RegistroPageInner() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [shaking, setShaking] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    if (password.length < 8) { setError("La contraseña debe tener al menos 8 caracteres."); return; }
+    if (password.length < 8) { setError("La contraseña debe tener al menos 8 caracteres."); setShaking(true); setTimeout(() => setShaking(false), 300); return; }
     setLoading(true);
 
     try {
@@ -81,6 +82,7 @@ function RegistroPageInner() {
             ? `Error ${(signUpError as any).status ?? ""} ${(signUpError as any).code ?? ""}`.trim() || "Error al crear cuenta. Intenta con otro email."
             : msg
         );
+        setShaking(true); setTimeout(() => setShaking(false), 300);
         setLoading(false);
         return;
       }
@@ -148,7 +150,8 @@ function RegistroPageInner() {
         <div style={{ flex: 1, height: "0.5px", background: "rgba(26,22,18,0.12)" }} />
       </div>
 
-      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+      <style>{`@keyframes mn-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}`}</style>
+      <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14, animation: shaking ? "mn-shake 280ms cubic-bezier(0.36,0.07,0.19,0.97) both" : "none" }}>
         <div>
           <label style={{ fontSize: 13, fontWeight: 600, color: "#1A1612", display: "block", marginBottom: 6 }}>
             Tu nombre
@@ -174,7 +177,7 @@ function RegistroPageInner() {
             type="email"
             value={email}
             onChange={e => setEmail(e.target.value)}
-            placeholder="nombre@universidad.edu"
+            placeholder="tu@email.com"
             required
             autoComplete="email"
             style={inputStyle}

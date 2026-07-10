@@ -113,7 +113,7 @@ function Hero() {
       </div>
 
       <p className="mn-animate mn-animate-d4" style={{ marginTop: 16, color: "#9E9389", fontSize: 13 }}>
-        Sin tarjeta · plan Free para siempre · actualiza cuando quieras
+        Sin tarjeta · Starter gratuito para siempre · actualiza cuando quieras
       </p>
 
       <div className="mn-animate mn-animate-d4" style={{ marginTop: 72 }}>
@@ -214,7 +214,7 @@ function Strip() {
       <div style={{ maxWidth: 1120, margin: "0 auto", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: "24px 56px", alignItems: "center" }}>
         {[
           { icon: <Shield size={18} color="#86EFAC" />, text: "Garantía de 30 días sin preguntas" },
-          { icon: <Sparkles size={18} color="#86EFAC" />, text: "Plan Free disponible sin tarjeta" },
+          { icon: <Sparkles size={18} color="#86EFAC" />, text: "Plan Starter gratuito para siempre" },
           { icon: <Star size={18} color="#86EFAC" />, text: "Diseñado para universidades LATAM" },
           { icon: <span style={{ fontSize: 18 }}>🎁</span>, text: "Invita amigos y estudia gratis" },
         ].map(({ icon, text }) => (
@@ -755,13 +755,13 @@ function Pricing() {
           {/* STARTER */}
           <div className="mn-card" style={{ padding: 32 }}>
             <h3 className="font-display" style={{ fontSize: 20, fontWeight: 800, color: "#1A1612", marginBottom: 4 }}>Starter</h3>
-            <p style={{ fontSize: 13, color: "#6B6259", marginBottom: 24 }}>Para explorar Mnemora</p>
+            <p style={{ fontSize: 13, color: "#6B6259", marginBottom: 24 }}>Para una materia, para siempre</p>
             <div style={{ marginBottom: 28 }}>
               <span className="font-display" style={{ fontSize: 44, fontWeight: 800, color: "#1A1612" }}>$0</span>
               <span style={{ fontSize: 14, color: "#9E9389", marginLeft: 6 }}>para siempre</span>
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10, marginBottom: 28 }}>
-              {["1 materia activa", "1 programa de materia / mes", "30 flashcards / mes", "3 resúmenes / mes", "20 mensajes al tutor / mes"].map(f => (
+              {["1 materia activa", "2 programas de materia / mes", "60 generaciones de flashcards / mes", "5 resúmenes / mes", "35 mensajes al tutor / mes"].map(f => (
                 <div key={f} style={{ display: "flex", gap: 8, alignItems: "center" }}>
                   <Check size={15} color="#9E9389" />
                   <span style={{ fontSize: 14, color: "#6B6259" }}>{f}</span>
@@ -806,10 +806,10 @@ function Pricing() {
               ))}
             </div>
             <Link href={billing === "monthly" ? "https://pay.hotmart.com/X106608100N?off=dc4u4ck4" : "https://pay.hotmart.com/X106608100N?off=rglfytvv"} target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center", padding: "14px", borderRadius: 12, background: "#FFFFFF", fontSize: 15, fontWeight: 700, color: "#1B3F2F", textDecoration: "none" }}>
-              Obtener Pro — cobro inmediato
+              Comenzar con Pro
             </Link>
             <p style={{ textAlign: "center", fontSize: 12, color: "#86EFAC", marginTop: 12, lineHeight: 1.5 }}>
-              Cobro inmediato al confirmar. Cancela cuando quieras.
+              Garantía de 30 días · cancela cuando quieras
             </p>
           </div>
 
@@ -856,10 +856,10 @@ function Pricing() {
               ))}
             </div>
             <Link href={billing === "monthly" ? "https://pay.hotmart.com/X106608100N?off=ob9wndyf" : "https://pay.hotmart.com/X106608100N?off=5k6odu6s"} target="_blank" rel="noopener noreferrer" style={{ display: "block", textAlign: "center", padding: "14px", borderRadius: 12, background: "var(--mn-green)", fontSize: 15, fontWeight: 700, color: "#fff", textDecoration: "none" }}>
-              Obtener Premium — cobro inmediato
+              Comenzar con Premium
             </Link>
             <p style={{ textAlign: "center", fontSize: 12, color: "#FCD34D", marginTop: 12, lineHeight: 1.5 }}>
-              Cobro inmediato al confirmar. Cancela cuando quieras.
+              Garantía de 30 días · cancela cuando quieras
             </p>
           </div>
 
@@ -972,7 +972,7 @@ function Proof() {
 const faqs = [
   { q: "¿Necesito saber usar IA?", a: "No. Solo sube tus documentos y Mnemora hace el resto. No hay comandos, no hay prompts, no hay configuración." },
   { q: "¿Puedo cancelar cuando quiera?", a: "Sí. La suscripción se puede cancelar en cualquier momento desde tu cuenta, sin formularios ni llamadas." },
-  { q: "¿Necesito tarjeta para empezar?", a: "No. El plan Free es permanente y no requiere tarjeta ni datos de pago. Solo necesitas una tarjeta si decides actualizar a Pro o Premium." },
+  { q: "¿Necesito tarjeta para empezar?", a: "No. El plan Starter es gratuito para siempre y no requiere tarjeta ni datos de pago. Solo necesitas una tarjeta si decides actualizar a Pro o Premium." },
   { q: "¿Mis documentos son privados?", a: "Sí. Solo tú puedes acceder a ellos. No usamos tu contenido para entrenar modelos de IA." },
   { q: "¿En qué idioma funciona el tutor?", a: "100% en español. Entiende vocabulario académico latinoamericano, nombres de materias en español y el formato de las universidades de la región." },
   { q: "¿Qué formatos de documentos acepta?", a: "PDF (el más común para programas de materia y apuntes), texto copiado directamente, e imágenes de apuntes. No requiere formato especial." },

@@ -10,6 +10,14 @@ import { createClient } from "@/lib/supabase/client";
 import { PaywallModal } from "@/components/paywall-modal";
 import type { Feature, PlanId } from "@/lib/plans";
 
+function cleanTitle(title: string): string {
+  return title
+    .replace(/\s*\[[^\]]+\]/g, "")
+    .replace(/\s*\([A-ZÁÉÍÓÚÑ\s]{4,}\)/g, "")
+    .replace(/\s*\|\s*CURSO:\s*/g, " — ")
+    .trim();
+}
+
 type ClassItem = {
   id: string;
   title: string;
@@ -321,7 +329,7 @@ export default function MisClasesPage() {
                 </div>
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3 }}>
-                    <p style={{ fontSize: 14, fontWeight: 600, color: "var(--mn-ink-1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cls.title}</p>
+                    <p style={{ fontSize: 14, fontWeight: 600, color: "var(--mn-ink-1)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{cleanTitle(cls.title)}</p>
                     {statusBadge(cls)}
                   </div>
                   <div style={{ display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>

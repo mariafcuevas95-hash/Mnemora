@@ -640,11 +640,11 @@ export default function MateriaPage() {
       {/* ── Tabs ── */}
       <div style={{ display: "flex", gap: 0, marginBottom: 24, borderBottom: "1px solid var(--mn-ink-4)" }}>
         {([
-          { id: "documentos", label: `Documentos (${docs.length})` },
-          { id: "flashcards", label: `Flashcards (${flashcards.length})` },
-          { id: "resumen",    label: "Resúmenes" },
-          { id: "tutor",      label: "Tutor" },
-        ] as { id: TabId; label: string }[]).map(t => (
+          { id: "documentos", label: `Documentos (${docs.length})`, show: true },
+          { id: "flashcards", label: `Flashcards (${flashcards.length})`, show: flashcards.length > 0 },
+          { id: "resumen",    label: "Resúmenes", show: docs.some(d => d.summary) },
+          { id: "tutor",      label: "Tutor", show: true },
+        ] as { id: TabId; label: string; show: boolean }[]).filter(t => t.show).map(t => (
           <button key={t.id} onClick={() => setTab(t.id)} style={{ padding: "10px 16px", border: "none", borderBottom: tab === t.id ? "2px solid var(--mn-green)" : "2px solid transparent", background: "none", fontSize: 13, fontWeight: tab === t.id ? 600 : 400, color: tab === t.id ? "var(--mn-ink-1)" : "var(--mn-ink-3)", cursor: "pointer", transition: "color 150ms", marginBottom: -1 }}>
             {t.label}
           </button>

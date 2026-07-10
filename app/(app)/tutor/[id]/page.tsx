@@ -147,6 +147,7 @@ function TutorPageInner() {
   const [conversationId, setConversationId] = useState<string | undefined>();
   const [paywall, setPaywall] = useState<PaywallState>(null);
   const [greetingCtx, setGreetingCtx] = useState<GreetingContext | null>(null);
+  const [hasProcessedDoc, setHasProcessedDoc] = useState<boolean | null>(null);
   const [suggestions, setSuggestions] = useState<string[]>([]);
   const [showContextCard, setShowContextCard] = useState(false);
   const [greetingLoading, setGreetingLoading] = useState(true);
@@ -204,6 +205,15 @@ function TutorPageInner() {
       .catch(() => null)
       .finally(() => setGreetingLoading(false));
   }, [id, conceptParam, isGuided]);
+
+  useEffect(() => {
+    createClient()
+      .from("documents")
+      .select("id", { count: "exact", head: true })
+      .eq("subject_id", id)
+      .eq("processing_status", "done")
+      .then(({ count }) => setHasProcessedDoc((count ?? 0) > 0));
+  }, [id]);
 
   useEffect(() => {
     if (!greetingLoading && messages.length === 0) {
@@ -496,10 +506,17 @@ function TutorPageInner() {
                         ))}
                       </div>
                     ) : (
+                      <>
                       <div
                         style={{ fontSize: 15, color: "var(--mn-ink-1)", lineHeight: 1.75, fontWeight: 400 }}
                         dangerouslySetInnerHTML={{ __html: renderMarkdown(msg.content) }}
                       />
+                      {memoryActive && i > 0 && (
+                        <p style={{ fontSize: 11, color: "var(--mn-ink-3)", marginTop: 8, animation: "mn-ctx-fade 200ms ease both" }}>
+                          Generado usando tu contenido
+                        </p>
+                      )}
+                      </>
                     )}
                   </div>
                 </div>
@@ -508,7 +525,7 @@ function TutorPageInner() {
 
             // User message
             return (
-              <div key={msg.id} style={{ display: "flex", justifyContent: "flex-end", paddingBottom: 24 }}>
+              <div key={msg.id} style={{ display: "flex", justifyContent: "flex-end", paddingBottom: 24, animation: "mn-msg-up 200ms cubic-bezier(0.16,1,0.3,1) both" }}>
                 <div style={{ maxWidth: "68%", padding: "10px 16px", background: "var(--mn-raised)", borderRadius: "var(--mn-r-lg)", fontSize: 14, color: "var(--mn-ink-1)", lineHeight: 1.6 }}>
                   {msg.content}
                 </div>
@@ -547,9 +564,16 @@ function TutorPageInner() {
               <ArrowUp size={16} color={input.trim() && !loading ? "#FFFFFF" : "var(--mn-ink-3)"} />
             </button>
           </div>
-          <p style={{ textAlign: "center", fontSize: 11, color: "var(--mn-ink-4)", marginTop: 8 }}>
-            Shift+Enter para nueva línea · El tutor aprende de cada sesión
-          </p>
+          {hasProcessedDoc === false && !hasStartedConversation ? (
+            <p style={{ textAlign: "center", fontSize: 11, color: "var(--mn-amber)", marginTop: 8, lineHeight: 1.5 }}>
+              Esta materia aún no tiene documentos procesados — el tutor responde de forma general.{" "}
+              <a href={`/materias/${id}`} style={{ color: "var(--mn-amber)", fontWeight: 600, textDecoration: "underline" }}>Sube un documento</a> para personalizarlo.
+            </p>
+          ) : (
+            <p style={{ textAlign: "center", fontSize: 11, color: "var(--mn-ink-4)", marginTop: 8 }}>
+              Shift+Enter para nueva línea · El tutor aprende de cada sesión
+            </p>
+          )}
         </div>
       </div>
 
@@ -558,6 +582,8 @@ function TutorPageInner() {
           0%, 100% { opacity: 0.25; transform: scale(0.75); }
           50% { opacity: 1; transform: scale(1); }
         }
+        @keyframes mn-msg-up { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes mn-ctx-fade { from { opacity: 0; } to { opacity: 1; } }
       `}</style>
     </div>
   );
