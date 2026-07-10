@@ -102,51 +102,48 @@ export async function sendDailyDigest(data: DailyDigestData) {
 }
 
 export async function sendWelcomeEmail(to: string, name: string) {
+  const firstName = name.split(" ")[0] || "estudiante";
   await getResend().emails.send({
     from: FROM,
     to,
-    subject: "Bienvenido a Mnemora 🎓",
-    html: `
-      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#F7F4EF;border-radius:16px;">
-        <h1 style="color:#1B3F2F;font-size:24px;margin-bottom:8px;">Hola, ${name} 👋</h1>
-        <p style="color:#6B6259;font-size:16px;line-height:1.6;">
-          Tu tutor con memoria ya está listo. Tus primeros <strong>7 días Pro</strong> están activos —
-          sin tarjeta, sin compromiso.
-        </p>
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard"
-           style="display:inline-block;margin-top:20px;padding:12px 28px;background:#1B3F2F;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;">
-          Ir a mi dashboard →
-        </a>
-        <p style="color:#9E9389;font-size:13px;margin-top:24px;">
-          Garantía 30 días · cancela cuando quieras · soporte en hello@mnemora.me
-        </p>
-      </div>
-    `,
+    subject: "Te damos la bienvenida a Mnemora 🎓",
+    html: emailShell(`
+      <h1 style="margin:0 0 12px;color:#1A1612;font-size:22px;font-weight:800;">Hola, ${firstName} 👋</h1>
+      <p style="margin:0 0 16px;color:#6B6259;font-size:15px;line-height:1.6;">
+        Tu cuenta está lista. Sube tu primer apunte o graba tu clase y Mnemora se encarga del resto.
+      </p>
+      ${btn(`${APP_URL}/onboarding`, "Empezar →")}
+      <p style="text-align:center;margin:0;color:#9E9389;font-size:13px;">
+        ¿Tienes preguntas? <a href="mailto:hello@mnemora.me" style="color:#1B3F2F;">hello@mnemora.me</a>
+      </p>
+    `),
   });
 }
 
-export async function sendProActivatedEmail(to: string, name: string) {
+export async function sendPlanActivatedEmail(to: string, name: string, plan: "pro" | "premium") {
+  const firstName = name.split(" ")[0] || "estudiante";
+  const planLabel = plan === "premium" ? "Premium" : "Pro";
+  const features = plan === "premium"
+    ? "AI Class Studio, tutor ilimitado, modo examen intensivo, predicción de nota y más."
+    : "Materias ilimitadas, flashcards, mapas mentales, tutor con memoria y más.";
   await getResend().emails.send({
     from: FROM,
     to,
-    subject: "Tu Plan Pro está activo — Mnemora",
-    html: `
-      <div style="font-family:sans-serif;max-width:520px;margin:0 auto;padding:32px;background:#F7F4EF;border-radius:16px;">
-        <h1 style="color:#1B3F2F;font-size:24px;margin-bottom:8px;">¡Bienvenido al Plan Pro, ${name}! 🎉</h1>
-        <p style="color:#6B6259;font-size:16px;line-height:1.6;">
-          Ya tienes acceso completo a todas las funciones de Mnemora Pro.
-          Materias ilimitadas, programas de materia, flashcards, mapas mentales y más.
-        </p>
-        <a href="${process.env.NEXT_PUBLIC_APP_URL}/dashboard"
-           style="display:inline-block;margin-top:20px;padding:12px 28px;background:#1B3F2F;color:#fff;border-radius:10px;text-decoration:none;font-weight:700;">
-          Ir a mi dashboard →
-        </a>
-        <p style="color:#9E9389;font-size:13px;margin-top:24px;">
-          Garantía 30 días · cancela cuando quieras · soporte en hello@mnemora.me
-        </p>
-      </div>
-    `,
+    subject: `Tu Plan ${planLabel} está activo — Mnemora`,
+    html: emailShell(`
+      <h1 style="margin:0 0 12px;color:#1A1612;font-size:22px;font-weight:800;">¡Bienvenido al Plan ${planLabel}, ${firstName}! 🎉</h1>
+      <p style="margin:0 0 16px;color:#6B6259;font-size:15px;line-height:1.6;">
+        Ya tienes acceso completo a Mnemora ${planLabel}. ${features}
+      </p>
+      ${btn(`${APP_URL}/dashboard`, "Ir a mi dashboard →")}
+      <p style="text-align:center;margin:0;color:#9E9389;font-size:13px;">Garantía 30 días · cancela cuando quieras</p>
+    `),
   });
+}
+
+/** @deprecated — kept for backwards compat; use sendPlanActivatedEmail */
+export async function sendProActivatedEmail(to: string, name: string) {
+  return sendPlanActivatedEmail(to, name, "pro");
 }
 
 const emailShell = (content: string) => `<!DOCTYPE html>
@@ -196,15 +193,15 @@ export async function sendPlanCancelledEmail(to: string, name: string) {
   const firstName = name.split(" ")[0] || "estudiante";
   await getResend().emails.send({
     from: FROM, to,
-    subject: "Tu plan Pro fue cancelado — Mnemora",
+    subject: "Tu suscripción fue cancelada — Mnemora",
     html: emailShell(`
       <h1 style="margin:0 0 12px;color:#1A1612;font-size:22px;font-weight:800;">Cancelación confirmada</h1>
-      <p style="margin:0 0 16px;color:#6B6259;font-size:15px;line-height:1.6;">Hola ${firstName}, tu suscripción Pro fue cancelada. Sigues en Plan Free — tus materias y datos están guardados.</p>
+      <p style="margin:0 0 16px;color:#6B6259;font-size:15px;line-height:1.6;">Hola ${firstName}, tu suscripción fue cancelada. Sigues con el plan gratuito — tus materias y datos están guardados.</p>
       <div style="background:#F7F4EF;border-radius:12px;padding:16px 18px;margin-bottom:16px;">
         <p style="margin:0 0 8px;color:#1A1612;font-size:14px;font-weight:700;">Puedes volver cuando quieras</p>
-        <p style="margin:0;color:#6B6259;font-size:13px;line-height:1.6;">Tu historial, flashcards y progreso te esperan. Reactivar el Plan Pro toma menos de 1 minuto.</p>
+        <p style="margin:0;color:#6B6259;font-size:13px;line-height:1.6;">Tu historial, flashcards y progreso te esperan. Reactivar el plan toma menos de 1 minuto.</p>
       </div>
-      ${btn(`${APP_URL}/upgrade`, "Reactivar Plan Pro")}
+      ${btn(`${APP_URL}/upgrade`, "Ver planes")}
       <p style="text-align:center;margin:0;color:#9E9389;font-size:13px;">¿Tuviste algún problema? <a href="mailto:hello@mnemora.me" style="color:#1B3F2F;">hello@mnemora.me</a></p>
     `),
   });
@@ -226,8 +223,28 @@ export async function sendPaymentFailedEmail(to: string, name: string) {
           <li>Intenta con otro método de pago en Hotmart</li>
         </ol>
       </div>
-      ${btn(`${APP_URL}/upgrade`, "Actualizar método de pago")}
+      ${btn("https://app.hotmart.com/", "Actualizar método de pago en Hotmart →")}
       <p style="text-align:center;margin:0;color:#9E9389;font-size:13px;">¿Necesitas ayuda? <a href="mailto:hello@mnemora.me" style="color:#1B3F2F;">hello@mnemora.me</a></p>
+    `),
+  });
+}
+
+export async function sendReferralRewardEmail(to: string, name: string, milestone: number, daysGranted: number) {
+  const firstName = name.split(" ")[0] || "estudiante";
+  const daysLabel = daysGranted >= 365 ? "12 meses" : daysGranted >= 180 ? "6 meses" : daysGranted >= 60 ? "2 meses" : daysGranted >= 30 ? "1 mes" : "1 semana";
+  await getResend().emails.send({
+    from: FROM, to,
+    subject: `🎁 ¡Ganaste ${daysLabel} gratis en Mnemora!`,
+    html: emailShell(`
+      <h1 style="margin:0 0 12px;color:#1A1612;font-size:22px;font-weight:800;">¡Recompensa desbloqueada, ${firstName}! 🎉</h1>
+      <p style="margin:0 0 16px;color:#6B6259;font-size:15px;line-height:1.6;">
+        Llegaste a <strong>${milestone} referido${milestone !== 1 ? "s" : ""}</strong> que activaron un plan. Como recompensa, sumamos <strong>${daysLabel} gratis</strong> a tu cuenta.
+      </p>
+      <div style="background:#F0FDF4;border:1px solid #BBF7D0;border-radius:12px;padding:16px 18px;margin-bottom:16px;text-align:center;">
+        <p style="margin:0;color:#065F46;font-size:28px;font-weight:900;">+${daysLabel}</p>
+        <p style="margin:4px 0 0;color:#4B7A5E;font-size:13px;">agregados automáticamente a tu plan</p>
+      </div>
+      ${btn(`${APP_URL}/referidos`, "Ver mi programa de referidos →")}
     `),
   });
 }

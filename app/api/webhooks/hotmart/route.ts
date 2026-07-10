@@ -19,7 +19,7 @@ import {
   shouldActivate,
   shouldDeactivate,
 } from "@/lib/hotmart";
-import { sendProActivatedEmail, sendPlanCancelledEmail, sendPaymentFailedEmail } from "@/lib/resend";
+import { sendPlanActivatedEmail, sendPlanCancelledEmail, sendPaymentFailedEmail } from "@/lib/resend";
 import { handleReferralConversion } from "@/lib/referrals";
 
 export async function POST(req: NextRequest) {
@@ -176,8 +176,8 @@ async function activatePlan(
   console.info(`[hotmart/webhook] ${plan} activated — user ${userId}`);
 
   if (process.env.RESEND_API_KEY) {
-    sendProActivatedEmail(email, name ?? "estudiante").catch(err =>
-      console.error("[hotmart/webhook] sendProActivatedEmail failed:", err)
+    sendPlanActivatedEmail(email, name ?? "estudiante", plan).catch(err =>
+      console.error("[hotmart/webhook] sendPlanActivatedEmail failed:", err)
     );
   }
 }

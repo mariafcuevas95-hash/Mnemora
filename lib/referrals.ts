@@ -4,6 +4,7 @@
  */
 
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { sendReferralRewardEmail } from "@/lib/resend";
 
 export const MILESTONES = [
   { count: 1,  days: 7,   label: "1 semana"  },
@@ -108,6 +109,19 @@ export async function handleReferralConversion(
 
   // 8. Mark referral as rewarded
   await db.from("referrals").update({ status: "rewarded" }).eq("id", referral.id);
+
+  // 9. Notify referrer by email for each newly unlocked milestone
+  const { data: referrerEmailRow } = await db
+    .from("profiles")
+    .select("email, name")
+    .eq("id", referrerId)
+    .single();
+  if (referrerEmailRow?.email) {
+    for (const m of newMilestones) {
+      sendReferralRewardEmail(referrerEmailRow.email, referrerEmailRow.name ?? "estudiante", m.count, m.days)
+        .catch(err => console.error("[referrals] sendReferralRewardEmail failed:", err));
+    }
+  }
 
   console.info(`[referrals] Referrer ${referrerId} reached ${newTotal} referrals, +${totalDaysToAdd} days, new expiry ${newExpiry.toISOString()}`);
 }

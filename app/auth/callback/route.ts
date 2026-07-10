@@ -91,6 +91,13 @@ export async function GET(request: NextRequest) {
         await adminDb.from("payment_events").update({ user_id: data.user.id }).eq("id", pendingEvent.id);
       }
 
+      // Send welcome email to brand new users
+      if (isNewUser && data.user.email) {
+        const { sendWelcomeEmail } = await import("@/lib/resend");
+        const userName = data.user.user_metadata?.full_name ?? data.user.user_metadata?.name ?? data.user.email.split("@")[0];
+        sendWelcomeEmail(data.user.email, userName).catch(() => {});
+      }
+
       // Check if user has subjects yet — if not, go to onboarding
       const { count } = await supabase
         .from("subjects")

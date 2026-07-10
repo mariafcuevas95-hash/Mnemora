@@ -32,7 +32,7 @@ export const weeklySummaryTask = schedules.task({
   run: async () => {
     const admin = getAdmin();
     const resend = new Resend(process.env.RESEND_API_KEY);
-    const fromEmail = process.env.RESEND_FROM_EMAIL ?? "hola@mnemora.me";
+    const fromEmail = process.env.RESEND_FROM_EMAIL ?? "hello@mnemora.me";
 
     // Obtener todos los usuarios activos con email (paginado)
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
