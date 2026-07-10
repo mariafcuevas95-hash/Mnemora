@@ -25,7 +25,7 @@ export async function POST() {
   const name = user.user_metadata?.name ?? user.user_metadata?.full_name ?? user.email.split("@")[0];
 
   if (process.env.RESEND_API_KEY) {
-    sendWelcomeEmail(user.email, name).catch(() => {});
+    await sendWelcomeEmail(user.email, name).catch(() => {});
   }
 
   return NextResponse.json({ sent: true });
