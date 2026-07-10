@@ -6,7 +6,7 @@ import { useParams } from "next/navigation";
 import React from "react";
 import {
   FileText, Layers, Brain, Upload, Plus,
-  Sparkles, ChevronRight, Clock, Loader2, Camera, CheckCircle, BookOpen,
+  Sparkles, ChevronRight, Clock, Loader2, Camera, Check, CheckCircle, BookOpen,
   Star, LayoutGrid, List, Calendar, Zap, ArrowRight, Trash2,
 } from "lucide-react";
 import { createClient } from "@/lib/supabase/client";
@@ -168,6 +168,8 @@ function LiveProcessingCard({ docId, docName, subjectId, onDone, onViewFlashcard
   const [failed, setFailed]             = useState(false);
   const [flashcardCount, setFcCount]    = useState(0);
   const [conceptCount, setCcCount]      = useState(0);
+  const [displayFc, setDisplayFc]       = useState(0);
+  const [displayCc, setDisplayCc]       = useState(0);
   const [dismissed, setDismissed]       = useState(false);
 
   useEffect(() => {
@@ -190,9 +192,20 @@ function LiveProcessingCard({ docId, docName, subjectId, onDone, onViewFlashcard
           db.from("flashcards").select("id", { count: "exact" }).eq("document_id", docId),
           db.from("subject_concepts").select("id", { count: "exact" }).eq("subject_id", subjectId),
         ]);
-        setFcCount(fcRes.count ?? 0);
-        setCcCount(cRes.count ?? 0);
+        const fc = fcRes.count ?? 0;
+        const cc = cRes.count ?? 0;
+        setFcCount(fc);
+        setCcCount(cc);
         setDone(true);
+        const dur = 700, start = Date.now();
+        const tick = () => {
+          const t = Math.min((Date.now() - start) / dur, 1);
+          const e = 1 - Math.pow(1 - t, 3);
+          setDisplayFc(Math.round(fc * e));
+          setDisplayCc(Math.round(cc * e));
+          if (t < 1) requestAnimationFrame(tick);
+        };
+        requestAnimationFrame(tick);
         onDone(fcRes.count ?? 0);
       } else if (data?.processing_status === "failed" || polls >= MAX_POLLS) {
         clearInterval(interval);
@@ -256,7 +269,7 @@ function LiveProcessingCard({ docId, docName, subjectId, onDone, onViewFlashcard
               <div style={{ display: "flex", gap: 12, marginBottom: 16 }}>
                 {flashcardCount > 0 && (
                   <div style={{ textAlign: "center" }}>
-                    <p className="font-display" style={{ fontSize: 28, fontWeight: 800, color: "var(--mn-green)", lineHeight: 1 }}>{flashcardCount}</p>
+                    <p className="font-display" style={{ fontSize: 28, fontWeight: 800, color: "var(--mn-green)", lineHeight: 1 }}>{displayFc}</p>
                     <p style={{ fontSize: 11, color: "var(--mn-ink-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginTop: 2 }}>flashcards</p>
                   </div>
                 )}
@@ -265,7 +278,7 @@ function LiveProcessingCard({ docId, docName, subjectId, onDone, onViewFlashcard
                 )}
                 {conceptCount > 0 && (
                   <div style={{ textAlign: "center" }}>
-                    <p className="font-display" style={{ fontSize: 28, fontWeight: 800, color: "var(--mn-ink-1)", lineHeight: 1 }}>{conceptCount}</p>
+                    <p className="font-display" style={{ fontSize: 28, fontWeight: 800, color: "var(--mn-ink-1)", lineHeight: 1 }}>{displayCc}</p>
                     <p style={{ fontSize: 11, color: "var(--mn-ink-3)", fontWeight: 600, textTransform: "uppercase", letterSpacing: "0.04em", marginTop: 2 }}>conceptos</p>
                   </div>
                 )}
@@ -315,6 +328,7 @@ export default function MateriaPage() {
   type CardRating = { mastery: string; nextReview: string | null };
   const [cardRatings, setCardRatings]   = useState<Record<string, CardRating>>({});
   const [uploading, setUploading]       = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
   const [uploadError, setUploadError]   = useState("");
   const [processingDocId, setProcessingDocId]   = useState<string | null>(null);
   const [processingDocName, setProcessingDocName] = useState("");
@@ -344,11 +358,15 @@ export default function MateriaPage() {
     ]).then(([subRes, docRes, fcRes, evRes]) => {
       const sub = subRes.data;
       setSubject(sub);
-      setDocs(docRes.data ?? []);
+      const allDocs = docRes.data ?? [];
+      setDocs(allDocs);
       setFlashcards(fcRes.data ?? []);
       setNextExam(evRes.data);
       if (sub?.goal_type) { setGoalType(sub.goal_type as GoalType); setGoalValue(sub.goal_value ?? ""); }
       setLoading(false);
+      // Resume polling for any document left pending/processing when user closed the tab
+      const inFlight = allDocs.find(d => d.processing_status === "pending" || d.processing_status === "processing");
+      if (inFlight) { setProcessingDocId(inFlight.id); setProcessingDocName(inFlight.name); }
       db.from("student_knowledge")
         .select("mastery_level, next_review, subject_concepts!inner(name, subject_id)")
         .eq("subject_concepts.subject_id", id)
@@ -407,6 +425,9 @@ export default function MateriaPage() {
       body: JSON.stringify({ documentId: doc.id, subjectId: id, type: "document", subjectName: subject?.name }),
     });
     setUploading(false);
+    setUploadSuccess(true);
+    await new Promise(r => setTimeout(r, 700));
+    setUploadSuccess(false);
     setProcessingDocId(doc.id);
     setProcessingDocName(file.name);
     if (res.status === 403) {
@@ -633,6 +654,24 @@ export default function MateriaPage() {
       {/* ══════════ Tab: Documentos ══════════ */}
       {tab === "documentos" && (
         <div>
+          {/* Guía de primeros pasos — solo cuando no hay documentos ni procesamiento activo */}
+          {!loading && docs.length === 0 && !processingDocId && (
+            <div style={{ background: "#1B3F2F", borderRadius: "var(--mn-r-xl)", padding: "20px 22px", marginBottom: 20 }}>
+              <p style={{ fontSize: 12, fontWeight: 700, color: "#86EFAC", marginBottom: 6, textTransform: "uppercase", letterSpacing: "0.06em" }}>Primero esto</p>
+              <p className="font-display" style={{ fontSize: 17, fontWeight: 800, color: "#fff", marginBottom: 10, lineHeight: 1.3 }}>
+                Sube el programa de la materia o un apunte para empezar.
+              </p>
+              <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+                {["Mnemora genera flashcards automáticamente", "Extrae las fechas de tus exámenes", "El tutor estudia tu contenido antes de responder"].map(t => (
+                  <div key={t} style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                    <div style={{ width: 4, height: 4, borderRadius: "50%", background: "#86EFAC", flexShrink: 0 }} />
+                    <span style={{ fontSize: 13, color: "#D1FAE5" }}>{t}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {processingDocId && (
             <LiveProcessingCard docId={processingDocId} docName={processingDocName} subjectId={id}
               onDone={() => {
@@ -654,10 +693,10 @@ export default function MateriaPage() {
           >
             <input ref={fileInputRef} type="file" accept=".pdf,.txt,.md" style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); e.target.value = ""; }} />
             <div style={{ width: 34, height: 34, borderRadius: "var(--mn-r-md)", background: "var(--mn-raised)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-              {uploading ? <Loader2 size={16} color="var(--mn-ink-2)" style={{ animation: "spin 1s linear infinite" }} /> : <Upload size={16} color="var(--mn-ink-2)" />}
+              {uploadSuccess ? <Check size={16} color="var(--mn-green)" /> : uploading ? <Loader2 size={16} color="var(--mn-ink-2)" style={{ animation: "spin 1s linear infinite" }} /> : <Upload size={16} color="var(--mn-ink-2)" />}
             </div>
             <div>
-              <p style={{ fontSize: 14, fontWeight: 600, color: "var(--mn-ink-1)" }}>{uploading ? "Subiendo…" : "Subir documento"}</p>
+              <p style={{ fontSize: 14, fontWeight: 600, color: uploadSuccess ? "var(--mn-green)" : "var(--mn-ink-1)" }}>{uploadSuccess ? "¡Archivo subido!" : uploading ? "Subiendo…" : "Subir documento"}</p>
               <p style={{ fontSize: 12, color: "var(--mn-ink-3)" }}>PDF o texto · Mnemora extrae flashcards y resumen automáticamente</p>
             </div>
           </div>

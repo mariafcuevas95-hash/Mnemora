@@ -211,6 +211,7 @@ function StepCarrera({ data, update, onNext }: { data: OnboardingData; update: (
 function StepMateria({ data, update, onNext }: { data: OnboardingData; update: (d: Partial<OnboardingData>) => void; onNext: () => void }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [limitReached, setLimitReached] = useState(false);
   const [showOptional, setShowOptional] = useState(false);
   const semestres = ["2026-I", "2026-II", "2025-II", "Otro"];
 
@@ -230,6 +231,7 @@ function StepMateria({ data, update, onNext }: { data: OnboardingData; update: (
       if (res.status === 403) {
         const json = await res.json();
         setError(json.message ?? "Límite del plan alcanzado.");
+        setLimitReached(true);
         setLoading(false);
         return;
       }
@@ -288,8 +290,13 @@ function StepMateria({ data, update, onNext }: { data: OnboardingData; update: (
           </div>
         </div>
         {error && (
-          <div style={{ padding: "10px 14px", borderRadius: 10, background: "#FEE2E2" }}>
-            <p style={{ fontSize: 13, color: "#DC2626" }}>{error}</p>
+          <div style={{ padding: "10px 14px", borderRadius: 10, background: limitReached ? "#F0FDF4" : "#FEE2E2", border: limitReached ? "1px solid #86EFAC" : "none" }}>
+            <p style={{ fontSize: 13, color: limitReached ? "#166534" : "#DC2626", marginBottom: limitReached ? 8 : 0 }}>{error}</p>
+            {limitReached && (
+              <a href="/upgrade" style={{ display: "inline-block", fontSize: 13, fontWeight: 700, color: "#fff", background: "#16A34A", borderRadius: 8, padding: "6px 14px", textDecoration: "none" }}>
+                Ver planes →
+              </a>
+            )}
           </div>
         )}
         <button onClick={handleNext} disabled={loading || !data.subjectName} className="mn-btn-primary"
@@ -488,7 +495,7 @@ function StepSyllabus({ data, update, onNext }: { data: OnboardingData; update: 
             {uploading ? (
               <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> Subiendo...</>
             ) : processing ? (
-              <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> {PROCESSING_MSGS[processingMsgIdx]}</>
+              <><Loader2 size={16} style={{ animation: "spin 1s linear infinite" }} /> <span key={processingMsgIdx} style={{ animation: "mn-msg-fade 300ms ease both" }}>{PROCESSING_MSGS[processingMsgIdx]}</span></>
             ) : (
               <>Subir y extraer calendario <ArrowRight size={16} /></>
             )}
@@ -505,7 +512,7 @@ function StepSyllabus({ data, update, onNext }: { data: OnboardingData; update: 
         </button>
       </div>
 
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
+      <style>{`@keyframes spin{to{transform:rotate(360deg)}} @keyframes mn-msg-fade{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}`}</style>
     </div>
   );
 }
