@@ -26,6 +26,7 @@ function FlashcardsReviewPageInner() {
   const [idx, setIdx] = useState(0);
   const [flipped, setFlipped] = useState(false);
   const [scores, setScores] = useState<Record<string, number>>({});
+  const [cardPhase, setCardPhase] = useState<"in" | "out">("in");
   const [loading, setLoading] = useState(true);
   const [subjectName, setSubjectName] = useState("");
   const [rating, setRating] = useState(false);
@@ -72,10 +73,13 @@ function FlashcardsReviewPageInner() {
       body: JSON.stringify({ flashcardId: card.id, quality }),
     }).catch(() => {});
 
-    await new Promise(r => setTimeout(r, 220));
+    // Salida: flip back + slide out
+    setCardPhase("out");
+    await new Promise(r => setTimeout(r, 180));
     setFlipped(false);
-    await new Promise(r => setTimeout(r, 280));
+    await new Promise(r => setTimeout(r, 60));
     setIdx(prev => prev + 1);
+    setCardPhase("in");
     setRating(false);
   }, [idx, cards, rating]);
 
@@ -95,6 +99,24 @@ function FlashcardsReviewPageInner() {
 
   const done = idx >= cards.length && cards.length > 0;
   const correctCount = Object.values(scores).filter(q => q >= 3).length;
+  const pctCorrect = cards.length ? Math.round((correctCount / cards.length) * 100) : 0;
+  const [displayCorrect, setDisplayCorrect] = useState(0);
+  const [displayPct, setDisplayPct] = useState(0);
+
+  useEffect(() => {
+    if (!done) return;
+    const duration = 700;
+    const start = Date.now();
+    const animate = () => {
+      const t = Math.min((Date.now() - start) / duration, 1);
+      const ease = 1 - Math.pow(1 - t, 3);
+      setDisplayCorrect(Math.round(correctCount * ease));
+      setDisplayPct(Math.round(pctCorrect * ease));
+      if (t < 1) requestAnimationFrame(animate);
+    };
+    const raf = requestAnimationFrame(animate);
+    return () => cancelAnimationFrame(raf);
+  }, [done, correctCount, pctCorrect]);
 
   useEffect(() => {
     if (done && !xpAwarded && cards.length >= 3) {
@@ -142,7 +164,6 @@ function FlashcardsReviewPageInner() {
 
   /* ── Complete ────────────────────────────── */
   if (done) {
-    const pctCorrect = Math.round((correctCount / cards.length) * 100);
     const masteredCards = cards.filter(c => (scores[c.id] ?? 0) >= 4);
     const toReviewCards = cards.filter(c => (scores[c.id] ?? 0) < 3);
     const bestCard = masteredCards[0];
@@ -211,11 +232,11 @@ function FlashcardsReviewPageInner() {
           {/* Score mini-cards */}
           <div className="mn-fade-up" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10, marginBottom: 16, animationDelay: "80ms" }}>
             <div style={{ background: "var(--mn-surface)", borderRadius: "var(--mn-r-lg)", padding: "16px 12px", textAlign: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
-              <p className="font-display" style={{ fontSize: 28, fontWeight: 700, color: "var(--mn-ink-1)", marginBottom: 2 }}>{correctCount}</p>
+              <p className="font-display" style={{ fontSize: 28, fontWeight: 700, color: "var(--mn-ink-1)", marginBottom: 2 }}>{displayCorrect}</p>
               <p style={{ fontSize: 11, color: "var(--mn-ink-3)" }}>Bien / Perfecto</p>
             </div>
             <div style={{ background: "var(--mn-surface)", borderRadius: "var(--mn-r-lg)", padding: "16px 12px", textAlign: "center", boxShadow: "0 1px 3px rgba(0,0,0,0.05)" }}>
-              <p className="font-display" style={{ fontSize: 28, fontWeight: 700, color: "var(--mn-ink-1)", marginBottom: 2 }}>{pctCorrect}%</p>
+              <p className="font-display" style={{ fontSize: 28, fontWeight: 700, color: "var(--mn-ink-1)", marginBottom: 2 }}>{displayPct}%</p>
               <p style={{ fontSize: 11, color: "var(--mn-ink-3)" }}>Precisión</p>
             </div>
           </div>
@@ -286,7 +307,11 @@ function FlashcardsReviewPageInner() {
       {cardToast && (
         <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", background: "#1B3F2F", color: "#fff", padding: "10px 20px", borderRadius: 12, fontSize: 13, fontWeight: 600, zIndex: 200, animation: "toast-in 300ms ease", whiteSpace: "nowrap", boxShadow: "0 4px 16px rgba(0,0,0,0.2)" }}>
           ✨ {cardToast}
-          <style>{`@keyframes toast-in{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}`}</style>
+          <style>{`
+            @keyframes toast-in{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+            @keyframes fc-enter{from{opacity:0;transform:translateX(24px)}to{opacity:1;transform:translateX(0)}}
+            @keyframes fc-exit{from{opacity:1;transform:translateX(0)}to{opacity:0;transform:translateX(-24px)}}
+          `}</style>
         </div>
       )}
 
@@ -312,7 +337,10 @@ function FlashcardsReviewPageInner() {
 
         {/* 3D Flip card */}
         <div
-          style={{ perspective: "1000px", width: "100%", maxWidth: 520, cursor: flipped ? "default" : "pointer" }}
+          style={{
+            perspective: "1000px", width: "100%", maxWidth: 520, cursor: flipped ? "default" : "pointer",
+            animation: cardPhase === "in" ? "fc-enter 220ms cubic-bezier(0.16,1,0.3,1) both" : "fc-exit 180ms ease both",
+          }}
           onClick={() => !flipped && setFlipped(true)}
         >
           <div style={{

@@ -73,7 +73,7 @@ function BienvenidoContent() {
         </div>
 
         <p style={{ marginTop: 28, fontSize: 13, color: "#9E9389" }}>
-          ¿Problemas? Escribinos a{" "}
+          ¿Problemas? Escríbenos a{" "}
           <a href="mailto:hello@mnemora.me" style={{ color: "#1B3F2F", fontWeight: 600 }}>hello@mnemora.me</a>
         </p>
       </div>

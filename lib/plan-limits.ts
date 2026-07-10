@@ -170,7 +170,7 @@ export function limitMessage(check: LimitCheck): string {
   const { feature, used, limit } = check;
   switch (feature) {
     case "subjects":
-      return "El plan Free permite 1 materia activa. Actualiza a Pro para agregar materias ilimitadas.";
+      return "El plan Starter permite 1 materia activa. Actualiza a Pro para agregar materias ilimitadas.";
     case "syllabuses":
       return `Usaste tu programa de materia del mes (${used}/${limit}). Actualiza a Pro para programas ilimitados.`;
     case "summaries":

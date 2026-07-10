@@ -89,7 +89,9 @@ export function PaywallModal({ feature, message, planRequired = "pro", onClose }
         background: "#F7F4EF", borderRadius: 20, padding: 32,
         maxWidth: 420, width: "100%", position: "relative",
         boxShadow: "0 20px 60px rgba(26,22,18,0.18)",
+        animation: "mn-modal-in 220ms cubic-bezier(0.16,1,0.3,1) both",
       }}>
+      <style>{`@keyframes mn-modal-in{from{opacity:0;transform:scale(0.95) translateY(8px)}to{opacity:1;transform:scale(1) translateY(0)}}`}</style>
         <button
           onClick={onClose}
           style={{

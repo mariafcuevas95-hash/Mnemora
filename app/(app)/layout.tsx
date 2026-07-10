@@ -113,16 +113,28 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     const db = createClient();
-    db.auth.getUser().then(({ data: { user } }) => {
-      if (!user) return;
-      db.from("profiles").select("name, email, plan, plan_expires_at").eq("id", user.id).single()
-        .then(({ data }) => setProfile(data));
-      db.from("subjects").select("id, name").order("created_at")
-        .then(({ data }) => setSubjects(data ?? []));
-    });
+
+    function loadProfile() {
+      db.auth.getUser().then(({ data: { user } }) => {
+        if (!user) return;
+        db.from("profiles").select("name, email, plan, plan_expires_at").eq("id", user.id).single()
+          .then(({ data }) => setProfile(data));
+        db.from("subjects").select("id, name").order("created_at")
+          .then(({ data }) => setSubjects(data ?? []));
+      });
+    }
+
+    loadProfile();
     fetch("/api/notifications/unread-count")
       .then(r => r.ok ? r.json() : { count: 0 })
       .then(d => setUnreadNotifs(d.count ?? 0));
+
+    // Refresca el plan cuando el usuario vuelve a la pestaña (ej. después de comprar en Hotmart)
+    function handleVisibility() {
+      if (document.visibilityState === "visible") loadProfile();
+    }
+    document.addEventListener("visibilitychange", handleVisibility);
+    return () => document.removeEventListener("visibilitychange", handleVisibility);
   }, []);
 
   async function handleLogout() {
@@ -133,9 +145,9 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     router.refresh();
   }
 
-  const navItems = [
+  const navItems: { href: string; icon: React.ReactNode; label: string; badge?: string }[] = [
     { href: "/dashboard", icon: <LayoutDashboard size={16} />, label: "Inicio" },
-    { href: "/mis-clases", icon: <Mic size={16} />, label: "Mis clases" },
+    { href: "/mis-clases", icon: <Mic size={16} />, label: "Mis clases", badge: "PREMIUM" },
     { href: "/quiz", icon: <Brain size={16} />, label: "Quiz" },
     { href: "/calendario", icon: <Calendar size={16} />, label: "Mi Plan" },
     { href: "/flashcards", icon: <Layers size={16} />, label: "Flashcards" },
@@ -200,7 +212,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* Nav principal */}
         <div style={{ padding: "0 8px", marginBottom: 8 }}>
-          {navItems.map(({ href, icon, label }) => {
+          {navItems.map(({ href, icon, label, badge }) => {
             const active = pathname === href;
             return (
               <Link key={href} href={href} style={{
@@ -213,6 +225,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 transition: "background 120ms",
               }}>
                 {icon} {label}
+                {badge && <span style={{ marginLeft: "auto", fontSize: 9, fontWeight: 700, letterSpacing: "0.05em", color: "#7C3AED", background: "#EDE9FE", padding: "1px 5px", borderRadius: 4 }}>{badge}</span>}
               </Link>
             );
           })}

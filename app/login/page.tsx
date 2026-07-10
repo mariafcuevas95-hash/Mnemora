@@ -34,6 +34,7 @@ function LoginInner() {
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [error, setError] = useState("");
+  const [shaking, setShaking] = useState(false);
   const [resetSent, setResetSent] = useState(false);
   const [lastSubject, setLastSubject] = useState<string | null>(null);
 
@@ -62,6 +63,7 @@ function LoginInner() {
           ? "Email o contraseña incorrectos."
           : signInError.message
       );
+      setShaking(true); setTimeout(() => setShaking(false), 300);
       setLoading(false);
       return;
     }
@@ -156,7 +158,8 @@ function LoginInner() {
             <div style={{ flex: 1, height: "0.5px", background: "rgba(26,22,18,0.12)" }} />
           </div>
 
-          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+          <style>{`@keyframes mn-shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}`}</style>
+          <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14, animation: shaking ? "mn-shake 280ms cubic-bezier(0.36,0.07,0.19,0.97) both" : "none" }}>
             <div>
               <label style={{ fontSize: 13, fontWeight: 600, color: "#1A1612", display: "block", marginBottom: 6 }}>Email</label>
               <input
