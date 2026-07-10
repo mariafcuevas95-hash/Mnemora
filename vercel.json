@@ -3,10 +3,6 @@
     {
       "path": "/api/notifications/daily",
       "schedule": "0 11 * * *"
-    },
-    {
-      "path": "/api/notifications/trial-ending",
-      "schedule": "0 12 * * *"
     }
   ]
 }

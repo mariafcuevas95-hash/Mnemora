@@ -167,27 +167,6 @@ const emailShell = (content: string) => `<!DOCTYPE html>
 const btn = (url: string, label: string) =>
   `<div style="text-align:center;margin:24px 0;"><a href="${url}" style="display:inline-block;padding:13px 32px;background:#1B3F2F;color:#FFFFFF;border-radius:12px;text-decoration:none;font-size:15px;font-weight:700;">${label}</a></div>`;
 
-export async function sendTrialEndingEmail(to: string, name: string) {
-  const firstName = name.split(" ")[0] || "estudiante";
-  await getResend().emails.send({
-    from: FROM, to,
-    subject: "Tu prueba gratuita termina en 2 días — Mnemora",
-    html: emailShell(`
-      <h1 style="margin:0 0 12px;color:#1A1612;font-size:22px;font-weight:800;">Tu prueba termina pronto, ${firstName}</h1>
-      <p style="margin:0 0 16px;color:#6B6259;font-size:15px;line-height:1.6;">En 2 días finaliza tu período de prueba gratuita de Pro. A partir de entonces pasarás al plan gratuito con funciones limitadas.</p>
-      <div style="background:#FEF3C7;border:1px solid #D97706;border-radius:12px;padding:16px 18px;margin-bottom:16px;">
-        <p style="margin:0;color:#92400E;font-size:14px;font-weight:700;">¿Qué pierdes si no te suscribes?</p>
-        <ul style="margin:8px 0 0;padding-left:18px;color:#78350F;font-size:13px;line-height:1.8;">
-          <li>Solo 1 materia activa (ahora tienes ilimitadas)</li>
-          <li>El tutor ya no recordará lo que hablaron</li>
-          <li>Sin flashcards ni resúmenes nuevos este mes</li>
-        </ul>
-      </div>
-      ${btn(`${APP_URL}/upgrade`, "Mantener mi Plan Pro →")}
-      <p style="text-align:center;margin:0;color:#9E9389;font-size:13px;">Solo $9,99/mes · cancela cuando quieras</p>
-    `),
-  });
-}
 
 export async function sendPlanCancelledEmail(to: string, name: string) {
   const firstName = name.split(" ")[0] || "estudiante";
