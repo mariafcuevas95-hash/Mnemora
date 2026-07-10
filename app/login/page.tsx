@@ -122,7 +122,7 @@ function LoginInner() {
             <div style={{ padding: "16px 20px", borderRadius: 12, background: "#E8F1EC", border: "0.5px solid #86EFAC", marginBottom: 20 }}>
               <p style={{ fontSize: 14, fontWeight: 600, color: "#1B3F2F", marginBottom: 4 }}>Email enviado</p>
               <p style={{ fontSize: 13, color: "#16A34A" }}>
-                Revisa tu bandeja de entrada para resetear la contraseña.
+                Revisa tu bandeja de entrada para restablecer la contraseña.
               </p>
             </div>
           ) : null}
