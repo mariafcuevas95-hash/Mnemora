@@ -28,16 +28,19 @@ function ResetPasswordInner() {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    // Supabase JS processes the hash fragment (#access_token=...&type=recovery)
-    // and fires PASSWORD_RECOVERY in onAuthStateChange.
     const db = createClient();
+
+    // Detect recovery session: Supabase fires PASSWORD_RECOVERY when processing
+    // the #access_token hash with type=recovery. Also accept SIGNED_IN as fallback
+    // (fired when client already consumed the hash before the listener registered).
     const { data: { subscription } } = db.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
+      if (event === "PASSWORD_RECOVERY" || event === "SIGNED_IN") {
         setReady(true);
       }
     });
 
-    // Also handle the case where the session is already active (page reload)
+    // If the hash was already consumed (navigation to same URL with hash),
+    // check for an active session directly.
     db.auth.getSession().then(({ data: { session } }) => {
       if (session) setReady(true);
     });
