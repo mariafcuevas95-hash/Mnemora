@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { Eye, EyeOff, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { Logo } from "@/components/logo";
-import { createClient } from "@/lib/supabase/client";
 
 const inputStyle = {
   width: "100%",
@@ -26,31 +25,19 @@ function ResetPasswordInner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
-  const [sessionReady, setSessionReady] = useState(false);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
 
   useEffect(() => {
-    const db = createClient();
-    // Implicit flow: Supabase puts access_token+refresh_token in the URL hash.
-    // @supabase/ssr's createBrowserClient doesn't auto-process the hash —
-    // we call setSession() explicitly so the tokens are persisted in cookies.
     const hash = window.location.hash;
     if (hash.includes("type=recovery") || hash.includes("access_token")) {
       const params = new URLSearchParams(hash.replace(/^#/, ""));
-      const access_token = params.get("access_token");
-      const refresh_token = params.get("refresh_token");
-      if (access_token && refresh_token) {
-        db.auth.setSession({ access_token, refresh_token }).then(({ error: e }) => {
-          if (!e) setSessionReady(true);
-          else setError("El enlace expiró. Solicita uno nuevo desde el inicio de sesión.");
-        });
+      const token = params.get("access_token");
+      if (token) {
+        setAccessToken(token);
         return;
       }
     }
-    // Fallback: check if there's already an active session (e.g. user reloaded the page)
-    db.auth.getSession().then(({ data: { session } }) => {
-      if (session) setSessionReady(true);
-      else setError("Accede desde el enlace en tu email de recuperación.");
-    });
+    setError("Accede desde el enlace en tu email de recuperación.");
   }, []);
 
   async function handleSubmit(e: React.FormEvent) {
@@ -61,15 +48,19 @@ function ResetPasswordInner() {
     }
     setLoading(true);
     setError("");
-    const db = createClient();
-    const { error: updateError } = await db.auth.updateUser({ password });
-    if (updateError) {
-      setError(updateError.message ?? "Error al actualizar la contraseña. Solicita un nuevo enlace.");
+    const res = await fetch("/api/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ access_token: accessToken, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      setError(data.error ?? "Error al actualizar la contraseña. Solicita un nuevo enlace.");
       setLoading(false);
       return;
     }
     setDone(true);
-    setTimeout(() => router.replace("/dashboard"), 1500);
+    setTimeout(() => router.replace("/login"), 1500);
   }
 
   return (
@@ -90,14 +81,14 @@ function ResetPasswordInner() {
             Elige una contraseña segura para tu cuenta.
           </p>
 
-          {!sessionReady && !error ? (
+          {!accessToken && !error ? (
             <p style={{ fontSize: 14, color: "#9E9389", textAlign: "center" }}>Verificando enlace…</p>
           ) : done ? (
             <div style={{ padding: "16px 20px", borderRadius: 12, background: "#D1FAE5", border: "0.5px solid #6EE7B7", textAlign: "center" }}>
               <p style={{ fontSize: 15, fontWeight: 700, color: "#065F46" }}>¡Contraseña actualizada!</p>
-              <p style={{ fontSize: 13, color: "#047857", marginTop: 4 }}>Redirigiendo al dashboard…</p>
+              <p style={{ fontSize: 13, color: "#047857", marginTop: 4 }}>Redirigiendo al inicio de sesión…</p>
             </div>
-          ) : error && !sessionReady ? (
+          ) : error && !accessToken ? (
             <div style={{ padding: "10px 14px", borderRadius: 10, background: "#FEE2E2", border: "0.5px solid #FCA5A5" }}>
               <p style={{ fontSize: 13, color: "#DC2626" }}>{error}</p>
               <Link href="/login" style={{ fontSize: 13, color: "#1B3F2F", fontWeight: 600 }}>Volver al inicio de sesión →</Link>
