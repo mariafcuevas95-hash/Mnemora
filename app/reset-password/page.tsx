@@ -26,6 +26,32 @@ function ResetPasswordInner() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [done, setDone] = useState(false);
+  const [sessionReady, setSessionReady] = useState(false);
+
+  useEffect(() => {
+    const db = createClient();
+    // Implicit flow: Supabase puts access_token+refresh_token in the URL hash.
+    // @supabase/ssr's createBrowserClient doesn't auto-process the hash —
+    // we call setSession() explicitly so the tokens are persisted in cookies.
+    const hash = window.location.hash;
+    if (hash.includes("type=recovery") || hash.includes("access_token")) {
+      const params = new URLSearchParams(hash.replace(/^#/, ""));
+      const access_token = params.get("access_token");
+      const refresh_token = params.get("refresh_token");
+      if (access_token && refresh_token) {
+        db.auth.setSession({ access_token, refresh_token }).then(({ error: e }) => {
+          if (!e) setSessionReady(true);
+          else setError("El enlace expiró. Solicita uno nuevo desde el inicio de sesión.");
+        });
+        return;
+      }
+    }
+    // Fallback: check if there's already an active session (e.g. user reloaded the page)
+    db.auth.getSession().then(({ data: { session } }) => {
+      if (session) setSessionReady(true);
+      else setError("Accede desde el enlace en tu email de recuperación.");
+    });
+  }, []);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -38,12 +64,7 @@ function ResetPasswordInner() {
     const db = createClient();
     const { error: updateError } = await db.auth.updateUser({ password });
     if (updateError) {
-      const msg = updateError.message ?? "";
-      setError(
-        msg.includes("session") || msg.includes("Auth")
-          ? "El enlace expiró o ya fue usado. Solicita uno nuevo desde la pantalla de inicio de sesión."
-          : msg
-      );
+      setError(updateError.message ?? "Error al actualizar la contraseña. Solicita un nuevo enlace.");
       setLoading(false);
       return;
     }
@@ -69,10 +90,17 @@ function ResetPasswordInner() {
             Elige una contraseña segura para tu cuenta.
           </p>
 
-          {done ? (
+          {!sessionReady && !error ? (
+            <p style={{ fontSize: 14, color: "#9E9389", textAlign: "center" }}>Verificando enlace…</p>
+          ) : done ? (
             <div style={{ padding: "16px 20px", borderRadius: 12, background: "#D1FAE5", border: "0.5px solid #6EE7B7", textAlign: "center" }}>
               <p style={{ fontSize: 15, fontWeight: 700, color: "#065F46" }}>¡Contraseña actualizada!</p>
               <p style={{ fontSize: 13, color: "#047857", marginTop: 4 }}>Redirigiendo al dashboard…</p>
+            </div>
+          ) : error && !sessionReady ? (
+            <div style={{ padding: "10px 14px", borderRadius: 10, background: "#FEE2E2", border: "0.5px solid #FCA5A5" }}>
+              <p style={{ fontSize: 13, color: "#DC2626" }}>{error}</p>
+              <Link href="/login" style={{ fontSize: 13, color: "#1B3F2F", fontWeight: 600 }}>Volver al inicio de sesión →</Link>
             </div>
           ) : (
             <form onSubmit={handleSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
