@@ -44,6 +44,10 @@ export default function MateriasPage() {
           <Link href="/onboarding" className="mn-btn-primary" style={{ fontSize: 13 }}>Agregar materia →</Link>
         </div>
       ) : (
+        <>
+        <style>{`
+          @media (max-width: 479px) { .mn-subject-secondary { display: none !important; } }
+        `}</style>
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
           {subjects.map(s => (
             <div
@@ -61,19 +65,20 @@ export default function MateriasPage() {
                 </div>
               </Link>
               <div style={{ display: "flex", gap: 6, flexShrink: 0 }}>
-                <Link href={`/tutor/${s.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#1B3F2F", fontWeight: 600, textDecoration: "none", padding: "5px 9px", background: "#E8F1EC", borderRadius: 7 }}>
-                  <Brain size={11} /> Tutor
+                <Link href={`/tutor/${s.id}`} style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#1B3F2F", fontWeight: 600, textDecoration: "none", padding: "6px 11px", background: "#E8F1EC", borderRadius: 8 }}>
+                  <Brain size={12} /> Tutor
                 </Link>
-                <Link href={`/flashcards/${s.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#6B6259", fontWeight: 600, textDecoration: "none", padding: "5px 9px", background: "#F7F4EF", borderRadius: 7 }}>
-                  <Layers size={11} /> Flashcards
+                <Link href={`/flashcards/${s.id}`} className="mn-subject-secondary" style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#6B6259", fontWeight: 600, textDecoration: "none", padding: "6px 11px", background: "#F7F4EF", borderRadius: 8 }}>
+                  <Layers size={12} /> Flashcards
                 </Link>
-                <Link href={`/progreso?subject=${s.id}`} style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 11, color: "#6B6259", fontWeight: 600, textDecoration: "none", padding: "5px 9px", background: "#F7F4EF", borderRadius: 7 }}>
-                  <BarChart2 size={11} /> Progreso
+                <Link href={`/progreso?subject=${s.id}`} className="mn-subject-secondary" style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 12, color: "#6B6259", fontWeight: 600, textDecoration: "none", padding: "6px 11px", background: "#F7F4EF", borderRadius: 8 }}>
+                  <BarChart2 size={12} /> Progreso
                 </Link>
               </div>
             </div>
           ))}
         </div>
+        </>
       )}
     </div>
   );

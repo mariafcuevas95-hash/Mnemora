@@ -385,32 +385,32 @@ function FlashcardsReviewPageInner() {
             <p style={{ textAlign: "center", fontSize: 12, color: "var(--mn-ink-3)", marginBottom: 14 }}>
               ¿Cómo te fue? · Teclas 1–4
             </p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 10 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 8 }}>
               {RATINGS.map((r, i) => (
                 <button
                   key={r.label}
                   onClick={() => handleRate(r.quality)}
                   disabled={rating}
                   style={{
-                    padding: "12px 8px",
+                    padding: "14px 6px",
                     borderRadius: "var(--mn-r-lg)",
-                    border: "1px solid var(--mn-ink-4)",
-                    background: "var(--mn-surface)",
+                    border: `1.5px solid ${r.color}22`,
+                    background: `${r.color}0D`,
                     color: r.color,
                     fontSize: 13,
-                    fontWeight: 600,
+                    fontWeight: 700,
                     cursor: rating ? "default" : "pointer",
                     opacity: rating ? 0.5 : 1,
-                    transition: "transform 100ms, opacity 150ms",
+                    transition: "transform 100ms, opacity 150ms, border-color 100ms",
                     display: "flex",
                     flexDirection: "column",
                     alignItems: "center",
-                    gap: 4,
+                    gap: 6,
                   }}
-                  onMouseEnter={e => { if (!rating) (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.03)"; }}
-                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)"; }}
+                  onMouseEnter={e => { if (!rating) { (e.currentTarget as HTMLButtonElement).style.transform = "scale(1.04)"; (e.currentTarget as HTMLButtonElement).style.borderColor = r.color; } }}
+                  onMouseLeave={e => { (e.currentTarget as HTMLButtonElement).style.transform = "scale(1)"; (e.currentTarget as HTMLButtonElement).style.borderColor = `${r.color}22`; }}
                 >
-                  <span style={{ fontSize: 10, color: "var(--mn-ink-3)" }}>{i + 1}</span>
+                  <span style={{ fontSize: 10, fontWeight: 500, color: r.color, opacity: 0.55 }}>{i + 1}</span>
                   {r.label}
                 </button>
               ))}

@@ -12,6 +12,30 @@ interface PaywallModalProps {
   onClose: () => void;
 }
 
+const FEATURE_TITLES: Partial<Record<Feature, string>> = {
+  subjects:        "Agrega todas tus materias del semestre",
+  syllabuses:      "Procesa todos los programas sin límite",
+  summaries:       "Genera más resúmenes este mes",
+  flashcards:      "Genera más flashcards este mes",
+  tutor_messages:  "Sigue preguntándole al tutor",
+  quiz:            "Quizzes adaptativos con IA",
+  advanced_memory: "El tutor que te recuerda",
+  daily_planner:   "Tu plan de estudio inteligente",
+  mind_maps:       "Mapas mentales automáticos",
+  exam_mode:             "Modo examen intensivo",
+  ai_coaches:            "IA que reorganiza tu agenda",
+  multimodal:            "Analiza fotos de tus apuntes",
+  transcription:         "Transcripción de clases",
+  advanced_analytics:    "Dashboard de rendimiento avanzado",
+  performance_prediction:"Conoce tu probabilidad de aprobar",
+  semester_replanner:    "Reorganiza tu semestre automáticamente",
+  advanced_mind_maps:    "Mapas mentales adaptativos",
+  learning_roadmap:      "Tu ruta de aprendizaje personalizada",
+  exam_coverage:         "Cobertura del examen en tiempo real",
+  academic_goals:        "Metas académicas personalizadas",
+  ai_class_studio:       "Graba clases, obtén material en segundos",
+};
+
 // Each entry answers: "what does this unlock FOR ME?"
 const FEATURE_BENEFITS: Record<Feature, string[]> = {
   // Numeric — upgrade to Pro
@@ -90,7 +114,7 @@ export function PaywallModal({ feature, message, planRequired = "pro", onClose }
         </div>
 
         <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1A1612", marginBottom: 8 }}>
-          {isPremium ? "Plan Premium" : "Plan Pro"}
+          {FEATURE_TITLES[feature] ?? (isPremium ? "Plan Premium" : "Plan Pro")}
         </h2>
         <p style={{ fontSize: 15, color: "#6B6259", marginBottom: 24, lineHeight: 1.5 }}>
           {message}

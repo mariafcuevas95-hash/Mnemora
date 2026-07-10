@@ -3,7 +3,7 @@
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useState, useEffect, Suspense } from "react";
-import { BookOpen, Check, Shield, Zap, Lock, Star } from "lucide-react";
+import { BookOpen, Check, Shield, Zap, Sparkles, Star } from "lucide-react";
 
 type PaywallReason = "materia" | "memoria" | "limite" | "syllabus" | "general";
 
@@ -103,10 +103,10 @@ function UpgradeContent() {
         {/* Headline */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
           <div style={{
-            width: 52, height: 52, background: "var(--mn-canvas)", border: "1px solid var(--mn-ink-4)", borderRadius: "var(--mn-r-xl)",
+            width: 52, height: 52, background: "#E8F1EC", borderRadius: "var(--mn-r-xl)",
             display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px",
           }}>
-            <Lock size={22} color="var(--mn-ink-2)" />
+            <Sparkles size={22} color="var(--mn-green)" />
           </div>
           <h1 className="font-display" style={{ fontSize: 26, fontWeight: 800, color: "#1A1612", lineHeight: 1.2, marginBottom: 10 }}>
             {title}
