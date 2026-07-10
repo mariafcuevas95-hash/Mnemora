@@ -55,11 +55,14 @@ export async function POST(req: NextRequest) {
   });
 
   if (error || !data?.properties?.action_link) {
-    // Return 200 regardless — don't reveal if the email exists
+    console.error("[forgot-password] generateLink error:", error?.message ?? "no action_link");
     return NextResponse.json({ ok: true });
   }
 
-  await sendPasswordResetEmail(email, data.properties.action_link).catch(() => {});
+  const sendResult = await sendPasswordResetEmail(email, data.properties.action_link).catch((e) => {
+    console.error("[forgot-password] sendPasswordResetEmail error:", e?.message);
+  });
+  console.log("[forgot-password] email sent to:", email, "result:", sendResult);
 
   return NextResponse.json({ ok: true });
 }
