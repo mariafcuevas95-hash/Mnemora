@@ -13,8 +13,10 @@ import type { Feature, PlanId } from "@/lib/plans";
 function cleanTitle(title: string): string {
   return title
     .replace(/\s*\[[^\]]+\]/g, "")
-    .replace(/\s*\([A-ZÁÉÍÓÚÑ\s]{4,}\)/g, "")
-    .replace(/\s*\|\s*CURSO:\s*/g, " — ")
+    // ASCII | y fullwidth ｜ seguido de CURSO con : o ：
+    .replace(/\s*[|｜]\s*CURSO\s*[：:].*/g, "")
+    // (LEER DESCRIPCIÓN) y variantes
+    .replace(/\s*\(LEER DESCRIPCI[ÓO]N\)/gi, "")
     .trim();
 }
 
@@ -88,6 +90,9 @@ export default function MisClasesPage() {
   const timerRef = useRef<NodeJS.Timeout | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const xhrRef = useRef<XMLHttpRequest | null>(null);
+  const pendingClassIdRef = useRef<string | null>(null);
+  const [retryingId, setRetryingId] = useState<string | null>(null);
 
   const loadClasses = useCallback(async () => {
     const res = await fetch("/api/classes");
@@ -129,7 +134,16 @@ export default function MisClasesPage() {
     }
   }
 
-  function resetModal() {
+  function resetModal(cancelUpload = false) {
+    // B5: abortar XHR y limpiar registro huérfano si se cierra durante subida
+    if (cancelUpload && xhrRef.current) {
+      xhrRef.current.abort();
+      xhrRef.current = null;
+      if (pendingClassIdRef.current) {
+        fetch(`/api/classes/${pendingClassIdRef.current}`, { method: "DELETE" }).catch(() => {});
+        pendingClassIdRef.current = null;
+      }
+    }
     setStep("choose");
     setUploadMode(null);
     setSelectedSubjectId("");
@@ -146,6 +160,10 @@ export default function MisClasesPage() {
 
   // ── Grabación ──────────────────────────────────────────────────────────────
   async function startRecording() {
+    // B1: validar antes de solicitar el micrófono
+    if (!classTitle.trim()) { setUploadError("Escribe un título antes de grabar."); return; }
+    if (!selectedSubjectId) { setUploadError("Selecciona una materia antes de grabar."); return; }
+    setUploadError("");
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
       const mr = new MediaRecorder(stream, { mimeType: "audio/webm" });
@@ -231,23 +249,29 @@ export default function MisClasesPage() {
     }
 
     const { classId, uploadUrl } = await createRes.json();
+    pendingClassIdRef.current = classId; // B5: registrar para cleanup si se cancela
 
     // 2. Upload directo a Supabase Storage via XHR (para progress)
     await new Promise<void>((resolve, reject) => {
       const xhr = new XMLHttpRequest();
+      xhrRef.current = xhr; // B5: guardar ref para poder abortar
       xhr.upload.onprogress = e => {
         if (e.lengthComputable) setUploadProgress(Math.round((e.loaded / e.total) * 100));
       };
       xhr.onload = () => xhr.status < 300 ? resolve() : reject(new Error(`Upload ${xhr.status}`));
       xhr.onerror = () => reject(new Error("Error de red al subir el archivo."));
+      xhr.onabort = () => reject(new Error("__aborted__"));
       xhr.open("PUT", uploadUrl);
       xhr.setRequestHeader("Content-Type", mimeType);
       xhr.send(file);
     }).catch(err => {
+      if (err.message === "__aborted__") throw err; // cancelación limpia, no mostrar error
       setUploadError(err.message);
       setStep("form");
       throw err;
     });
+    xhrRef.current = null;
+    pendingClassIdRef.current = null;
 
     // 3. Disparar procesamiento
     setStep("processing");
@@ -268,14 +292,32 @@ export default function MisClasesPage() {
     setStep("form");
   }
 
+  // B2: reintentar procesamiento de una clase fallida
+  async function retryClass(id: string) {
+    setRetryingId(id);
+    setClasses(prev => prev.map(c => c.id === id ? { ...c, processing_status: "pending", processing_stage: "Reintentando…" } : c));
+    await fetch(`/api/classes/${id}/trigger`, { method: "POST" }).catch(() => {});
+    setRetryingId(null);
+    await loadClasses();
+  }
+
   const formatTime = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
 
   if (loading) return (
     <div className="mn-dashboard-wrap" style={{ maxWidth: 720 }}>
-      {[200, 320, 260].map((w, i) => (
-        <div key={i} style={{ height: 20, width: w, background: "var(--mn-raised)", borderRadius: "var(--mn-r-sm)", marginBottom: 12, animation: "pulse-sk 1.4s ease infinite" }} />
-      ))}
       <style>{`@keyframes pulse-sk{0%,100%{opacity:1}50%{opacity:.45}} @keyframes spin{to{transform:rotate(360deg)}}`}</style>
+      {/* Skeleton header */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 28 }}>
+        <div>
+          <div style={{ height: 28, width: 140, background: "var(--mn-raised)", borderRadius: "var(--mn-r-sm)", marginBottom: 8, animation: "pulse-sk 1.4s ease infinite" }} />
+          <div style={{ height: 14, width: 280, background: "var(--mn-raised)", borderRadius: "var(--mn-r-sm)", animation: "pulse-sk 1.4s ease infinite" }} />
+        </div>
+        <div style={{ height: 36, width: 110, background: "var(--mn-raised)", borderRadius: "var(--mn-r-lg)", animation: "pulse-sk 1.4s ease infinite" }} />
+      </div>
+      {/* Skeleton cards */}
+      {[1, 2, 3].map(i => (
+        <div key={i} style={{ height: 76, background: "var(--mn-raised)", borderRadius: "var(--mn-r-lg)", marginBottom: 10, animation: "pulse-sk 1.4s ease infinite", animationDelay: `${i * 80}ms` }} />
+      ))}
     </div>
   );
 
@@ -314,15 +356,13 @@ export default function MisClasesPage() {
         </div>
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-          {classes.map(cls => (
-            <Link
-              key={cls.id}
-              href={cls.processing_status === "done" ? `/mis-clases/${cls.id}` : "#"}
-              style={{ textDecoration: "none", pointerEvents: cls.processing_status === "done" ? "auto" : "none" }}
-            >
-              <div style={{ padding: "16px 18px", background: "var(--mn-surface)", borderRadius: "var(--mn-r-lg)", border: "1px solid var(--mn-ink-4)", display: "flex", gap: 14, alignItems: "flex-start", cursor: cls.processing_status === "done" ? "pointer" : "default", transition: "border-color 150ms" }}
-                onMouseEnter={e => { if (cls.processing_status === "done") e.currentTarget.style.borderColor = "var(--mn-green)"; }}
-                onMouseLeave={e => { e.currentTarget.style.borderColor = "var(--mn-ink-4)"; }}
+          {classes.map(cls => {
+            const isFailed = cls.processing_status === "failed";
+            const isDone = cls.processing_status === "done";
+            const cardInner = (
+              <div style={{ padding: "16px 18px", background: "var(--mn-surface)", borderRadius: "var(--mn-r-lg)", border: `1px solid ${isFailed ? "rgba(220,38,38,0.2)" : "var(--mn-ink-4)"}`, display: "flex", gap: 14, alignItems: "flex-start", cursor: isDone ? "pointer" : "default", transition: "border-color 150ms" }}
+                onMouseEnter={e => { if (isDone) e.currentTarget.style.borderColor = "var(--mn-green)"; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor = isFailed ? "rgba(220,38,38,0.2)" : "var(--mn-ink-4)"; }}
               >
                 <div style={{ width: 36, height: 36, borderRadius: "var(--mn-r-md)", background: "var(--mn-raised)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, color: "var(--mn-ink-3)" }}>
                   {SOURCE_ICONS[cls.source]}
@@ -337,15 +377,28 @@ export default function MisClasesPage() {
                     <span style={{ fontSize: 11, color: "var(--mn-ink-4)" }}>{SOURCE_LABELS[cls.source]}</span>
                     <span style={{ fontSize: 11, color: "var(--mn-ink-4)" }}>{new Date(cls.created_at).toLocaleDateString("es", { day: "numeric", month: "short" })}</span>
                   </div>
-                  {cls.processing_status === "done" && (
+                  {isDone && (
                     <div style={{ display: "flex", gap: 12, marginTop: 8 }}>
                       {cls.flashcards_count > 0 && <span style={{ fontSize: 11, color: "var(--mn-green)", fontWeight: 600, display: "flex", alignItems: "center", gap: 3 }}><Layers size={10} /> {cls.flashcards_count} flashcards</span>}
                       {cls.quiz_count > 0 && <span style={{ fontSize: 11, color: "var(--mn-ink-3)", fontWeight: 600, display: "flex", alignItems: "center", gap: 3 }}><HelpCircle size={10} /> {cls.quiz_count} quiz</span>}
                       {cls.concepts_count > 0 && <span style={{ fontSize: 11, color: "var(--mn-ink-3)", fontWeight: 600, display: "flex", alignItems: "center", gap: 3 }}><BookOpen size={10} /> {cls.concepts_count} conceptos</span>}
                     </div>
                   )}
-                  {(cls.processing_status === "transcribing" || cls.processing_status === "analyzing") && (
-                    <p style={{ fontSize: 12, color: "var(--mn-amber)", marginTop: 4 }}>{cls.processing_stage}</p>
+                  {/* B2: mensaje de error + reintentar */}
+                  {isFailed && (
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginTop: 8 }}>
+                      <p style={{ fontSize: 12, color: "var(--mn-error)" }}>El procesamiento falló. Puede ser un problema con el audio o una interrupción temporal.</p>
+                      <button
+                        onClick={e => { e.preventDefault(); e.stopPropagation(); retryClass(cls.id); }}
+                        disabled={retryingId === cls.id}
+                        style={{ flexShrink: 0, padding: "4px 12px", borderRadius: "var(--mn-r-md)", border: "1px solid var(--mn-error)", background: "none", fontSize: 12, fontWeight: 600, color: "var(--mn-error)", cursor: "pointer", opacity: retryingId === cls.id ? 0.5 : 1 }}
+                      >
+                        {retryingId === cls.id ? "…" : "Reintentar"}
+                      </button>
+                    </div>
+                  )}
+                  {(cls.processing_status === "transcribing" || cls.processing_status === "analyzing" || cls.processing_status === "pending") && (
+                    <p style={{ fontSize: 12, color: "var(--mn-amber)", marginTop: 4 }}>{cls.processing_stage ?? "Procesando…"}</p>
                   )}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
@@ -356,11 +409,18 @@ export default function MisClasesPage() {
                   >
                     <Trash2 size={14} />
                   </button>
-                  {cls.processing_status === "done" && <ChevronRight size={16} color="var(--mn-ink-4)" />}
+                  {isDone && <ChevronRight size={16} color="var(--mn-ink-4)" />}
                 </div>
               </div>
-            </Link>
-          ))}
+            );
+            return isDone ? (
+              <Link key={cls.id} href={`/mis-clases/${cls.id}`} style={{ textDecoration: "none" }}>
+                {cardInner}
+              </Link>
+            ) : (
+              <div key={cls.id}>{cardInner}</div>
+            );
+          })}
         </div>
       )}
 
@@ -393,7 +453,7 @@ export default function MisClasesPage() {
 
       {/* ── Modal Nueva Clase ── */}
       {showModal && (
-        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setShowModal(false); resetModal(); } }}>
+        <div style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.5)", zIndex: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: 24 }} onClick={e => { if (e.target === e.currentTarget) { setShowModal(false); resetModal(step === "uploading"); } }}>
           <div style={{ background: "var(--mn-surface)", borderRadius: "var(--mn-r-xl)", width: "100%", maxWidth: 480, boxShadow: "0 20px 60px rgba(0,0,0,0.25)", animation: "fadeIn 0.2s ease", overflow: "hidden" }}>
 
             {/* Modal header */}
@@ -401,7 +461,7 @@ export default function MisClasesPage() {
               <p style={{ fontSize: 15, fontWeight: 700, color: "var(--mn-ink-1)" }}>
                 {step === "choose" ? "Nueva clase" : step === "uploading" ? "Subiendo audio..." : step === "processing" ? "Procesando..." : "Configurar clase"}
               </p>
-              <button onClick={() => { setShowModal(false); resetModal(); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--mn-ink-3)", display: "flex", alignItems: "center" }}>
+              <button onClick={() => { setShowModal(false); resetModal(step === "uploading"); }} style={{ background: "none", border: "none", cursor: "pointer", color: "var(--mn-ink-3)", display: "flex", alignItems: "center" }}>
                 <X size={18} />
               </button>
             </div>
@@ -426,8 +486,9 @@ export default function MisClasesPage() {
                     </div>
                   </button>
 
-                  <div onClick={() => fileInputRef.current?.click()}
-                    style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 18px", borderRadius: "var(--mn-r-lg)", border: "1px solid var(--mn-ink-4)", background: "var(--mn-surface)", cursor: "pointer", transition: "border-color 150ms" }}
+                  {/* B4: button accesible por teclado y lectores de pantalla */}
+                  <button onClick={() => fileInputRef.current?.click()}
+                    style={{ display: "flex", alignItems: "center", gap: 14, padding: "16px 18px", borderRadius: "var(--mn-r-lg)", border: "1px solid var(--mn-ink-4)", background: "var(--mn-surface)", cursor: "pointer", transition: "border-color 150ms", textAlign: "left", width: "100%" }}
                     onMouseEnter={e => e.currentTarget.style.borderColor = "var(--mn-green)"}
                     onMouseLeave={e => e.currentTarget.style.borderColor = "var(--mn-ink-4)"}
                   >
@@ -438,7 +499,7 @@ export default function MisClasesPage() {
                       <p style={{ fontSize: 14, fontWeight: 600, color: "var(--mn-ink-1)" }}>Subir audio</p>
                       <p style={{ fontSize: 12, color: "var(--mn-ink-3)" }}>MP3, M4A, WAV, AAC, FLAC u OGG</p>
                     </div>
-                  </div>
+                  </button>
                   <input ref={fileInputRef} type="file" accept={ALLOWED_AUDIO} style={{ display: "none" }} onChange={e => { const f = e.target.files?.[0]; if (f) handleFileSelect(f); e.target.value = ""; }} />
                 </div>
               )}

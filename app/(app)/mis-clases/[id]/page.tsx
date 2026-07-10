@@ -37,8 +37,8 @@ type TabId = "resumen" | "apuntes" | "flashcards" | "quiz" | "transcript";
 function cleanTitle(title: string): string {
   return title
     .replace(/\s*\[[^\]]+\]/g, "")
-    .replace(/\s*\([A-ZÁÉÍÓÚÑ\s]{4,}\)/g, "")
-    .replace(/\s*\|\s*CURSO:\s*/g, " — ")
+    .replace(/\s*[|｜]\s*CURSO\s*[：:].*/g, "")
+    .replace(/\s*\(LEER DESCRIPCI[ÓO]N\)/gi, "")
     .trim();
 }
 
@@ -121,6 +121,8 @@ export default function ClaseDetailPage() {
 
   // Transcript expand
   const [transcriptExpanded, setTranscriptExpanded] = useState(false);
+  // R7: toast de confirmación al agregar al calendario
+  const [toastMsg, setToastMsg] = useState("");
 
   useEffect(() => {
     fetch(`/api/classes/${id}`)
@@ -144,6 +146,10 @@ export default function ClaseDetailPage() {
     });
     if (res.ok) {
       setSuggestions(prev => prev.map((s, i) => i === index ? { ...s, approved: true } : s));
+      // R7: confirmar visualmente
+      const s = suggestions[index];
+      setToastMsg(`"${s.title}" agregado al calendario`);
+      setTimeout(() => setToastMsg(""), 3000);
     }
     setApprovingIdx(null);
   }
@@ -178,7 +184,17 @@ export default function ClaseDetailPage() {
 
   return (
     <div className="mn-dashboard-wrap" style={{ maxWidth: 720 }}>
-      <style>{`@keyframes pulse-sk{0%,100%{opacity:1}50%{opacity:.45}}`}</style>
+      <style>{`
+        @keyframes pulse-sk{0%,100%{opacity:1}50%{opacity:.45}}
+        @keyframes mn-toast-in{from{opacity:0;transform:translateX(-50%) translateY(-8px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+        @media(max-width:540px){.mn-fc-grid{grid-template-columns:1fr!important}}
+      `}</style>
+      {/* R7: toast de confirmación */}
+      {toastMsg && (
+        <div style={{ position: "fixed", top: 20, left: "50%", transform: "translateX(-50%)", background: "#1B3F2F", color: "#fff", padding: "10px 20px", borderRadius: 12, fontSize: 13, fontWeight: 600, zIndex: 300, animation: "mn-toast-in 250ms ease both", whiteSpace: "nowrap", boxShadow: "0 4px 16px rgba(0,0,0,0.2)" }}>
+          ✓ {toastMsg}
+        </div>
+      )}
 
       {/* Breadcrumb */}
       <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 16 }}>
@@ -200,7 +216,9 @@ export default function ClaseDetailPage() {
                 {new Date(cls.created_at).toLocaleDateString("es", { day: "numeric", month: "long", year: "numeric" })}
               </span>
               <span style={{ fontSize: 11, color: "var(--mn-ink-4)", display: "flex", alignItems: "center", gap: 3 }}>
-                <Mic size={10} /> {cls.source === "recording" ? "Grabación" : "Audio subido"}
+                {/* R10: ícono correcto según fuente */}
+                {cls.source === "recording" ? <Mic size={10} /> : <FileText size={10} />}
+                {cls.source === "recording" ? "Grabación" : "Audio subido"}
               </span>
             </div>
           </div>
@@ -230,6 +248,18 @@ export default function ClaseDetailPage() {
         </div>
       </div>
 
+      {/* R8: CTA tutor */}
+      {cls.subject_id && (
+        <div style={{ marginBottom: 16 }}>
+          <Link href={`/tutor/${cls.subject_id}`} style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 13, color: "var(--mn-green)", fontWeight: 600, textDecoration: "none", padding: "7px 14px", borderRadius: "var(--mn-r-md)", border: "1px solid rgba(27,63,47,0.2)", background: "rgba(27,63,47,0.04)", transition: "background 150ms" }}
+            onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.background = "rgba(27,63,47,0.08)"}
+            onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.background = "rgba(27,63,47,0.04)"}
+          >
+            <Mic size={13} /> Hablar con el tutor sobre esta clase
+          </Link>
+        </div>
+      )}
+
       {/* Sugerencias pendientes */}
       {pendingSuggestions.length > 0 && (
         <div style={{ marginBottom: 20, padding: "14px 16px", borderRadius: "var(--mn-r-lg)", background: "var(--mn-amber-soft, #FEF3C7)", border: "1px solid rgba(217,119,6,0.2)" }}>
@@ -257,15 +287,15 @@ export default function ClaseDetailPage() {
         </div>
       )}
 
-      {/* Tabs */}
+      {/* Tabs — R5: ocultar flashcards/quiz si tienen 0 elementos */}
       <div style={{ display: "flex", gap: 0, marginBottom: 24, borderBottom: "1px solid var(--mn-ink-4)", overflowX: "auto" }}>
         {([
-          { id: "resumen", label: "Resumen", icon: <FileText size={13} /> },
-          { id: "apuntes", label: "Apuntes", icon: <BookOpen size={13} /> },
-          { id: "flashcards", label: `Flashcards (${cls.flashcards_count})`, icon: <Layers size={13} /> },
-          { id: "quiz", label: `Quiz (${cls.quiz_count})`, icon: <HelpCircle size={13} /> },
-          { id: "transcript", label: "Transcripción", icon: <Mic size={13} /> },
-        ] as { id: TabId; label: string; icon: React.ReactNode }[]).map(t => (
+          { id: "resumen", label: "Resumen", icon: <FileText size={13} />, show: true },
+          { id: "apuntes", label: "Apuntes", icon: <BookOpen size={13} />, show: !!cls.smart_notes },
+          { id: "flashcards", label: `Flashcards (${cls.flashcards_count})`, icon: <Layers size={13} />, show: cls.flashcards_count > 0 },
+          { id: "quiz", label: `Quiz (${cls.quiz_count})`, icon: <HelpCircle size={13} />, show: cls.quiz_count > 0 },
+          { id: "transcript", label: "Transcripción", icon: <Mic size={13} />, show: !!cls.transcript },
+        ] as { id: TabId; label: string; icon: React.ReactNode; show: boolean }[]).filter(t => t.show).map(t => (
           <button key={t.id} onClick={() => setTab(t.id)} style={{ padding: "10px 14px", border: "none", borderBottom: tab === t.id ? "2px solid var(--mn-green)" : "2px solid transparent", background: "none", fontSize: 13, fontWeight: tab === t.id ? 600 : 400, color: tab === t.id ? "var(--mn-ink-1)" : "var(--mn-ink-3)", cursor: "pointer", whiteSpace: "nowrap", display: "flex", alignItems: "center", gap: 5, marginBottom: -1 }}>
             {t.icon} {t.label}
           </button>
@@ -322,7 +352,7 @@ export default function ClaseDetailPage() {
           {flashcards.length === 0 ? (
             <p style={{ fontSize: 13, color: "var(--mn-ink-3)", textAlign: "center", paddingTop: 32 }}>No se generaron flashcards para esta clase.</p>
           ) : (
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+            <div className="mn-fc-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
               {flashcards.map(card => {
                 const isFlipped = flippedCard === card.id;
                 const isStarred = starredCards.has(card.id);
@@ -344,7 +374,7 @@ export default function ClaseDetailPage() {
                       ) : (
                         <div onClick={() => setFlippedCard(card.id)} style={{ cursor: "pointer", paddingBottom: 14 }}>
                           <p style={{ fontSize: 14, fontWeight: 600, color: "var(--mn-ink-1)", lineHeight: 1.45, marginBottom: 6 }}>{card.front}</p>
-                          <span style={{ fontSize: 12, color: "var(--mn-ink-3)" }}>Toca para ver la respuesta</span>
+                          <span style={{ fontSize: 12, color: "var(--mn-ink-3)" }}>Ver respuesta</span>
                         </div>
                       )}
                     </div>
