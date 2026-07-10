@@ -54,16 +54,12 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  // If user not found or is OAuth-only, return ok silently (no enumeration)
   if (error || !data?.properties?.action_link) {
-    // TEMP DEBUG: return actual error
-    return NextResponse.json({ ok: false, debug_error: error?.message ?? "no action_link" }, { status: 500 });
+    return NextResponse.json({ ok: true });
   }
 
-  const sendError = await sendPasswordResetEmail(email, data.properties.action_link).catch((e) => e);
-  if (sendError instanceof Error) {
-    // TEMP DEBUG: return actual error
-    return NextResponse.json({ ok: false, debug_error: sendError.message }, { status: 500 });
-  }
+  await sendPasswordResetEmail(email, data.properties.action_link).catch(() => {});
 
   return NextResponse.json({ ok: true });
 }

@@ -89,17 +89,11 @@ function LoginInner() {
   async function handleForgotPassword() {
     if (!email) { setError("Ingresa tu email primero."); return; }
     setLoading(true);
-    const res = await fetch("/api/auth/forgot-password", {
+    await fetch("/api/auth/forgot-password", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ email }),
     });
-    const data = await res.json();
-    if (!res.ok) {
-      setError(`[debug] ${data.debug_error ?? "error desconocido"}`);
-      setLoading(false);
-      return;
-    }
     setResetSent(true);
     setLoading(false);
   }
