@@ -13,7 +13,6 @@ type Profile = {
   name: string;
   email: string;
   plan: PlanId;
-  trial_ends_at: string | null;
   notifications_email: boolean;
 };
 
@@ -60,7 +59,7 @@ export default function SettingsPage() {
         const { data: { user } } = await db.auth.getUser();
         if (!user) { router.replace("/login"); return; }
         const { data, error } = await db.from("profiles")
-          .select("id, name, plan, trial_ends_at, notifications_email")
+          .select("id, name, plan, notifications_email")
           .eq("id", user.id).single();
         if (error && !data) { setFetchError(true); setLoading(false); return; }
         const p: Profile = {
@@ -68,7 +67,6 @@ export default function SettingsPage() {
           name:                data?.name ?? "",
           email:               user.email ?? "",
           plan:                data?.plan ?? "free",
-          trial_ends_at:       data?.trial_ends_at ?? null,
           notifications_email: data?.notifications_email ?? false,
         };
         setProfile(p); setName(p.name); setLoading(false);
@@ -131,15 +129,7 @@ export default function SettingsPage() {
   );
 
   const plan = PLANS[profile.plan];
-  const isTrialActive = profile.trial_ends_at && new Date(profile.trial_ends_at) > new Date();
-  const trialDays = isTrialActive
-    ? Math.ceil((new Date(profile.trial_ends_at!).getTime() - Date.now()) / 86_400_000)
-    : 0;
-
-  const planLabel =
-    profile.plan === "free"
-      ? isTrialActive ? `Pro (prueba · ${trialDays} días)` : "Free"
-      : plan.name;
+  const planLabel = profile.plan === "free" ? "Starter" : plan.name;
 
   const initials = (profile.name || profile.email).slice(0, 2).toUpperCase();
 
@@ -163,7 +153,6 @@ export default function SettingsPage() {
           <p style={{ fontSize: 13, color: "var(--mn-ink-2)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{profile.email}</p>
         </div>
         <span style={{ display: "flex", alignItems: "center", gap: 6, padding: "3px 11px", borderRadius: "var(--mn-r-full)", background: "var(--mn-raised)", fontSize: 12, fontWeight: 600, color: "var(--mn-ink-2)", flexShrink: 0 }}>
-          {isTrialActive && <span style={{ width: 7, height: 7, borderRadius: "50%", background: "var(--mn-green)", animation: "live-pulse 2s ease infinite", flexShrink: 0 }} />}
           {planLabel}
         </span>
       </div>
@@ -237,35 +226,33 @@ export default function SettingsPage() {
           <Row
             label={planLabel}
             sub={
-              isTrialActive
-                ? `${trialDays} ${trialDays === 1 ? "día restante" : "días restantes"} de prueba gratuita`
-                : profile.plan === "free"
-                  ? "Sin costo · funciones del plan Starter"
-                  : `$${plan.price_usd}/mes`
+              profile.plan === "free"
+                ? "Sin costo · funciones del plan Starter"
+                : `$${plan.price_usd}/mes`
             }
-            border={false}
+            border={profile.plan !== "free"}
             right={
               profile.plan === "free" ? (
                 <Link href="/upgrade" className="mn-btn-primary" style={{ fontSize: 13, padding: "8px 16px", textDecoration: "none" }}>
-                  {isTrialActive ? "Ver planes" : "Mejorar"} <ArrowRight size={13} />
+                  Mejorar <ArrowRight size={13} />
                 </Link>
               ) : null
             }
           />
-          {isTrialActive && trialDays <= 2 && (
-            <p style={{ fontSize: 12, color: "#92400E", lineHeight: 1.6, marginTop: 8, padding: "8px 12px", background: "#FEF3C7", borderRadius: 8 }}>
-              Tu prueba termina pronto. Al finalizar, conservás todo tu contenido y accedés a las funciones del plan Starter.
-            </p>
-          )}
-          {!isTrialActive && profile.plan === "free" && (
-            <p style={{ fontSize: 12, color: "var(--mn-ink-3)", lineHeight: 1.6, marginTop: 4 }}>
-              Tu información y materias están guardadas. Actualizá para recuperar el acceso completo.
-            </p>
-          )}
           {profile.plan !== "free" && (
-            <p style={{ fontSize: 12, color: "var(--mn-ink-3)", lineHeight: 1.6 }}>
-              Para cancelar o gestionar la suscripción, hazlo desde tu cuenta de Hotmart.
-            </p>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 14 }}>
+              <p style={{ fontSize: 12, color: "var(--mn-ink-3)", lineHeight: 1.6 }}>
+                Gestiona o cancela tu suscripción en Hotmart.
+              </p>
+              <a
+                href="https://app.hotmart.com/products"
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{ fontSize: 12, fontWeight: 600, color: "var(--mn-green)", textDecoration: "none", whiteSpace: "nowrap", marginLeft: 16 }}
+              >
+                Ir a Hotmart →
+              </a>
+            </div>
           )}
         </div>
       </Section>

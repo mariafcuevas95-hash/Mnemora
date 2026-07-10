@@ -26,7 +26,7 @@ export default function TerminosPage() {
           },
           {
             title: "2. Descripción del servicio",
-            body: "Mnemora es una plataforma de estudio asistida por inteligencia artificial. Ofrece funciones como tutor conversacional, generación de flashcards, planificación académica y análisis de progreso. El servicio se brinda según el plan contratado (Free, Pro o Premium).",
+            body: "Mnemora es una plataforma de estudio asistida por inteligencia artificial. Ofrece funciones como tutor conversacional, generación de flashcards, planificación académica y análisis de progreso. El servicio se brinda según el plan contratado (Starter, Pro o Premium).",
           },
           {
             title: "3. Uso aceptable",

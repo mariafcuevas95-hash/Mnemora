@@ -501,7 +501,7 @@ function StepSyllabus({ data, update, onNext }: { data: OnboardingData; update: 
             background: "transparent", fontSize: 14, color: "#6B6259", cursor: "pointer",
           }}
         >
-          No lo tengo ahora, omitir →
+          Lo subiré desde la materia
         </button>
       </div>
 

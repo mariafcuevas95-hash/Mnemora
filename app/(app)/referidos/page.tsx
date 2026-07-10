@@ -31,8 +31,6 @@ type Data = {
   plan: string;
 };
 
-type LeaderEntry = { name: string; count: number; badge?: boolean };
-
 const STATUS: Record<string, { label: string; color: string }> = {
   registered: { label: "Registrado", color: "var(--mn-ink-3)" },
   converted:  { label: "Compró",     color: "#16A34A" },
@@ -44,20 +42,12 @@ export default function ReferidosPage() {
   const [loading, setLoading]     = useState(true);
   const [fetchError, setFetchError] = useState<string | false>(false);
   const [copied, setCopied]       = useState(false);
-  const [leaderboard, setLeaderboard] = useState<LeaderEntry[]>([]);
-
   const loadData = useCallback(async () => {
     setFetchError(false);
     const res = await fetch("/api/referrals");
     if (res.ok) {
       const json = await res.json() as Data;
       setData(json);
-      const converted = json.referrals.filter(r => r.status !== "registered");
-      const topFriends: LeaderEntry[] = converted
-        .slice(0, 3)
-        .map(r => ({ name: r.name ?? r.email.split("@")[0], count: Math.floor(Math.random() * 8 + 1) }))
-        .sort((a, b) => b.count - a.count);
-      if (topFriends.length > 0) setLeaderboard(topFriends);
     } else {
       setFetchError("error");
     }
@@ -307,28 +297,6 @@ export default function ReferidosPage() {
         <div style={{ padding: "36px 24px", textAlign: "center", background: "var(--mn-surface)", borderRadius: "var(--mn-r-xl)", border: "1px solid var(--mn-ink-4)", marginBottom: 16 }}>
           <p style={{ fontSize: 14, fontWeight: 600, color: "var(--mn-ink-1)", marginBottom: 6 }}>Aún no hay referidos</p>
           <p style={{ fontSize: 13, color: "var(--mn-ink-3)" }}>Comparte tu enlace y empieza a ganar crédito.</p>
-        </div>
-      )}
-
-      {/* ── Leaderboard (solo si hay datos) ── */}
-      {leaderboard.length > 0 && (
-        <div style={{ padding: "20px 24px", background: "var(--mn-surface)", borderRadius: "var(--mn-r-xl)", border: "1px solid var(--mn-ink-4)", marginBottom: 16 }}>
-          <p style={{ fontSize: 11, fontWeight: 600, color: "var(--mn-ink-3)", textTransform: "uppercase", letterSpacing: "0.07em", marginBottom: 14 }}>
-            Top entre tus amigos
-          </p>
-          <div style={{ display: "flex", flexDirection: "column", gap: 0 }}>
-            {leaderboard.map((entry, i) => {
-              const medals = ["🥇", "🥈", "🥉"];
-              const isLast = i === leaderboard.length - 1;
-              return (
-                <div key={i} style={{ display: "flex", alignItems: "center", gap: 12, paddingTop: i > 0 ? 10 : 0, paddingBottom: isLast ? 0 : 10, borderBottom: isLast ? "none" : "1px solid var(--mn-ink-4)" }}>
-                  <span style={{ fontSize: 16, flexShrink: 0 }}>{medals[i] ?? "🎖️"}</span>
-                  <p style={{ flex: 1, fontSize: 14, fontWeight: 500, color: "var(--mn-ink-1)" }}>{entry.name}</p>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: "var(--mn-ink-1)" }}>{entry.count}</p>
-                </div>
-              );
-            })}
-          </div>
         </div>
       )}
 

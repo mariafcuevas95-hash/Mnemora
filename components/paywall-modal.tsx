@@ -1,17 +1,14 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import { X, Zap, Check, Star } from "lucide-react";
 import { PLANS } from "@/lib/plans";
 import type { Feature, PlanId } from "@/lib/plans";
 import { useRouter } from "next/navigation";
-import { createClient } from "@/lib/supabase/client";
 
 interface PaywallModalProps {
   feature: Feature;
   message: string;
   planRequired?: PlanId;
-  recovery?: boolean; // true cuando el usuario ya usó esto durante el trial
   onClose: () => void;
 }
 
@@ -43,21 +40,11 @@ const FEATURE_BENEFITS: Record<Feature, string[]> = {
   ai_class_studio:       ["Graba o sube cualquier clase y obtén resumen, apuntes, flashcards y quiz automáticamente", "La IA transcribe el audio y genera todos tus materiales de estudio en minutos"],
 };
 
-export function PaywallModal({ feature, message, planRequired = "pro", recovery: recoveryProp = false, onClose }: PaywallModalProps) {
+export function PaywallModal({ feature, message, planRequired = "pro", onClose }: PaywallModalProps) {
   const router    = useRouter();
   const plan      = PLANS[planRequired];
   const benefits  = FEATURE_BENEFITS[feature] ?? [];
   const isPremium = planRequired === "premium";
-  const [recovery, setRecovery] = useState(recoveryProp);
-
-  useEffect(() => {
-    if (recoveryProp) return;
-    createClient().from("profiles").select("plan, trial_ends_at").single().then(({ data }) => {
-      if (data?.plan === "free" && data.trial_ends_at && new Date(data.trial_ends_at) < new Date()) {
-        setRecovery(true);
-      }
-    });
-  }, [recoveryProp]);
 
   function handleUpgrade() {
     onClose();
@@ -102,13 +89,8 @@ export function PaywallModal({ feature, message, planRequired = "pro", recovery:
             : <Zap  size={22} color="#F0C040" fill="#F0C040" />}
         </div>
 
-        {recovery && (
-          <p style={{ fontSize: 11, fontWeight: 700, color: "#D97706", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 8 }}>
-            Ya tenías esto
-          </p>
-        )}
         <h2 style={{ fontSize: 22, fontWeight: 800, color: "#1A1612", marginBottom: 8 }}>
-          {recovery ? "Recupera el acceso completo" : `Función ${plan.name}`}
+          {isPremium ? "Plan Premium" : "Plan Pro"}
         </h2>
         <p style={{ fontSize: 15, color: "#6B6259", marginBottom: 24, lineHeight: 1.5 }}>
           {message}
@@ -138,7 +120,7 @@ export function PaywallModal({ feature, message, planRequired = "pro", recovery:
             cursor: "pointer", fontSize: 15, fontWeight: 700,
           }}
         >
-          {recovery ? `Recuperar ${plan.name} — desde $${plan.price_usd}/mes` : `Actualizar a ${plan.name} — desde $${plan.price_usd}/mes`}
+          Ver planes y precios
         </button>
         <button
           onClick={onClose}

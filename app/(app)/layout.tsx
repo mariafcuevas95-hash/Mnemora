@@ -311,8 +311,8 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             const planLabel =
               profile.plan === "premium" ? "Premium" :
               profile.plan === "pro"
-                ? (profile.plan_expires_at && new Date(profile.plan_expires_at) > new Date() ? "Pro · Trial activo" : "Pro")
-                : "Plan gratuito";
+                ? "Pro"
+                : "Starter";
             const isFree = !profile.plan || profile.plan === "free";
             return (
               <div style={{ padding: "10px 12px", background: "#E8F1EC", borderRadius: 10, margin: "0 4px 8px" }}>
@@ -324,7 +324,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                 </p>
                 {isFree && (
                   <Link href="/upgrade" style={{ fontSize: 11, color: "#1B3F2F", fontWeight: 600, textDecoration: "none" }}>
-                    Activar Pro →
+                    Ver planes →
                   </Link>
                 )}
               </div>
