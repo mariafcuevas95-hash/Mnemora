@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, useCallback } from "react";
+import { useState, useEffect, useRef, useCallback, type ReactElement } from "react";
 import Link from "next/link";
 
 // ─── Demo data ─────────────────────────────────────────────────────────────
@@ -539,7 +539,7 @@ export default function DemoPage() {
 
   const progressPct = (totalElapsed / TOTAL_MS) * 100;
 
-  const screens: Record<string, JSX.Element> = {
+  const screens: Record<string, ReactElement> = {
     dashboard: <ScreenDashboard elapsed={elapsed} />,
     flashcard: <ScreenFlashcard elapsed={elapsed} />,
     tutor: <ScreenTutor elapsed={elapsed} />,

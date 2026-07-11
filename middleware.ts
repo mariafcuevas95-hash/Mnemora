@@ -6,6 +6,7 @@ const PROTECTED = [
   "/onboarding", "/progreso", "/settings",
   "/examen", "/quiz", "/mapas", "/roadmap", "/replanner",
   "/analytics", "/referidos", "/biblioteca", "/admin", "/instalar",
+  "/demo-marketing",
 ];
 const AUTH_PAGES = ["/login", "/registro"];
 const PUBLIC_PAGES = ["/bienvenido"];
